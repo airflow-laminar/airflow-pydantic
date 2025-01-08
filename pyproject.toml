@@ -4,8 +4,8 @@ build-backend="hatchling.build"
 
 [project]
 name = "airflow-pydantic"
-authors = [{name = "the airflow-pydantic authors", email = "3105306+timkpaine@users.noreply.github.com"}]
-description="Pydantic models of Airflow data structures"
+authors = [{name = "the airflow-pydantic authors", email = "t.paine154@gmail.com"}]
+description = "Pydantic models of Airflow data structures"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 version = "0.1.0"
@@ -14,10 +14,10 @@ keywords = []
 
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -25,10 +25,6 @@ classifiers = [
 ]
 
 dependencies = []
-
-[project.urls]
-Repository = "https://github.com/airflow-laminar/airflow-pydantic"
-Homepage = "https://github.com/airflow-laminar/airflow-pydantic"
 
 [project.optional-dependencies]
 develop = [
@@ -44,6 +40,10 @@ develop = [
 ]
 
 [project.scripts]
+
+[project.urls]
+Repository = "https://github.com/airflow-laminar/airflow-pydantic"
+Homepage = "https://github.com/airflow-laminar/airflow-pydantic"
 
 [tool.bumpversion]
 current_version = "0.1.0"
@@ -89,33 +89,10 @@ artifacts = []
 src = "/"
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "/airflow_pydantic",
-    "LICENSE",
-    "README.md",
-]
-exclude = [
-    ".copier-answers.yml",
-    "/.github",
-    "/.gitattributes",
-    "/.gitignore",
-    "/docs",
-]
+packages = ["airflow_pydantic"]
 
 [tool.hatch.build.targets.wheel]
-include = [
-    "/airflow_pydantic",
-]
-exclude = [
-    ".copier-answers.yml",
-    "/.github",
-    "/.gitattributes",
-    "/.gitignore",
-    "/pyproject.toml",
-    "/docs",
-]
-
-[tool.hatch.build.targets.wheel.shared-data]
+packages = ["airflow_pydantic"]
 
 [tool.pytest.ini_options]
 addopts = ["-vvv", "--junitxml=junit.xml"]
