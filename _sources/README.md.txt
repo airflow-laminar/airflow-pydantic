@@ -9,4 +9,3 @@ Pydantic models of Airflow data structures
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/airflow-laminar/airflow-pydantic/main?urlpath=lab)
 
 ## Overview
-
