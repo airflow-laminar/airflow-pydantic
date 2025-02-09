@@ -1,0 +1,21 @@
+airflow_pydantic
+================
+
+.. py:module:: airflow_pydantic
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   airflow_pydantic.__version__
+
+
+Package Contents
+----------------
+
+.. py:data:: __version__
+   :value: '0.1.0'
+
+
