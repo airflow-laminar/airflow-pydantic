@@ -5,7 +5,7 @@ build-backend="hatchling.build"
 [project]
 name = "airflow-pydantic"
 authors = [{name = "the airflow-pydantic authors", email = "t.paine154@gmail.com"}]
-description = "Pydantic models of Airflow data structures"
+description = "Pydantic models for Apache Airflow"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 version = "0.1.0"
@@ -64,7 +64,6 @@ replace = 'version = "{new_version}"'
 ignore = [
     ".copier-answers.yml",
     "Makefile",
-    "setup.py",
     "docs/**/*",
 ]
 
@@ -94,6 +93,8 @@ packages = ["airflow_pydantic"]
 [tool.hatch.build.targets.wheel]
 packages = ["airflow_pydantic"]
 
+[tool.hatch.build.targets.wheel.shared-data]
+
 [tool.pytest.ini_options]
 addopts = ["-vvv", "--junitxml=junit.xml"]
 asyncio_mode = "strict"
@@ -113,9 +114,3 @@ section-order = ["future", "standard-library", "third-party", "first-party", "lo
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-
-[tool.yardang]
-title = "airflow-pydantic"
-root = "README.md"
-pages = ["docs/src/API.md"]
-use-autoapi = false

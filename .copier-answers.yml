@@ -1,10 +1,10 @@
 # Changes here will be overwritten by Copier
-_commit: 81e8acd
-_src_path: git@github.com:python-project-templates/base.git
+_commit: '9689455'
+_src_path: https://github.com/python-project-templates/base.git
 add_extension: python
 email: t.paine154@gmail.com
 github: airflow-laminar
-project_description: Pydantic models of Airflow data structures
+project_description: Pydantic models for Apache Airflow
 project_name: airflow-pydantic
 python_version_primary: '3.11'
 team: the airflow-pydantic authors
