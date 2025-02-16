@@ -82,7 +82,7 @@ exclude_also = [
     "@(abc\\.)?abstractmethod",
 ]
 ignore_errors = true
-fail_under = 50
+fail_under = 75
 
 [tool.hatch.build]
 artifacts = []
@@ -122,4 +122,4 @@ section-order = ["future", "standard-library", "third-party", "first-party", "lo
 title = "airflow-pydantic"
 root = "README.md"
 pages = ["docs/src/API.md"]
-use-autoapi = true
+use-autoapi = false
