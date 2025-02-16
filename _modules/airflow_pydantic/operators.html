@@ -219,25 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../../docs/src/_build/airflow_pydantic.RelativeDelta.html">airflow_pydantic.RelativeDelta</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_dag/index.html">test_dag</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_all/index.html">test_all</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_task/index.html">test_task</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_operators/index.html">test_operators</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/airflow_pydantic/index.html">airflow_pydantic</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of airflow_pydantic</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../autoapi/airflow_pydantic/dag/index.html">airflow_pydantic.dag</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../autoapi/airflow_pydantic/operators/index.html">airflow_pydantic.operators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../autoapi/airflow_pydantic/task/index.html">airflow_pydantic.task</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/index.html">airflow_pydantic.utils</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of airflow_pydantic.utils</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/common/index.html">airflow_pydantic.utils.common</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/importpath/index.html">airflow_pydantic.utils.importpath</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/relativedelta/index.html">airflow_pydantic.utils.relativedelta</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 
 </div>
@@ -373,8 +354,6 @@
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;If command exits with this exit code, leave the task in skipped state (default: None). If set to None, any non-zero exit code will be treated as a failure.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-<div class="viewcode-block" id="SSHOperatorArgs._validate_ssh_hook">
-<a class="viewcode-back" href="../../autoapi/airflow_pydantic/operators/index.html#airflow_pydantic.SSHOperatorArgs._validate_ssh_hook">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_ssh_hook</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
@@ -382,17 +361,13 @@
             <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.providers.ssh.hooks.ssh</span><span class="w"> </span><span class="kn">import</span> <span class="n">SSHHook</span>
 
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">SSHHook</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">v</span></div>
+        <span class="k">return</span> <span class="n">v</span>
 
-
-<div class="viewcode-block" id="SSHOperatorArgs._serialize_hook">
-<a class="viewcode-back" href="../../autoapi/airflow_pydantic/operators/index.html#airflow_pydantic.SSHOperatorArgs._serialize_hook">[docs]</a>
     <span class="nd">@field_serializer</span><span class="p">(</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh_hook</span><span class="p">:</span> <span class="nb">object</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">ssh_hook</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SSHHook(hostname=</span><span class="si">{</span><span class="n">ssh_hook</span><span class="o">.</span><span class="n">hostname</span><span class="si">}</span><span class="s2">, ssh_conn_id=</span><span class="si">{</span><span class="n">ssh_hook</span><span class="o">.</span><span class="n">ssh_conn_id</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
-
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="c1"># generic extras</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">)</span></div>

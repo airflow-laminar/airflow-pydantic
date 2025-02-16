@@ -219,25 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../../docs/src/_build/airflow_pydantic.RelativeDelta.html">airflow_pydantic.RelativeDelta</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_dag/index.html">test_dag</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_all/index.html">test_all</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_task/index.html">test_task</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../autoapi/test_operators/index.html">test_operators</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/airflow_pydantic/index.html">airflow_pydantic</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of airflow_pydantic</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../autoapi/airflow_pydantic/dag/index.html">airflow_pydantic.dag</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../autoapi/airflow_pydantic/operators/index.html">airflow_pydantic.operators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../autoapi/airflow_pydantic/task/index.html">airflow_pydantic.task</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/index.html">airflow_pydantic.utils</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of airflow_pydantic.utils</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/common/index.html">airflow_pydantic.utils.common</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/importpath/index.html">airflow_pydantic.utils.importpath</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../autoapi/airflow_pydantic/utils/relativedelta/index.html">airflow_pydantic.utils.relativedelta</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 
 </div>
@@ -287,7 +268,7 @@
 
 
 <div class="viewcode-block" id="DagArgs">
-<a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.DagArgs.html#airflow_pydantic.dag.DagArgs">[docs]</a>
+<a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DagArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="c1"># DAG args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG</span>
@@ -345,7 +326,7 @@
 
 
 <div class="viewcode-block" id="Dag">
-<a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.Dag.html#airflow_pydantic.dag.Dag">[docs]</a>
+<a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.Dag.html#airflow_pydantic.Dag">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Dag</span><span class="p">(</span><span class="n">DagArgs</span><span class="p">):</span>
     <span class="n">dag_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)&quot;</span>
