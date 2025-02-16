@@ -24,7 +24,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 
-dependencies = []
+dependencies = [
+    "apache-airflow>=2.8,<3",
+    "pydantic>=2",
+]
 
 [project.optional-dependencies]
 develop = [
@@ -113,4 +116,10 @@ known-first-party = ["airflow_pydantic"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"__init__.py" = ["F401", "F403"]
+
+[tool.yardang]
+title = "airflow-pydantic"
+root = "README.md"
+pages = ["docs/src/API.md"]
+use-autoapi = true
