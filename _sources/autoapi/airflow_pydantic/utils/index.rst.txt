@@ -1,0 +1,42 @@
+airflow_pydantic.utils
+======================
+
+.. py:module:: airflow_pydantic.utils
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/airflow_pydantic/utils/common/index
+   /autoapi/airflow_pydantic/utils/importpath/index
+   /autoapi/airflow_pydantic/utils/relativedelta/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   airflow_pydantic.utils.DatetimeArg
+   airflow_pydantic.utils.ScheduleArg
+   airflow_pydantic.utils.CallablePath
+   airflow_pydantic.utils.ImportPath
+   airflow_pydantic.utils.RelativeDelta
+
+
+Package Contents
+----------------
+
+.. py:data:: DatetimeArg
+
+.. py:data:: ScheduleArg
+
+.. py:data:: CallablePath
+
+.. py:data:: ImportPath
+
+.. py:data:: RelativeDelta
+

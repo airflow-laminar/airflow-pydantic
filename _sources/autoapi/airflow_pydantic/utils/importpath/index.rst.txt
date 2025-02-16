@@ -1,0 +1,32 @@
+airflow_pydantic.utils.importpath
+=================================
+
+.. py:module:: airflow_pydantic.utils.importpath
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   airflow_pydantic.utils.importpath.ImportPath
+   airflow_pydantic.utils.importpath.CallablePath
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   airflow_pydantic.utils.importpath.get_import_path
+
+
+Module Contents
+---------------
+
+.. py:function:: get_import_path(path: str) -> type
+
+.. py:data:: ImportPath
+
+.. py:data:: CallablePath
+

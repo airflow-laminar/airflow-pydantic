@@ -1,0 +1,38 @@
+test_operators
+==============
+
+.. py:module:: test_operators
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   test_operators.TestOperators
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   test_operators.test
+
+
+Module Contents
+---------------
+
+.. py:function:: test(**kwargs)
+
+.. py:class:: TestOperators
+
+   .. py:method:: test_python_operator_args()
+
+
+   .. py:method:: test_bash_operator_args()
+
+
+   .. py:method:: test_ssh_operator_args()
+
+

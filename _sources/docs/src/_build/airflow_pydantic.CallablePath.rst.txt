@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.CallablePath
+==============================
+
+.. currentmodule:: airflow_pydantic
+
+.. autodata:: CallablePath

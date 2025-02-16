@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.Task
+======================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: Task

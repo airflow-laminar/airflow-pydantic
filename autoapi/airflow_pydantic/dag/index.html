@@ -1,0 +1,768 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="airflow_pydantic.operators" href="../operators/index.html" /><link rel="prev" title="airflow_pydantic" href="../index.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>airflow_pydantic.dag - airflow-pydantic v0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/custom.css?v=98e9b53e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v0.1.0</code></span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../docs/src/API.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.DagArgs.html">airflow_pydantic.DagArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.Dag.html">airflow_pydantic.Dag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.TaskArgs.html">airflow_pydantic.TaskArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.Task.html">airflow_pydantic.Task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.PythonOperatorArgs.html">airflow_pydantic.PythonOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.BashOperatorArgs.html">airflow_pydantic.BashOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.SSHOperatorArgs.html">airflow_pydantic.SSHOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.DatetimeArg.html">airflow_pydantic.DatetimeArg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.ScheduleArg.html">airflow_pydantic.ScheduleArg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.CallablePath.html">airflow_pydantic.CallablePath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.ImportPath.html">airflow_pydantic.ImportPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../docs/src/_build/airflow_pydantic.RelativeDelta.html">airflow_pydantic.RelativeDelta</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../test_dag/index.html">test_dag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../test_all/index.html">test_all</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../test_task/index.html">test_task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../test_operators/index.html">test_operators</a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">airflow_pydantic</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of airflow_pydantic</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">airflow_pydantic.dag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../operators/index.html">airflow_pydantic.operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../task/index.html">airflow_pydantic.task</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/index.html">airflow_pydantic.utils</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of airflow_pydantic.utils</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/common/index.html">airflow_pydantic.utils.common</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/importpath/index.html">airflow_pydantic.utils.importpath</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/relativedelta/index.html">airflow_pydantic.utils.relativedelta</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../../_sources/autoapi/airflow_pydantic/dag/index.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-airflow_pydantic.dag">
+<span id="airflow-pydantic-dag"></span><h1>airflow_pydantic.dag<a class="headerlink" href="#module-airflow_pydantic.dag" title="Link to this heading">¶</a></h1>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#airflow_pydantic.dag.DagArgs" title="airflow_pydantic.dag.DagArgs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DagArgs</span></code></a></p></td>
+<td><p>Usage docs: <a class="reference external" href="https://docs.pydantic.dev/2.10/concepts/models/">https://docs.pydantic.dev/2.10/concepts/models/</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#airflow_pydantic.dag.Dag" title="airflow_pydantic.dag.Dag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dag</span></code></a></p></td>
+<td><p>Usage docs: <a class="reference external" href="https://docs.pydantic.dev/2.10/concepts/models/">https://docs.pydantic.dev/2.10/concepts/models/</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.dag.</span></span><span class="sig-name descname"><span class="pre">DagArgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/airflow_pydantic/dag.html#DagArgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.dag.DagArgs" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
+<p>Usage docs: <a class="reference external" href="https://docs.pydantic.dev/2.10/concepts/models/">https://docs.pydantic.dev/2.10/concepts/models/</a></p>
+<p>A base class for creating Pydantic models.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__class_vars__">
+<span class="sig-name descname"><span class="pre">__class_vars__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__class_vars__" title="Link to this definition">¶</a></dt>
+<dd><p>The names of the class variables defined on the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__private_attributes__">
+<span class="sig-name descname"><span class="pre">__private_attributes__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__private_attributes__" title="Link to this definition">¶</a></dt>
+<dd><p>Metadata about the private attributes of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__signature__">
+<span class="sig-name descname"><span class="pre">__signature__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__signature__" title="Link to this definition">¶</a></dt>
+<dd><p>The synthesized <cite>__init__</cite> [<cite>Signature</cite>][inspect.Signature] of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_complete__">
+<span class="sig-name descname"><span class="pre">__pydantic_complete__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_complete__" title="Link to this definition">¶</a></dt>
+<dd><p>Whether model building is completed, or if there are still undefined fields.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_core_schema__">
+<span class="sig-name descname"><span class="pre">__pydantic_core_schema__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_core_schema__" title="Link to this definition">¶</a></dt>
+<dd><p>The core schema of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_custom_init__">
+<span class="sig-name descname"><span class="pre">__pydantic_custom_init__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_custom_init__" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the model has a custom <cite>__init__</cite> function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_decorators__">
+<span class="sig-name descname"><span class="pre">__pydantic_decorators__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_decorators__" title="Link to this definition">¶</a></dt>
+<dd><p>Metadata containing the decorators defined on the model.
+This replaces <cite>Model.__validators__</cite> and <cite>Model.__root_validators__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_generic_metadata__">
+<span class="sig-name descname"><span class="pre">__pydantic_generic_metadata__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_generic_metadata__" title="Link to this definition">¶</a></dt>
+<dd><p>Metadata for generic models; contains data used for a similar purpose to
+__args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_parent_namespace__">
+<span class="sig-name descname"><span class="pre">__pydantic_parent_namespace__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_parent_namespace__" title="Link to this definition">¶</a></dt>
+<dd><p>Parent namespace of the model, used for automatic rebuilding of models.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_post_init__">
+<span class="sig-name descname"><span class="pre">__pydantic_post_init__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_post_init__" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the post-init method for the model, if defined.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_root_model__">
+<span class="sig-name descname"><span class="pre">__pydantic_root_model__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_root_model__" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the model is a [<cite>RootModel</cite>][pydantic.root_model.RootModel].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_serializer__">
+<span class="sig-name descname"><span class="pre">__pydantic_serializer__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_serializer__" title="Link to this definition">¶</a></dt>
+<dd><p>The <cite>pydantic-core</cite> <cite>SchemaSerializer</cite> used to dump instances of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_validator__">
+<span class="sig-name descname"><span class="pre">__pydantic_validator__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_validator__" title="Link to this definition">¶</a></dt>
+<dd><p>The <cite>pydantic-core</cite> <cite>SchemaValidator</cite> used to validate instances of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_fields__">
+<span class="sig-name descname"><span class="pre">__pydantic_fields__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_fields__" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary of field names and their corresponding [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_computed_fields__">
+<span class="sig-name descname"><span class="pre">__pydantic_computed_fields__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_computed_fields__" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding [<cite>ComputedFieldInfo</cite>][pydantic.fields.ComputedFieldInfo] objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_extra__">
+<span class="sig-name descname"><span class="pre">__pydantic_extra__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_extra__" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary containing extra values, if [<cite>extra</cite>][pydantic.config.ConfigDict.extra]
+is set to <cite>‘allow’</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_fields_set__">
+<span class="sig-name descname"><span class="pre">__pydantic_fields_set__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_fields_set__" title="Link to this definition">¶</a></dt>
+<dd><p>The names of fields explicitly set during instantiation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.__pydantic_private__">
+<span class="sig-name descname"><span class="pre">__pydantic_private__</span></span><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.__pydantic_private__" title="Link to this definition">¶</a></dt>
+<dd><p>Values of private attributes set on the model instance.</p>
+</dd></dl>
+
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.schedule">
+<span class="sig-name descname"><span class="pre">schedule</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">airflow_pydantic.utils.ScheduleArg</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.schedule" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.start_date">
+<span class="sig-name descname"><span class="pre">start_date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">airflow_pydantic.utils.DatetimeArg</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.start_date" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.end_date">
+<span class="sig-name descname"><span class="pre">end_date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">airflow_pydantic.utils.DatetimeArg</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.end_date" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.max_active_tasks">
+<span class="sig-name descname"><span class="pre">max_active_tasks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.max_active_tasks" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.max_active_runs">
+<span class="sig-name descname"><span class="pre">max_active_runs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.max_active_runs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.default_view">
+<span class="sig-name descname"><span class="pre">default_view</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'grid'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'graph'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'duration'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'gantt'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'landing_times'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.default_view" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.orientation">
+<span class="sig-name descname"><span class="pre">orientation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'LR'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'TB'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'RL'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'BT'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.orientation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.catchup">
+<span class="sig-name descname"><span class="pre">catchup</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.catchup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.is_paused_upon_creation">
+<span class="sig-name descname"><span class="pre">is_paused_upon_creation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.is_paused_upon_creation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.tags" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.dag_display_name">
+<span class="sig-name descname"><span class="pre">dag_display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.dag_display_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.DagArgs.enabled">
+<span class="sig-name descname"><span class="pre">enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.DagArgs.enabled" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.dag.</span></span><span class="sig-name descname"><span class="pre">Dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/airflow_pydantic/dag.html#Dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.dag.Dag" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#airflow_pydantic.dag.DagArgs" title="airflow_pydantic.dag.DagArgs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DagArgs</span></code></a></p>
+<p>Usage docs: <a class="reference external" href="https://docs.pydantic.dev/2.10/concepts/models/">https://docs.pydantic.dev/2.10/concepts/models/</a></p>
+<p>A base class for creating Pydantic models.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__class_vars__">
+<span class="sig-name descname"><span class="pre">__class_vars__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__class_vars__" title="Link to this definition">¶</a></dt>
+<dd><p>The names of the class variables defined on the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__private_attributes__">
+<span class="sig-name descname"><span class="pre">__private_attributes__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__private_attributes__" title="Link to this definition">¶</a></dt>
+<dd><p>Metadata about the private attributes of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__signature__">
+<span class="sig-name descname"><span class="pre">__signature__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__signature__" title="Link to this definition">¶</a></dt>
+<dd><p>The synthesized <cite>__init__</cite> [<cite>Signature</cite>][inspect.Signature] of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_complete__">
+<span class="sig-name descname"><span class="pre">__pydantic_complete__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_complete__" title="Link to this definition">¶</a></dt>
+<dd><p>Whether model building is completed, or if there are still undefined fields.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_core_schema__">
+<span class="sig-name descname"><span class="pre">__pydantic_core_schema__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_core_schema__" title="Link to this definition">¶</a></dt>
+<dd><p>The core schema of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_custom_init__">
+<span class="sig-name descname"><span class="pre">__pydantic_custom_init__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_custom_init__" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the model has a custom <cite>__init__</cite> function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_decorators__">
+<span class="sig-name descname"><span class="pre">__pydantic_decorators__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_decorators__" title="Link to this definition">¶</a></dt>
+<dd><p>Metadata containing the decorators defined on the model.
+This replaces <cite>Model.__validators__</cite> and <cite>Model.__root_validators__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_generic_metadata__">
+<span class="sig-name descname"><span class="pre">__pydantic_generic_metadata__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_generic_metadata__" title="Link to this definition">¶</a></dt>
+<dd><p>Metadata for generic models; contains data used for a similar purpose to
+__args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_parent_namespace__">
+<span class="sig-name descname"><span class="pre">__pydantic_parent_namespace__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_parent_namespace__" title="Link to this definition">¶</a></dt>
+<dd><p>Parent namespace of the model, used for automatic rebuilding of models.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_post_init__">
+<span class="sig-name descname"><span class="pre">__pydantic_post_init__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_post_init__" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the post-init method for the model, if defined.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_root_model__">
+<span class="sig-name descname"><span class="pre">__pydantic_root_model__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_root_model__" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the model is a [<cite>RootModel</cite>][pydantic.root_model.RootModel].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_serializer__">
+<span class="sig-name descname"><span class="pre">__pydantic_serializer__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_serializer__" title="Link to this definition">¶</a></dt>
+<dd><p>The <cite>pydantic-core</cite> <cite>SchemaSerializer</cite> used to dump instances of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_validator__">
+<span class="sig-name descname"><span class="pre">__pydantic_validator__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_validator__" title="Link to this definition">¶</a></dt>
+<dd><p>The <cite>pydantic-core</cite> <cite>SchemaValidator</cite> used to validate instances of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_fields__">
+<span class="sig-name descname"><span class="pre">__pydantic_fields__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_fields__" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary of field names and their corresponding [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_computed_fields__">
+<span class="sig-name descname"><span class="pre">__pydantic_computed_fields__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_computed_fields__" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary of computed field names and their corresponding [<cite>ComputedFieldInfo</cite>][pydantic.fields.ComputedFieldInfo] objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_extra__">
+<span class="sig-name descname"><span class="pre">__pydantic_extra__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_extra__" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary containing extra values, if [<cite>extra</cite>][pydantic.config.ConfigDict.extra]
+is set to <cite>‘allow’</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_fields_set__">
+<span class="sig-name descname"><span class="pre">__pydantic_fields_set__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_fields_set__" title="Link to this definition">¶</a></dt>
+<dd><p>The names of fields explicitly set during instantiation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.__pydantic_private__">
+<span class="sig-name descname"><span class="pre">__pydantic_private__</span></span><a class="headerlink" href="#airflow_pydantic.dag.Dag.__pydantic_private__" title="Link to this definition">¶</a></dt>
+<dd><p>Values of private attributes set on the model instance.</p>
+</dd></dl>
+
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.dag_id">
+<span class="sig-name descname"><span class="pre">dag_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.Dag.dag_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.default_args">
+<span class="sig-name descname"><span class="pre">default_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../task/index.html#airflow_pydantic.task.TaskArgs" title="airflow_pydantic.task.TaskArgs"><span class="pre">airflow_pydantic.task.TaskArgs</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.Dag.default_args" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="airflow_pydantic.dag.Dag.tasks">
+<span class="sig-name descname"><span class="pre">tasks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../task/index.html#airflow_pydantic.task.Task" title="airflow_pydantic.task.Task"><span class="pre">airflow_pydantic.task.Task</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.dag.Dag.tasks" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../operators/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">airflow_pydantic.operators</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">airflow_pydantic</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; the airflow-pydantic authors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">airflow_pydantic.dag</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs"><code class="docutils literal notranslate"><span class="pre">DagArgs</span></code></a><ul>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__class_vars__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__class_vars__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__private_attributes__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__private_attributes__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__signature__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__signature__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_complete__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_complete__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_core_schema__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_core_schema__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_custom_init__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_custom_init__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_decorators__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_decorators__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_generic_metadata__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_generic_metadata__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_parent_namespace__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_parent_namespace__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_post_init__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_post_init__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_root_model__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_root_model__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_serializer__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_serializer__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_validator__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_validator__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_fields__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_fields__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_computed_fields__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_computed_fields__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_extra__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_extra__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_fields_set__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_fields_set__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.__pydantic_private__"><code class="docutils literal notranslate"><span class="pre">DagArgs.__pydantic_private__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.description"><code class="docutils literal notranslate"><span class="pre">DagArgs.description</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.schedule"><code class="docutils literal notranslate"><span class="pre">DagArgs.schedule</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.start_date"><code class="docutils literal notranslate"><span class="pre">DagArgs.start_date</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.end_date"><code class="docutils literal notranslate"><span class="pre">DagArgs.end_date</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.max_active_tasks"><code class="docutils literal notranslate"><span class="pre">DagArgs.max_active_tasks</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.max_active_runs"><code class="docutils literal notranslate"><span class="pre">DagArgs.max_active_runs</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.default_view"><code class="docutils literal notranslate"><span class="pre">DagArgs.default_view</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.orientation"><code class="docutils literal notranslate"><span class="pre">DagArgs.orientation</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.catchup"><code class="docutils literal notranslate"><span class="pre">DagArgs.catchup</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.is_paused_upon_creation"><code class="docutils literal notranslate"><span class="pre">DagArgs.is_paused_upon_creation</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.tags"><code class="docutils literal notranslate"><span class="pre">DagArgs.tags</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.dag_display_name"><code class="docutils literal notranslate"><span class="pre">DagArgs.dag_display_name</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.DagArgs.enabled"><code class="docutils literal notranslate"><span class="pre">DagArgs.enabled</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag"><code class="docutils literal notranslate"><span class="pre">Dag</span></code></a><ul>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__class_vars__"><code class="docutils literal notranslate"><span class="pre">Dag.__class_vars__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__private_attributes__"><code class="docutils literal notranslate"><span class="pre">Dag.__private_attributes__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__signature__"><code class="docutils literal notranslate"><span class="pre">Dag.__signature__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_complete__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_complete__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_core_schema__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_core_schema__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_custom_init__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_custom_init__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_decorators__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_decorators__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_generic_metadata__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_generic_metadata__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_parent_namespace__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_parent_namespace__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_post_init__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_post_init__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_root_model__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_root_model__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_serializer__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_serializer__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_validator__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_validator__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_fields__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_fields__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_computed_fields__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_computed_fields__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_extra__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_extra__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_fields_set__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_fields_set__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.__pydantic_private__"><code class="docutils literal notranslate"><span class="pre">Dag.__pydantic_private__</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.dag_id"><code class="docutils literal notranslate"><span class="pre">Dag.dag_id</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.default_args"><code class="docutils literal notranslate"><span class="pre">Dag.default_args</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.dag.Dag.tasks"><code class="docutils literal notranslate"><span class="pre">Dag.tasks</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/js/custom.js?v=956e5d78"></script>
+    </body>
+</html>

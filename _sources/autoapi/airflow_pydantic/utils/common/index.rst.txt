@@ -1,0 +1,22 @@
+airflow_pydantic.utils.common
+=============================
+
+.. py:module:: airflow_pydantic.utils.common
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   airflow_pydantic.utils.common.ScheduleArg
+   airflow_pydantic.utils.common.DatetimeArg
+
+
+Module Contents
+---------------
+
+.. py:data:: ScheduleArg
+
+.. py:data:: DatetimeArg
+

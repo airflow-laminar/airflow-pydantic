@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.ScheduleArg
+=============================
+
+.. currentmodule:: airflow_pydantic
+
+.. autodata:: ScheduleArg
