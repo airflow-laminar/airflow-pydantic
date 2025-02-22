@@ -15,15 +15,17 @@ __all__ = (
 class TaskArgs(BaseModel):
     # Operator Args
     # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator
-    owner: str = Field(
-        default="airflow",
+
+    # NOTE: All fields here should be default None
+    owner: Optional[str] = Field(
+        default=None,
         description="the owner of the task. Using a meaningful description (e.g. user/person/team/role name) to clarify ownership is recommended.",
     )
     email: Optional[List[str]] = Field(default=None, description="the 'to' email address(es) used in email alerts")
-    email_on_failure: bool = Field(default=False, description="Indicates whether email alerts should be sent when a task failed")
-    email_on_retry: bool = Field(default=False, description="Indicates whether email alerts should be sent when a task is retried")
-    retries: int = Field(default=0, description="the number of retries that should be performed before failing the task")
-    retry_delay: timedelta = Field(default=timedelta(minutes=5), description="delay between retries")
+    email_on_failure: Optional[bool] = Field(default=None, description="Indicates whether email alerts should be sent when a task failed")
+    email_on_retry: Optional[bool] = Field(default=None, description="Indicates whether email alerts should be sent when a task is retried")
+    retries: Optional[int] = Field(default=None, description="the number of retries that should be performed before failing the task")
+    retry_delay: Optional[timedelta] = Field(default=None, description="delay between retries")
     # retry_exponential_backoff: bool = Field(
     #     default=False,
     #     description="allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)",
@@ -95,7 +97,7 @@ class TaskArgs(BaseModel):
     #     default=None, description="When set, a task will be able to limit the concurrent task instances per DAG run."
     # )
     # executor_config (dict | None) – Additional task-level configuration parameters that are interpreted by a specific executor. Parameters are namespaced by the name of executor.
-    do_xcom_push: bool = Field(default=False, description="if True, an XCom is pushed containing the Operator’s result")
+    do_xcom_push: Optional[bool] = Field(default=None, description="if True, an XCom is pushed containing the Operator’s result")
     # multiple_outputs (bool) – if True and do_xcom_push is True, pushes multiple XComs, one for each key in the returned dictionary result. If False and do_xcom_push is True, pushes a single XCom.
     # task_group (airflow.utils.task_group.TaskGroup | None) – The TaskGroup to which the task should belong. This is typically provided when not using a TaskGroup as a context manager.
     # doc (str | None) – Add documentation or notes to your Task objects that is visible in Task Instance details View in the Webserver

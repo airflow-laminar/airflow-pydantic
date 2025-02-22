@@ -14,6 +14,8 @@ __all__ = (
 class DagArgs(BaseModel):
     # DAG args
     # https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG
+
+    # NOTE: All fields here should be default None
     description: Optional[str] = Field(default=None, description="The description for the DAG to e.g. be shown on the webserver")
     schedule: Optional[ScheduleArg] = Field(
         default=None,
@@ -56,7 +58,7 @@ class DagArgs(BaseModel):
     )
     # jinja_environment_kwargs (dict | None) – additional configuration options to be passed to Jinja Environment for template rendering
     # render_template_as_native_obj (bool) – If True, uses a Jinja NativeEnvironment to render templates as native Python types. If False, a Jinja Environment is used to render templates as string values.
-    tags: Optional[List[str]] = Field(default_factory=list, description="List of tags to help filtering DAGs in the UI.")
+    tags: Optional[List[str]] = Field(default=None, description="List of tags to help filtering DAGs in the UI.")
     # owner_links (dict[str, str] | None) – Dict of owners and their links, that will be clickable on the DAGs view UI. Can be used as an HTTP link (for example the link to your Slack channel), or a mailto link. e.g: {“dag_owner”: “https://airflow.apache.org/”}
     # auto_register (bool) – Automatically register this DAG when it is used in a with block
     # fail_stop (bool) – Fails currently running tasks when task in DAG fails. Warning: A fail stop dag can only have tasks with the default trigger rule (“all_success”). An exception will be thrown if any task in a fail stop dag has a non default trigger rule.
