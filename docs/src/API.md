@@ -40,5 +40,4 @@
     ScheduleArg
     CallablePath
     ImportPath
-    RelativeDelta
 ```
