@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.RelativeDelta
-===============================
-
-.. currentmodule:: airflow_pydantic
-
-.. autodata:: RelativeDelta
