@@ -4,8 +4,6 @@ from typing import Annotated, Any, Literal, Tuple, Union
 from pydantic import AfterValidator
 from pytz import timezone
 
-from .relativedelta import RelativeDelta
-
 __all__ = (
     "ScheduleArg",
     "DatetimeArg",
@@ -15,9 +13,8 @@ __all__ = (
 # from airflow.models.dag import ScheduleArg
 # ScheduleArg = Union[ArgNotSet, ScheduleInterval, Timetable, BaseDatasetEventInput, Collection["Dataset"]]
 # ScheduleInterval = Union[None, str, timedelta, relativedelta]
-
 # ScheduleArg = Union[timedelta, RelativeDelta, Literal["NOTSET"], str, None]
-ScheduleArg = Union[timedelta, RelativeDelta, Literal["NOTSET"], str, None]
+ScheduleArg = Union[timedelta, Literal["NOTSET"], str, None]
 
 
 def _datetime_or_datetime_and_timezone(val: Any):
