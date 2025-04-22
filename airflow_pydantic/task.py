@@ -1,7 +1,8 @@
 from datetime import timedelta
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from ccflow import BaseModel
+from pydantic import Field
 
 from .utils import DatetimeArg, ImportPath
 
@@ -120,5 +121,5 @@ class Task(TaskArgs, extra="allow"):
     args: Optional[_TaskSpecificArgs] = Field(default=None)
 
     def instantiate(self, dag, **kwargs):
-        args = {**(self.args.model_dump(exclude_none=True) if self.args else {}), **kwargs, "task_id": self.task_id}
+        args = {**(self.args.model_dump(exclude_none=True, exclude=["type_"]) if self.args else {}), **kwargs, "task_id": self.task_id}
         return self.operator(dag=dag, **args)
