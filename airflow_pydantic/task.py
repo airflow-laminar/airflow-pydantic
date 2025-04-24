@@ -1,8 +1,7 @@
 from datetime import timedelta
 from typing import List, Optional
 
-from ccflow import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from .utils import DatetimeArg, ImportPath
 
