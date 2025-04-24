@@ -1,7 +1,6 @@
 from typing import Dict, List, Literal, Optional
 
-from ccflow import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from .task import Task, TaskArgs
 from .utils import DatetimeArg, ScheduleArg
