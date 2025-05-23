@@ -6,7 +6,7 @@ def test(**kwargs): ...
 
 class TestOperators:
     def test_python_operator_args(self):
-        PythonOperatorArgs(
+        o = PythonOperatorArgs(
             python_callable="airflow_pydantic.tests.test_operators.test",
             op_args=["test"],
             op_kwargs={"test": "test"},
@@ -14,9 +14,11 @@ class TestOperators:
             templates_exts=[".sql", ".hql"],
             show_return_value_in_logs=True,
         )
+        o.model_dump()
+        o.model_dump_json()
 
     def test_bash_operator_args(self):
-        BashOperatorArgs(
+        o = BashOperatorArgs(
             bash_command="test",
             env={"test": "test"},
             append_env=True,
@@ -26,9 +28,11 @@ class TestOperators:
             cwd="test",
             output_processor="airflow_pydantic.tests.test_operators.test",
         )
+        o.model_dump()
+        o.model_dump_json()
 
     def test_ssh_operator_args(self):
-        SSHOperatorArgs(
+        o = SSHOperatorArgs(
             ssh_conn_id="test",
             command="test",
             do_xcom_push=True,
@@ -36,3 +40,5 @@ class TestOperators:
             get_pty=True,
             env={"test": "test"},
         )
+        o.model_dump()
+        o.model_dump_json()

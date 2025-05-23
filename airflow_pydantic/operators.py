@@ -37,6 +37,12 @@ class PythonOperatorArgs(_TaskSpecificArgs):
     # generic extras
     model_config = ConfigDict(extra="allow")
 
+    @field_serializer("python_callable", when_used="json")
+    def _serialize_callable(self, python_callable: object):
+        if python_callable is not None:
+            return f"{python_callable.__module__}.{python_callable.__name__}"
+        return None
+
 
 class BashOperatorArgs(_TaskSpecificArgs):
     # bash operator args
@@ -52,6 +58,12 @@ class BashOperatorArgs(_TaskSpecificArgs):
 
     # generic extras
     model_config = ConfigDict(extra="allow")
+
+    @field_serializer("output_processor", when_used="json")
+    def _serialize_output_processor(self, output_processor: object):
+        if output_processor is not None:
+            return f"{output_processor.__module__}.{output_processor.__name__}"
+        return None
 
 
 class SSHOperatorArgs(_TaskSpecificArgs):

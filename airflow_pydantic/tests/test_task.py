@@ -23,9 +23,11 @@ class TestTask:
         )
 
     def test_task(self):
-        Task(
+        t = Task(
             task_id="a-task",
             operator="airflow.operators.empty.EmptyOperator",
             dependencies=[],
             args=None,
         )
+        t.model_dump()
+        t.model_dump_json()
