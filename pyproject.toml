@@ -8,7 +8,7 @@ authors = [{name = "the airflow-pydantic authors", email = "t.paine154@gmail.com
 description = "Pydantic models for Apache Airflow"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-version = "1.0.1post0"
+version = "1.0.1"
 requires-python = ">=3.9"
 keywords = []
 
