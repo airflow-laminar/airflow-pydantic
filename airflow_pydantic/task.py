@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 
 from .utils import DatetimeArg, ImportPath
 
@@ -122,3 +122,7 @@ class Task(TaskArgs, extra="allow"):
     def instantiate(self, dag, **kwargs):
         args = {**(self.args.model_dump(exclude_none=True, exclude=["type_"]) if self.args else {}), **kwargs, "task_id": self.task_id}
         return self.operator(dag=dag, **args)
+
+    @field_serializer("operator", when_used="json")
+    def serialize_operator(self, value) -> str:
+        return f"{value.__module__}.{value.__name__}"
