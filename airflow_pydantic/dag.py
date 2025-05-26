@@ -74,3 +74,9 @@ class Dag(DagArgs):
     )
     default_args: Optional[TaskArgs] = Field(default=None, description="Default arguments for tasks in the DAG")
     tasks: Optional[Dict[str, Task]] = Field(default_factory=list, description="List of tasks in the DAG")
+
+    def render(self) -> str:
+        """
+        Render the DAG to a string representation, suitable for use in a .py file.
+        """
+        return ""
