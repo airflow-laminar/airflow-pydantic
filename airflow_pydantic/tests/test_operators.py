@@ -11,37 +11,21 @@ def test_hook(**kwargs):
 
 
 class TestOperators:
-    def test_python_operator_args(self):
-        o = PythonOperatorArgs(
-            python_callable="airflow_pydantic.tests.test_operators.test",
-            op_args=["test"],
-            op_kwargs={"test": "test"},
-            templates_dict={"test": "test"},
-            templates_exts=[".sql", ".hql"],
-            show_return_value_in_logs=True,
-        )
+    def test_python_operator_args(self, python_operator_args):
+        o = python_operator_args
 
         # Test roundtrips
         assert o == PythonOperatorArgs.model_validate(o.model_dump())
         assert o == PythonOperatorArgs.model_validate_json(o.model_dump_json())
 
-    def test_bash_operator_args(self):
-        o = BashOperatorArgs(
-            bash_command="test",
-            env={"test": "test"},
-            append_env=True,
-            output_encoding="utf-8",
-            skip_exit_code=True,
-            skip_on_exit_code=99,
-            cwd="test",
-            output_processor="airflow_pydantic.tests.test_operators.test",
-        )
+    def test_bash_operator_args(self, bash_operator_args):
+        o = bash_operator_args
 
         # Test roundtrips
         assert o == BashOperatorArgs.model_validate(o.model_dump())
         assert o == BashOperatorArgs.model_validate_json(o.model_dump_json())
 
-    def test_ssh_operator_args(self):
+    def test_ssh_operator_args(self, ssh_operator_args):
         o = SSHOperatorArgs(
             ssh_hook=test_hook(),
             ssh_conn_id="test",
@@ -52,15 +36,7 @@ class TestOperators:
             env={"test": "test"},
         )
 
-        o = SSHOperatorArgs(
-            ssh_hook="airflow_pydantic.tests.test_operators.test_hook",
-            ssh_conn_id="test",
-            command="test",
-            do_xcom_push=True,
-            timeout=10,
-            get_pty=True,
-            env={"test": "test"},
-        )
+        o = ssh_operator_args
 
         # Test roundtrips
         assert o == SSHOperatorArgs.model_validate(o.model_dump())
