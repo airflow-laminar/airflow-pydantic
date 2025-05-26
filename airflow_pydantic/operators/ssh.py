@@ -1,63 +1,15 @@
 from types import FunctionType, MethodType
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from pydantic import Field, TypeAdapter, field_validator
 
-from .task import Task, TaskArgs
-from .utils import CallablePath, ImportPath, SSHHook, get_import_path
+from ..task import Task, TaskArgs
+from ..utils import ImportPath, SSHHook, get_import_path
 
 __all__ = (
-    "PythonOperatorArgs",
-    "PythonOperator",
-    "BashOperatorArgs",
-    "BashOperator",
     "SSHOperatorArgs",
     "SSHOperator",
 )
-
-
-class PythonOperatorArgs(TaskArgs, extra="allow"):
-    # python operator argss
-    # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator
-    python_callable: Optional[CallablePath] = Field(default=None, description="python_callable")
-    op_args: Optional[List[object]] = Field(
-        default=None, description="a list of positional arguments that will get unpacked when calling your callable"
-    )
-    op_kwargs: Optional[Dict[str, object]] = Field(
-        default=None, description="a dictionary of keyword arguments that will get unpacked in your function"
-    )
-    templates_dict: Optional[Dict[str, object]] = Field(
-        default=None,
-        description="a dictionary where the values are templates that will get templated by the Airflow engine sometime between __init__ and execute takes place and are made available in your callable’s context after the template has been applied. (templated)",
-    )
-    templates_exts: Optional[List[str]] = Field(
-        default=None, description="a list of file extensions to resolve while processing templated fields, for examples ['.sql', '.hql']"
-    )
-    show_return_value_in_logs: Optional[bool] = Field(
-        default=None,
-        description="a bool value whether to show return_value logs. Defaults to True, which allows return value log output. It can be set to False",
-    )
-
-
-class PythonOperator(Task, PythonOperatorArgs):
-    operator: ImportPath = Field(default="airflow.operators.python.PythonOperator", description="airflow operator path", validate_default=True)
-
-
-class BashOperatorArgs(TaskArgs, extra="allow"):
-    # bash operator args
-    # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
-    bash_command: Optional[str] = Field(default=None, description="bash_command")
-    env: Optional[Dict[str, str]] = Field(default=None)
-    append_env: Optional[bool] = Field(default=False)
-    output_encoding: Optional[str] = Field(default="utf-8")
-    skip_exit_code: Optional[bool] = Field(default=None)
-    skip_on_exit_code: Optional[int] = Field(default=99)
-    cwd: Optional[str] = Field(default=None)
-    output_processor: Optional[CallablePath] = None
-
-
-class BashOperator(Task, BashOperatorArgs):
-    operator: ImportPath = Field(default="airflow.operators.bash.BashOperator", description="airflow operator path", validate_default=True)
 
 
 class SSHOperatorArgs(TaskArgs, extra="allow"):
