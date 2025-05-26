@@ -5,7 +5,7 @@ from airflow_pydantic import Dag, DagArgs
 
 class TestDag:
     def test_dag_args(self):
-        DagArgs(
+        d = DagArgs(
             description="",
             schedule="* * * * *",
             start_date=datetime.today(),
@@ -21,9 +21,17 @@ class TestDag:
             enabled=True,
         )
 
+        # Test roundtrips
+        assert d == DagArgs.model_validate(d.model_dump())
+        assert d == DagArgs.model_validate_json(d.model_dump_json())
+
     def test_dag(self):
-        Dag(
+        d = Dag(
             dag_id="a-dag",
             default_args=None,
             tasks={},
         )
+
+        # Test roundtrips
+        assert d == Dag.model_validate(d.model_dump())
+        assert d == Dag.model_validate_json(d.model_dump_json())

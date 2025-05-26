@@ -1,19 +1,22 @@
 from typing import Dict, List, Optional
 
-from pydantic import ConfigDict, Field, field_serializer, field_validator
+from pydantic import Field, field_serializer, field_validator
 
-from .task import _TaskSpecificArgs
-from .utils import CallablePath
+from .task import Task, _TaskSpecificArgs
+from .utils import CallablePath, ImportPath
 
 __all__ = (
     "PythonOperatorArgs",
+    "PythonOperator",
     "BashOperatorArgs",
+    "BashOperator",
     "SSHOperatorArgs",
+    "SSHOperator",
 )
 
 
-class PythonOperatorArgs(_TaskSpecificArgs):
-    # python operator args
+class PythonOperatorArgs(_TaskSpecificArgs, extra="allow"):
+    # python operator argss
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator
     python_callable: Optional[CallablePath] = Field(default=None, description="python_callable")
     op_args: Optional[List[object]] = Field(
@@ -34,17 +37,13 @@ class PythonOperatorArgs(_TaskSpecificArgs):
         description="a bool value whether to show return_value logs. Defaults to True, which allows return value log output. It can be set to False",
     )
 
-    # generic extras
-    model_config = ConfigDict(extra="allow")
 
-    @field_serializer("python_callable", when_used="json")
-    def _serialize_callable(self, python_callable: object):
-        if python_callable is not None:
-            return f"{python_callable.__module__}.{python_callable.__name__}"
-        return None
+class PythonOperator(Task):
+    operator: ImportPath = Field(default="airflow.operators.python.PythonOperator", description="airflow operator path", validate_default=True)
+    args: PythonOperatorArgs = Field(default_factory=PythonOperatorArgs)
 
 
-class BashOperatorArgs(_TaskSpecificArgs):
+class BashOperatorArgs(_TaskSpecificArgs, extra="allow"):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
     bash_command: Optional[str] = Field(default=None, description="bash_command")
@@ -56,17 +55,13 @@ class BashOperatorArgs(_TaskSpecificArgs):
     cwd: Optional[str] = Field(default=None)
     output_processor: Optional[CallablePath] = None
 
-    # generic extras
-    model_config = ConfigDict(extra="allow")
 
-    @field_serializer("output_processor", when_used="json")
-    def _serialize_output_processor(self, output_processor: object):
-        if output_processor is not None:
-            return f"{output_processor.__module__}.{output_processor.__name__}"
-        return None
+class BashOperator(Task):
+    operator: ImportPath = Field(default="airflow.operators.bash.BashOperator", description="airflow operator path", validate_default=True)
+    args: BashOperatorArgs = Field(default_factory=BashOperatorArgs)
 
 
-class SSHOperatorArgs(_TaskSpecificArgs):
+class SSHOperatorArgs(_TaskSpecificArgs, extra="allow"):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
     ssh_hook: Optional[CallablePath] = Field(
@@ -117,5 +112,9 @@ class SSHOperatorArgs(_TaskSpecificArgs):
             return f"SSHHook(hostname={ssh_hook.hostname}, ssh_conn_id={ssh_hook.ssh_conn_id})"
         return None
 
-    # generic extras
-    model_config = ConfigDict(extra="allow")
+
+class SSHOperator(Task):
+    operator: ImportPath = Field(
+        default="airflow.providers.ssh.operators.ssh.SSHOperator", description="airflow operator path", validate_default=True
+    )
+    args: SSHOperatorArgs = Field(default_factory=SSHOperatorArgs)

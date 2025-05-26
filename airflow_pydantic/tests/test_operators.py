@@ -14,8 +14,10 @@ class TestOperators:
             templates_exts=[".sql", ".hql"],
             show_return_value_in_logs=True,
         )
-        o.model_dump()
-        o.model_dump_json()
+
+        # Test roundtrips
+        assert o == PythonOperatorArgs.model_validate(o.model_dump())
+        assert o == PythonOperatorArgs.model_validate_json(o.model_dump_json())
 
     def test_bash_operator_args(self):
         o = BashOperatorArgs(
@@ -28,8 +30,10 @@ class TestOperators:
             cwd="test",
             output_processor="airflow_pydantic.tests.test_operators.test",
         )
-        o.model_dump()
-        o.model_dump_json()
+
+        # Test roundtrips
+        assert o == BashOperatorArgs.model_validate(o.model_dump())
+        assert o == BashOperatorArgs.model_validate_json(o.model_dump_json())
 
     def test_ssh_operator_args(self):
         o = SSHOperatorArgs(
@@ -40,5 +44,7 @@ class TestOperators:
             get_pty=True,
             env={"test": "test"},
         )
-        o.model_dump()
-        o.model_dump_json()
+
+        # Test roundtrips
+        assert o == SSHOperatorArgs.model_validate(o.model_dump())
+        assert o == SSHOperatorArgs.model_validate_json(o.model_dump_json())

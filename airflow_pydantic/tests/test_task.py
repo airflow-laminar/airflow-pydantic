@@ -5,7 +5,7 @@ from airflow_pydantic import Task, TaskArgs
 
 class TestTask:
     def test_task_args(self):
-        TaskArgs(
+        t = TaskArgs(
             owner="airflow",
             email=["test@test.com"],
             email_on_failure=True,
@@ -22,6 +22,10 @@ class TestTask:
             task_display_name="test",
         )
 
+        # Test roundtrips
+        assert t == TaskArgs.model_validate(t.model_dump())
+        assert t == TaskArgs.model_validate_json(t.model_dump_json())
+
     def test_task(self):
         t = Task(
             task_id="a-task",
@@ -29,5 +33,7 @@ class TestTask:
             dependencies=[],
             args=None,
         )
-        t.model_dump()
-        t.model_dump_json()
+
+        # Test roundtrips
+        assert t == Task.model_validate(t.model_dump())
+        assert t == Task.model_validate_json(t.model_dump_json())

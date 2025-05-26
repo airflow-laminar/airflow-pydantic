@@ -1,9 +1,11 @@
+import ast
 from datetime import timedelta
-from typing import List, Optional
+from types import NoneType
+from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, field_serializer
+from pydantic import BaseModel, Field
 
-from .utils import DatetimeArg, ImportPath
+from .utils import CallablePath, DatetimeArg, ImportPath, RenderedCode, TriggerRule, serialize_path_as_string
 
 __all__ = (
     "TaskArgs",
@@ -26,11 +28,11 @@ class TaskArgs(BaseModel):
     email_on_retry: Optional[bool] = Field(default=None, description="Indicates whether email alerts should be sent when a task is retried")
     retries: Optional[int] = Field(default=None, description="the number of retries that should be performed before failing the task")
     retry_delay: Optional[timedelta] = Field(default=None, description="delay between retries")
-    # retry_exponential_backoff: bool = Field(
-    #     default=False,
-    #     description="allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)",
-    # )
-    # max_retry_delay: Optional[timedelta] = Field(default=None, description="maximum delay interval between retries")
+    retry_exponential_backoff: bool = Field(
+        default=False,
+        description="allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)",
+    )
+    max_retry_delay: Optional[timedelta] = Field(default=None, description="maximum delay interval between retries")
     start_date: Optional[DatetimeArg] = Field(
         default=None,
         description="The start_date for the task, determines the execution_date for the first task instance. The best practice is to have the start_date rounded to your DAG’s schedule_interval. Daily jobs have their start_date some day at 00:00:00, hourly jobs have their start_date at 00:00 of a specific hour. Note that Airflow simply looks at the latest execution_date and adds the schedule_interval to determine the next execution_date. It is also very important to note that different tasks’ dependencies need to line up in time. If task A depends on task B and their start_date are offset in a way that their execution_date don’t line up, A’s dependencies will never be met. If you are looking to delay a task, for example running a daily task at 2AM, look into the TimeSensor and TimeDeltaSensor. We advise against using dynamic start_date and recommend using fixed ones. Read the FAQ entry about start_date for more information.",
@@ -72,10 +74,10 @@ class TaskArgs(BaseModel):
     #     default=None,
     #     description="time by which the job is expected to succeed. Note that this represents the timedelta after the period is closed. For example if you set an SLA of 1 hour, the scheduler would send an email soon after 1:00AM on the 2016-01-02 if the 2016-01-01 instance has not succeeded yet. The scheduler pays special attention for jobs with an SLA and sends alert emails for SLA misses. SLA misses are also recorded in the database for future reference. All tasks that share the same SLA time get bundled in a single email, sent soon after that time. SLA notification are sent once and only once for each task instance.",
     # )
-    # execution_timeout: Optional[timedelta] = Field(
-    #     default=None,
-    #     description="max time allowed for the execution of this task instance, if it goes beyond it will raise and fail.",
-    # )
+    execution_timeout: Optional[timedelta] = Field(
+        default=None,
+        description="max time allowed for the execution of this task instance, if it goes beyond it will raise and fail.",
+    )
     # on_failure_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – a function or list of functions to be called when a task instance of this task fails. a context dictionary is passed as a single parameter to this function. Context contains references to related objects to the task instance and is documented under the macros section of the API.
     # on_execute_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed right before the task is executed.
     # on_retry_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed when retries occur.
@@ -83,22 +85,23 @@ class TaskArgs(BaseModel):
     # on_skipped_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed when skipped occur; this callback will be called only if AirflowSkipException get raised. Explicitly it is NOT called if a task is not started to be executed because of a preceding branching decision in the DAG or a trigger rule which causes execution to skip so that the task execution is never scheduled.
     # pre_execute (TaskPreExecuteHook | None) – a function to be called immediately before task execution, receiving a context dictionary; raising an exception will prevent the task from being executed.
     # post_execute (TaskPostExecuteHook | None) – a function to be called immediately after task execution, receiving a context dictionary and task result; raising an exception will prevent the task from succeeding.
-    # trigger_rule (str) – defines the rule by which dependencies are applied for the task to get triggered. Options are: { all_success | all_failed | all_done | all_skipped | one_success | one_done | one_failed | none_failed | none_failed_min_one_success | none_skipped | always} default is all_success. Options can be set as string or using the constants defined in the static class airflow.utils.TriggerRule
-    # trigger_rule: str = Field(
-    #     default="all_success",
-    #     description="defines the rule by which dependencies are applied for the task to get triggered. Options are: { all_success | all_failed | all_done | all_skipped | one_success | one_done | one_failed | none_failed | none_failed_min_one_success | none_skipped | always} default is all_success. Options can be set as string or using the constants defined in the static class airflow.utils.TriggerRule",
-    # )
+    trigger_rule: Optional[TriggerRule] = Field(
+        default=None, description="defines the rule by which dependencies are applied for the task to get triggered."
+    )
     # resources (dict[str, Any] | None) – A map of resource parameter names (the argument names of the Resources constructor) to their values.
     # run_as_user: Optional[str] = Field(default=None, description="unix username to impersonate while running the task")
-    # max_active_tis_per_dag: Optional[int] = Field(
-    #     default=None, description="When set, a task will be able to limit the concurrent runs across execution_dates."
-    # )
-    # max_active_tis_per_dagrun: Optional[int] = Field(
-    #     default=None, description="When set, a task will be able to limit the concurrent task instances per DAG run."
-    # )
+    max_active_tis_per_dag: Optional[int] = Field(
+        default=None, description="When set, a task will be able to limit the concurrent runs across execution_dates."
+    )
+    max_active_tis_per_dagrun: Optional[int] = Field(
+        default=None, description="When set, a task will be able to limit the concurrent task instances per DAG run."
+    )
     # executor_config (dict | None) – Additional task-level configuration parameters that are interpreted by a specific executor. Parameters are namespaced by the name of executor.
     do_xcom_push: Optional[bool] = Field(default=None, description="if True, an XCom is pushed containing the Operator’s result")
-    # multiple_outputs (bool) – if True and do_xcom_push is True, pushes multiple XComs, one for each key in the returned dictionary result. If False and do_xcom_push is True, pushes a single XCom.
+    multiple_outputs: Optional[bool] = Field(
+        default=None,
+        description="if True and do_xcom_push is True, pushes multiple XComs, one for each key in the returned dictionary result. If False and do_xcom_push is True, pushes a single XCom.",
+    )
     # task_group (airflow.utils.task_group.TaskGroup | None) – The TaskGroup to which the task should belong. This is typically provided when not using a TaskGroup as a context manager.
     # doc (str | None) – Add documentation or notes to your Task objects that is visible in Task Instance details View in the Webserver
     # doc_md (str | None) – Add documentation (in Markdown format) or notes to your Task objects that is visible in Task Instance details View in the Webserver
@@ -110,19 +113,55 @@ class TaskArgs(BaseModel):
     # allow_nested_operators (bool) – if True, when an operator is executed within another one a warning message will be logged. If False, then an exception will be raised if the operator is badly used (e.g. nested within another one). In future releases of Airflow this parameter will be removed and an exception will always be thrown when operators are nested within each other (default is True).
 
 
-class _TaskSpecificArgs(BaseModel): ...
+class _TaskSpecificArgs(BaseModel, extra="allow"): ...
 
 
 class Task(TaskArgs, extra="allow"):
     task_id: Optional[str] = Field(default=None, description="a unique, meaningful id for the task")
+
     operator: ImportPath = Field(description="airflow operator path")
-    dependencies: Optional[List[str]] = Field(default=None, description="dependencies")
     args: Optional[_TaskSpecificArgs] = Field(default=None)
 
+    dependencies: Optional[List[str]] = Field(default=None, description="dependencies")
+
     def instantiate(self, dag, **kwargs):
+        if not self.task_id:
+            raise ValueError("task_id must be set to instantiate a task")
         args = {**(self.args.model_dump(exclude_none=True, exclude=["type_"]) if self.args else {}), **kwargs, "task_id": self.task_id}
         return self.operator(dag=dag, **args)
 
-    @field_serializer("operator", when_used="json")
-    def serialize_operator(self, value) -> str:
-        return f"{value.__module__}.{value.__name__}"
+    def render(self, **kwargs: Dict[str, str]) -> RenderedCode:
+        if not self.task_id:
+            raise ValueError("task_id must be set to render a task")
+
+        # Extract the importable from the operator path
+        operator_import, operator_name = serialize_path_as_string(self.operator).rsplit(".", 1)
+        imports = [ast.unparse(ast.ImportFrom(module=operator_import, names=[ast.alias(name=operator_name)], level=0))]
+        globals_ = []
+
+        args = {**(self.args.model_dump(exclude_none=True, exclude=["type_"]) if self.args else {}), **kwargs, "task_id": self.task_id}
+        for k, v in self.args.__class__.model_fields.items():
+            if v.annotation in (ImportPath, CallablePath, Union[ImportPath, NoneType], Union[CallablePath, NoneType]) and k in args:
+                # If the field is an ImportPath or CallablePath, we need to serialize it as a string
+                # and add it to the imports
+                import_, name = serialize_path_as_string(args[k]).rsplit(".", 1)
+                imports.append(ast.unparse(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0)))
+
+                # Now swap the value in the args with the name
+                args[k] = ast.Name(id=name, ctx=ast.Load())
+
+        return (
+            imports,
+            globals_,
+            [
+                ast.unparse(
+                    ast.Expr(
+                        value=ast.Call(
+                            func=ast.Name(id=operator_name, ctx=ast.Load()),
+                            args=[],
+                            keywords=[ast.keyword(arg=k, value=ast.Constant(value=v) if not isinstance(v, ast.Name) else v) for k, v in args.items()],
+                        )
+                    )
+                )
+            ],
+        )
