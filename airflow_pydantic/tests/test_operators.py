@@ -1,13 +1,6 @@
+from conftest import test_hook
+
 from airflow_pydantic import BashOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
-
-
-def test(**kwargs): ...
-
-
-def test_hook(**kwargs):
-    from airflow.providers.ssh.hooks.ssh import SSHHook
-
-    return SSHHook(remote_host="test")
 
 
 class TestOperators:
@@ -39,7 +32,7 @@ class TestOperators:
         o = ssh_operator_args
 
         # Test roundtrips
-        assert o == SSHOperatorArgs.model_validate(o.model_dump())
+        assert o.model_dump() == SSHOperatorArgs.model_validate(o.model_dump()).model_dump()
 
         # NOTE: sshhook has no __eq__, so compare via json serialization
         assert o.model_dump_json() == SSHOperatorArgs.model_validate_json(o.model_dump_json()).model_dump_json()
