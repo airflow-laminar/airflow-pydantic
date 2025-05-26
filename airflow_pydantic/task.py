@@ -144,22 +144,20 @@ class Task(TaskArgs, extra="allow"):
                 # Now swap the value in the args with the name
                 args[k] = ast.Name(id=name, ctx=ast.Load())
 
-        inside_dag = [
-            ast.Expr(
-                value=ast.Call(
-                    func=ast.Name(id=operator_name, ctx=ast.Load()),
-                    args=[],
-                    keywords=[ast.keyword(arg=k, value=ast.Constant(value=v) if not isinstance(v, ast.Name) else v) for k, v in args.items()]
-                    + ([] if not dag_from_context else [ast.keyword(arg="dag", value=ast.Name(id="dag", ctx=ast.Load()))]),
-                )
+        inside_dag = ast.Expr(
+            value=ast.Call(
+                func=ast.Name(id=operator_name, ctx=ast.Load()),
+                args=[],
+                keywords=[ast.keyword(arg=k, value=ast.Constant(value=v) if not isinstance(v, ast.Name) else v) for k, v in args.items()]
+                + ([] if not dag_from_context else [ast.keyword(arg="dag", value=ast.Name(id="dag", ctx=ast.Load()))]),
             )
-        ]
+        )
 
         if not raw:
             # If not raw, we need to convert the imports and inside_dag to a string representation
             imports = [ast.unparse(i) for i in imports]
             globals_ = [ast.unparse(i) for i in globals_]
-            inside_dag = [ast.unparse(i) for i in inside_dag]
+            inside_dag = ast.unparse(inside_dag)
         return (
             imports,
             globals_,

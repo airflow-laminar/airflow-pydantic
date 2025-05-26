@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from pytest import fixture
 
-from airflow_pydantic import BashOperator, BashOperatorArgs, DagArgs, PythonOperator, PythonOperatorArgs, SSHOperator, SSHOperatorArgs, TaskArgs
+from airflow_pydantic import BashOperator, BashOperatorArgs, Dag, DagArgs, PythonOperator, PythonOperatorArgs, SSHOperator, SSHOperatorArgs, TaskArgs
 
 
 @fixture
@@ -103,4 +103,18 @@ def task_args():
         pool_slots=1,
         do_xcom_push=True,
         task_display_name="test",
+    )
+
+
+@fixture
+def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator):
+    return Dag(
+        dag_id="a-dag",
+        **dag_args.model_dump(),
+        default_args=task_args,
+        tasks={
+            "task1": python_operator,
+            "task2": bash_operator,
+            "task3": ssh_operator,
+        },
     )
