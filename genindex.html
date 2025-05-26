@@ -358,6 +358,8 @@
 </li>
         <li><a href="docs/src/_build/airflow_pydantic.SSHOperatorArgs.html#airflow_pydantic.SSHOperatorArgs.environment">environment (airflow_pydantic.SSHOperatorArgs attribute)</a>
 </li>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.execution_timeout">execution_timeout (airflow_pydantic.TaskArgs attribute)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -394,9 +396,17 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="docs/src/_build/airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs.max_active_runs">max_active_runs (airflow_pydantic.DagArgs attribute)</a>
 </li>
+        <li><a href="docs/src/_build/airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs.max_active_tasks">max_active_tasks (airflow_pydantic.DagArgs attribute)</a>
+</li>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.max_active_tis_per_dag">max_active_tis_per_dag (airflow_pydantic.TaskArgs attribute)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="docs/src/_build/airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs.max_active_tasks">max_active_tasks (airflow_pydantic.DagArgs attribute)</a>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.max_active_tis_per_dagrun">max_active_tis_per_dagrun (airflow_pydantic.TaskArgs attribute)</a>
+</li>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.max_retry_delay">max_retry_delay (airflow_pydantic.TaskArgs attribute)</a>
+</li>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.multiple_outputs">multiple_outputs (airflow_pydantic.TaskArgs attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -458,11 +468,19 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="docs/src/_build/airflow_pydantic.SSHOperatorArgs.html#airflow_pydantic.SSHOperatorArgs.remote_host">remote_host (airflow_pydantic.SSHOperatorArgs attribute)</a>
 </li>
+        <li><a href="docs/src/_build/airflow_pydantic.Dag.html#airflow_pydantic.Dag.render">render() (airflow_pydantic.Dag method)</a>
+
+        <ul>
+          <li><a href="docs/src/_build/airflow_pydantic.Task.html#airflow_pydantic.Task.render">(airflow_pydantic.Task method)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.retries">retries (airflow_pydantic.TaskArgs attribute)</a>
 </li>
         <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.retry_delay">retry_delay (airflow_pydantic.TaskArgs attribute)</a>
+</li>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.retry_exponential_backoff">retry_exponential_backoff (airflow_pydantic.TaskArgs attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -476,20 +494,18 @@
 </li>
         <li><a href="docs/src/_build/airflow_pydantic.ScheduleArg.html#airflow_pydantic.ScheduleArg">ScheduleArg (in module airflow_pydantic)</a>
 </li>
-        <li><a href="docs/src/_build/airflow_pydantic.Task.html#airflow_pydantic.Task.serialize_operator">serialize_operator() (airflow_pydantic.Task method)</a>
-</li>
         <li><a href="docs/src/_build/airflow_pydantic.PythonOperatorArgs.html#airflow_pydantic.PythonOperatorArgs.show_return_value_in_logs">show_return_value_in_logs (airflow_pydantic.PythonOperatorArgs attribute)</a>
 </li>
         <li><a href="docs/src/_build/airflow_pydantic.BashOperatorArgs.html#airflow_pydantic.BashOperatorArgs.skip_exit_code">skip_exit_code (airflow_pydantic.BashOperatorArgs attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="docs/src/_build/airflow_pydantic.BashOperatorArgs.html#airflow_pydantic.BashOperatorArgs.skip_on_exit_code">skip_on_exit_code (airflow_pydantic.BashOperatorArgs attribute)</a>
 
         <ul>
           <li><a href="docs/src/_build/airflow_pydantic.SSHOperatorArgs.html#airflow_pydantic.SSHOperatorArgs.skip_on_exit_code">(airflow_pydantic.SSHOperatorArgs attribute)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="docs/src/_build/airflow_pydantic.SSHOperatorArgs.html#airflow_pydantic.SSHOperatorArgs.ssh_conn_id">ssh_conn_id (airflow_pydantic.SSHOperatorArgs attribute)</a>
 </li>
         <li><a href="docs/src/_build/airflow_pydantic.SSHOperatorArgs.html#airflow_pydantic.SSHOperatorArgs.ssh_hook">ssh_hook (airflow_pydantic.SSHOperatorArgs attribute)</a>
@@ -521,6 +537,8 @@
         <li><a href="docs/src/_build/airflow_pydantic.PythonOperatorArgs.html#airflow_pydantic.PythonOperatorArgs.templates_dict">templates_dict (airflow_pydantic.PythonOperatorArgs attribute)</a>
 </li>
         <li><a href="docs/src/_build/airflow_pydantic.PythonOperatorArgs.html#airflow_pydantic.PythonOperatorArgs.templates_exts">templates_exts (airflow_pydantic.PythonOperatorArgs attribute)</a>
+</li>
+        <li><a href="docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs.trigger_rule">trigger_rule (airflow_pydantic.TaskArgs attribute)</a>
 </li>
     </ul></td>
   </tr></table>

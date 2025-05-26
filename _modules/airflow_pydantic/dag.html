@@ -333,7 +333,16 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)&quot;</span>
     <span class="p">)</span>
     <span class="n">default_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskArgs</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default arguments for tasks in the DAG&quot;</span><span class="p">)</span>
-    <span class="n">tasks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Task</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tasks in the DAG&quot;</span><span class="p">)</span></div>
+    <span class="n">tasks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Task</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tasks in the DAG&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Dag.render">
+<a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.Dag.html#airflow_pydantic.Dag.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render the DAG to a string representation, suitable for use in a .py file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+</div>
 
 </pre></div>
         </article>

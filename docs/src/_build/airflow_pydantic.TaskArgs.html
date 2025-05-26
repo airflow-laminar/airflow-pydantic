@@ -352,6 +352,26 @@
 <span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;delay between retries&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retry Delay&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;retry_exponential_backoff&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retry Exponential Backoff&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;max_retry_delay&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;maximum delay interval between retries&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Max Retry Delay&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;start_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
@@ -460,6 +480,58 @@
 <span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;the number of pool slots this task should use (&gt;= 1) Values less than 1 are not allowed&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pool Slots&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;execution_timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;max time allowed for the execution of this task instance, if it goes beyond it will raise and fail.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Execution Timeout&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;trigger_rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/TriggerRule&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;defines the rule by which dependencies are applied for the task to get triggered.&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;max_active_tis_per_dag&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;When set, a task will be able to limit the concurrent runs across execution_dates.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Max Active Tis Per Dag&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;max_active_tis_per_dagrun&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;When set, a task will be able to limit the concurrent task instances per DAG run.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Max Active Tis Per Dagrun&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;do_xcom_push&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
@@ -472,6 +544,19 @@
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;if True, an XCom is pushed containing the Operator\u2019s result&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Do Xcom Push&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;multiple_outputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;if True and do_xcom_push is True, pushes multiple XComs, one for each key in the returned dictionary result. If False and do_xcom_push is True, pushes a single XCom.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Multiple Outputs&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;task_display_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -486,6 +571,29 @@
 <span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The display name of the task which appears on the UI.&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Task Display Name&quot;</span>
 <span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;$defs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;TriggerRule&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Class with task&#39;s trigger rules.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;all_success&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;all_failed&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;all_done&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;all_done_setup_success&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;one_success&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;one_failed&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;one_done&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;none_failed&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;none_failed_or_skipped&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;none_skipped&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;dummy&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;always&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;none_failed_min_one_success&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;all_skipped&quot;</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TriggerRule&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">      </span><span class="p">}</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -499,14 +607,21 @@
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">email_on_failure</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">email_on_retry</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">end_date</span> <span class="pre">(datetime.datetime</span> <span class="pre">|</span> <span class="pre">Tuple[datetime.datetime,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">execution_timeout</span> <span class="pre">(datetime.timedelta</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_active_tis_per_dag</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_active_tis_per_dagrun</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_retry_delay</span> <span class="pre">(datetime.timedelta</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiple_outputs</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">owner</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pool</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pool_slots</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">queue</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retries</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retry_delay</span> <span class="pre">(datetime.timedelta</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retry_exponential_backoff</span> <span class="pre">(bool)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_date</span> <span class="pre">(datetime.datetime</span> <span class="pre">|</span> <span class="pre">Tuple[datetime.datetime,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">task_display_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger_rule</span> <span class="pre">(airflow.utils.trigger_rule.TriggerRule</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -547,6 +662,18 @@
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.retry_exponential_backoff">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">retry_exponential_backoff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.retry_exponential_backoff" title="Link to this definition">¶</a></dt>
+<dd><p>allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.max_retry_delay">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_retry_delay</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.max_retry_delay" title="Link to this definition">¶</a></dt>
+<dd><p>maximum delay interval between retries</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.start_date">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AfterValidator</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="pre">_datetime_or_datetime_and_timezone</span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.start_date" title="Link to this definition">¶</a></dt>
 <dd><p>The start_date for the task, determines the execution_date for the first task instance. The best practice is to have the start_date rounded to your DAG’s schedule_interval. Daily jobs have their start_date some day at 00:00:00, hourly jobs have their start_date at 00:00 of a specific hour. Note that Airflow simply looks at the latest execution_date and adds the schedule_interval to determine the next execution_date. It is also very important to note that different tasks’ dependencies need to line up in time. If task A depends on task B and their start_date are offset in a way that their execution_date don’t line up, A’s dependencies will never be met. If you are looking to delay a task, for example running a daily task at 2AM, look into the TimeSensor and TimeDeltaSensor. We advise against using dynamic start_date and recommend using fixed ones. Read the FAQ entry about start_date for more information.</p>
@@ -583,9 +710,39 @@
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.execution_timeout">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execution_timeout</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.execution_timeout" title="Link to this definition">¶</a></dt>
+<dd><p>max time allowed for the execution of this task instance, if it goes beyond it will raise and fail.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.trigger_rule">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trigger_rule</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TriggerRule</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.trigger_rule" title="Link to this definition">¶</a></dt>
+<dd><p>defines the rule by which dependencies are applied for the task to get triggered.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.max_active_tis_per_dag">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_active_tis_per_dag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.max_active_tis_per_dag" title="Link to this definition">¶</a></dt>
+<dd><p>When set, a task will be able to limit the concurrent runs across execution_dates.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.max_active_tis_per_dagrun">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_active_tis_per_dagrun</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.max_active_tis_per_dagrun" title="Link to this definition">¶</a></dt>
+<dd><p>When set, a task will be able to limit the concurrent task instances per DAG run.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.do_xcom_push">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">do_xcom_push</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.do_xcom_push" title="Link to this definition">¶</a></dt>
 <dd><p>if True, an XCom is pushed containing the Operator’s result</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.multiple_outputs">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multiple_outputs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.multiple_outputs" title="Link to this definition">¶</a></dt>
+<dd><p>if True and do_xcom_push is True, pushes multiple XComs, one for each key in the returned dictionary result. If False and do_xcom_push is True, pushes a single XCom.</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
@@ -661,13 +818,20 @@
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.email_on_retry"><code class="docutils literal notranslate"><span class="pre">TaskArgs.email_on_retry</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.retries"><code class="docutils literal notranslate"><span class="pre">TaskArgs.retries</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.retry_delay"><code class="docutils literal notranslate"><span class="pre">TaskArgs.retry_delay</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.retry_exponential_backoff"><code class="docutils literal notranslate"><span class="pre">TaskArgs.retry_exponential_backoff</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.max_retry_delay"><code class="docutils literal notranslate"><span class="pre">TaskArgs.max_retry_delay</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.start_date"><code class="docutils literal notranslate"><span class="pre">TaskArgs.start_date</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.end_date"><code class="docutils literal notranslate"><span class="pre">TaskArgs.end_date</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.depends_on_past"><code class="docutils literal notranslate"><span class="pre">TaskArgs.depends_on_past</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.queue"><code class="docutils literal notranslate"><span class="pre">TaskArgs.queue</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.pool"><code class="docutils literal notranslate"><span class="pre">TaskArgs.pool</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.pool_slots"><code class="docutils literal notranslate"><span class="pre">TaskArgs.pool_slots</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.execution_timeout"><code class="docutils literal notranslate"><span class="pre">TaskArgs.execution_timeout</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.trigger_rule"><code class="docutils literal notranslate"><span class="pre">TaskArgs.trigger_rule</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.max_active_tis_per_dag"><code class="docutils literal notranslate"><span class="pre">TaskArgs.max_active_tis_per_dag</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.max_active_tis_per_dagrun"><code class="docutils literal notranslate"><span class="pre">TaskArgs.max_active_tis_per_dagrun</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.do_xcom_push"><code class="docutils literal notranslate"><span class="pre">TaskArgs.do_xcom_push</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.TaskArgs.multiple_outputs"><code class="docutils literal notranslate"><span class="pre">TaskArgs.multiple_outputs</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.TaskArgs.task_display_name"><code class="docutils literal notranslate"><span class="pre">TaskArgs.task_display_name</span></code></a></li>
 </ul>
 </li>
