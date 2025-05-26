@@ -141,3 +141,5 @@ _template/labextension
 # Rust
 target
 
+
+docs/html

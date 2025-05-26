@@ -5,10 +5,19 @@ from pytest import fixture
 from airflow_pydantic import BashOperator, BashOperatorArgs, Dag, DagArgs, PythonOperator, PythonOperatorArgs, SSHOperator, SSHOperatorArgs, TaskArgs
 
 
+def test(**kwargs): ...
+
+
+def test_hook(**kwargs):
+    from airflow.providers.ssh.hooks.ssh import SSHHook
+
+    return SSHHook(remote_host="test", username="test")
+
+
 @fixture
 def python_operator_args():
     return PythonOperatorArgs(
-        python_callable="airflow_pydantic.tests.test_operators.test",
+        python_callable="airflow_pydantic.tests.conftest.test",
         op_args=["test"],
         op_kwargs={"test": "test"},
         templates_dict={"test": "test"},
@@ -35,7 +44,7 @@ def bash_operator_args():
         skip_exit_code=True,
         skip_on_exit_code=99,
         cwd="test",
-        output_processor="airflow_pydantic.tests.test_operators.test",
+        output_processor="airflow_pydantic.tests.conftest.test",
     )
 
 
@@ -51,6 +60,7 @@ def bash_operator(bash_operator_args):
 def ssh_operator_args():
     return SSHOperatorArgs(
         ssh_conn_id="test",
+        ssh_hook="airflow_pydantic.tests.conftest.test_hook",
         command="test",
         do_xcom_push=True,
         timeout=10,
