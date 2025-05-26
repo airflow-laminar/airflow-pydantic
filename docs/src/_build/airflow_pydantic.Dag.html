@@ -264,7 +264,7 @@
 <dl class="py class pydantic_model">
 <dt class="sig sig-object py" id="airflow_pydantic.Dag">
 <em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.</span></span><span class="sig-name descname"><span class="pre">Dag</span></span><a class="reference internal" href="../../../_modules/airflow_pydantic/dag.html#Dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.Dag" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs" title="airflow_pydantic.dag.DagArgs"><code class="xref py py-class docutils literal notranslate"><span class="pre">DagArgs</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs" title="airflow_pydantic.dag.DagArgs"><code class="xref py py-class docutils literal notranslate"><span class="pre">DagArgs</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DagRenderMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DagInstantiateMixin</span></code></p>
 <p><details  class="autodoc_pydantic_collapsable_json">
 <summary>Show JSON schema</summary><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">   </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Dag&quot;</span><span class="p">,</span>
@@ -527,6 +527,7 @@
 <span class="w">   </span><span class="p">},</span>
 <span class="w">   </span><span class="nt">&quot;$defs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;TaskArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="nt">&quot;owner&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">               </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -611,10 +612,17 @@
 <span class="w">               </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retry Delay&quot;</span>
 <span class="w">            </span><span class="p">},</span>
 <span class="w">            </span><span class="nt">&quot;retry_exponential_backoff&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                  </span><span class="p">{</span>
+<span class="w">                     </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
+<span class="w">                  </span><span class="p">},</span>
+<span class="w">                  </span><span class="p">{</span>
+<span class="w">                     </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">                  </span><span class="p">}</span>
+<span class="w">               </span><span class="p">],</span>
+<span class="w">               </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">               </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)&quot;</span><span class="p">,</span>
-<span class="w">               </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retry Exponential Backoff&quot;</span><span class="p">,</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
+<span class="w">               </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retry Exponential Backoff&quot;</span>
 <span class="w">            </span><span class="p">},</span>
 <span class="w">            </span><span class="nt">&quot;max_retry_delay&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">               </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -885,12 +893,6 @@
 <dd><p>List of tasks in the DAG</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="airflow_pydantic.Dag.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../_modules/airflow_pydantic/dag.html#Dag.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.Dag.render" title="Link to this definition">¶</a></dt>
-<dd><p>Render the DAG to a string representation, suitable for use in a .py file.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -955,7 +957,6 @@
 <li><a class="reference internal" href="#airflow_pydantic.Dag.dag_id"><code class="docutils literal notranslate"><span class="pre">Dag.dag_id</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.Dag.default_args"><code class="docutils literal notranslate"><span class="pre">Dag.default_args</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.Dag.tasks"><code class="docutils literal notranslate"><span class="pre">Dag.tasks</span></code></a></li>
-<li><a class="reference internal" href="#airflow_pydantic.Dag.render"><code class="docutils literal notranslate"><span class="pre">Dag.render()</span></code></a></li>
 </ul>
 </li>
 </ul>
