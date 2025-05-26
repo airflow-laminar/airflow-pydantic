@@ -42,6 +42,8 @@ develop = [
     "twine",
     "uv",
     "wheel",
+    # SSH Operator testing
+    "apache-airflow-providers-ssh",
 ]
 
 [project.scripts]

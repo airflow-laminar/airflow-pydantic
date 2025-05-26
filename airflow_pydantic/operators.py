@@ -1,9 +1,10 @@
+from types import FunctionType, MethodType
 from typing import Dict, List, Optional
 
-from pydantic import Field, field_serializer, field_validator
+from pydantic import Field, TypeAdapter, field_validator
 
 from .task import Task, _TaskSpecificArgs
-from .utils import CallablePath, ImportPath
+from .utils import CallablePath, ImportPath, SSHHook, get_import_path
 
 __all__ = (
     "PythonOperatorArgs",
@@ -64,7 +65,7 @@ class BashOperator(Task):
 class SSHOperatorArgs(_TaskSpecificArgs, extra="allow"):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
-    ssh_hook: Optional[CallablePath] = Field(
+    ssh_hook: Optional[SSHHook] = Field(
         default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
     )
     ssh_conn_id: Optional[str] = Field(
@@ -97,20 +98,23 @@ class SSHOperatorArgs(_TaskSpecificArgs, extra="allow"):
         description="If command exits with this exit code, leave the task in skipped state (default: None). If set to None, any non-zero exit code will be treated as a failure.",
     )
 
-    @field_validator("ssh_hook")
+    @field_validator("ssh_hook", mode="before")
     @classmethod
     def _validate_ssh_hook(cls, v):
         if v:
-            from airflow.providers.ssh.hooks.ssh import SSHHook
+            from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
 
-            assert isinstance(v, SSHHook)
+            if isinstance(v, str):
+                v = get_import_path(v)
+
+            if not isinstance(v, BaseSSHHook) and isinstance(v, (FunctionType, MethodType)):
+                v = v()
+
+            if isinstance(v, dict):
+                v = TypeAdapter(SSHHook).validate_python(v)
+
+            assert isinstance(v, BaseSSHHook)
         return v
-
-    @field_serializer("ssh_hook")
-    def _serialize_hook(self, ssh_hook: object):
-        if ssh_hook is not None:
-            return f"SSHHook(hostname={ssh_hook.hostname}, ssh_conn_id={ssh_hook.ssh_conn_id})"
-        return None
 
 
 class SSHOperator(Task):
