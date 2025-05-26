@@ -59,10 +59,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow_pydantic.tests.test_operators import test
-
-
-with DAG(dag_id='a-dag') as dag:
-    # Tasks
+with DAG('a-dag') as dag:
     task1 = PythonOperator(python_callable=test, op_args=['test'], op_kwargs={'test': 'test'}, templates_dict={'test': 'test'}, templates_exts=['.sql', '.hql'], show_return_value_in_logs=True, task_id='test_python_operator', dag=dag)
     task2 = BashOperator(bash_command='test', env={'test': 'test'}, append_env=True, output_encoding='utf-8', skip_exit_code=True, skip_on_exit_code=99, cwd='test', output_processor=test, task_id='test_bash_operator', dag=dag)
     task3 = SSHOperator(do_xcom_push=True, ssh_conn_id='test', command='test', get_pty=True, task_id='test_ssh_operator', timeout=10, env={'test': 'test'}, dag=dag)

@@ -61,10 +61,6 @@ class SSHHookType:
         )
 
     @classmethod
-    def __get_pydantic_json_schema__(cls, _source_type: Any, handler: GetCoreSchemaHandler) -> dict[str, Any]:
-        return cls.__get_pydantic_core_schema__(_source_type, handler).get_json_schema(handler)
-
-    @classmethod
     def _validate(cls, v) -> BaseSSHHook:
         return BaseSSHHook(**v)
 
