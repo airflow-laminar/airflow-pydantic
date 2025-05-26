@@ -47,10 +47,13 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='timkpaine', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', get_pty=True, task_id='test_ssh_operator', timeout=10, env={'test': 'test'})"
+            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', get_pty=True, task_id='test_ssh_operator', timeout=10, env={'test': 'test'})"
         )
 
     def test_render(self, dag):
+        dag.tasks["task1"].dependencies = []
+        dag.tasks["task2"].dependencies = ["task1"]
+        dag.tasks["task3"].dependencies = ["task1", "task2"]
         assert isinstance(dag, Dag)
         assert (
             dag.render()
@@ -64,6 +67,6 @@ from airflow_pydantic.tests.conftest import test
 with DAG('a-dag') as dag:
     task1 = PythonOperator(python_callable=test, op_args=['test'], op_kwargs={'test': 'test'}, templates_dict={'test': 'test'}, templates_exts=['.sql', '.hql'], show_return_value_in_logs=True, task_id='test_python_operator', dag=dag)
     task2 = BashOperator(bash_command='test', env={'test': 'test'}, append_env=True, output_encoding='utf-8', skip_exit_code=True, skip_on_exit_code=99, cwd='test', output_processor=test, task_id='test_bash_operator', dag=dag)
-    task3 = SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='timkpaine', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', get_pty=True, task_id='test_ssh_operator', timeout=10, env={'test': 'test'}, dag=dag)
+    task3 = SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', get_pty=True, task_id='test_ssh_operator', timeout=10, env={'test': 'test'}, dag=dag)
 """
         )

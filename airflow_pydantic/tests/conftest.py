@@ -11,7 +11,7 @@ def test(**kwargs): ...
 def test_hook(**kwargs):
     from airflow.providers.ssh.hooks.ssh import SSHHook
 
-    return SSHHook(remote_host="test")
+    return SSHHook(remote_host="test", username="test")
 
 
 @fixture
