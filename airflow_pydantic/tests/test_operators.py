@@ -4,6 +4,12 @@ from airflow_pydantic import BashOperatorArgs, PythonOperatorArgs, SSHOperatorAr
 def test(**kwargs): ...
 
 
+def test_hook(**kwargs):
+    from airflow.providers.ssh.hooks.ssh import SSHHook
+
+    return SSHHook(remote_host="test")
+
+
 class TestOperators:
     def test_python_operator_args(self):
         o = PythonOperatorArgs(
@@ -37,6 +43,17 @@ class TestOperators:
 
     def test_ssh_operator_args(self):
         o = SSHOperatorArgs(
+            ssh_hook=test_hook(),
+            ssh_conn_id="test",
+            command="test",
+            do_xcom_push=True,
+            timeout=10,
+            get_pty=True,
+            env={"test": "test"},
+        )
+
+        o = SSHOperatorArgs(
+            ssh_hook="airflow_pydantic.tests.test_operators.test_hook",
             ssh_conn_id="test",
             command="test",
             do_xcom_push=True,
@@ -47,4 +64,6 @@ class TestOperators:
 
         # Test roundtrips
         assert o == SSHOperatorArgs.model_validate(o.model_dump())
-        assert o == SSHOperatorArgs.model_validate_json(o.model_dump_json())
+
+        # NOTE: sshhook has no __eq__, so compare via json serialization
+        assert o.model_dump_json() == SSHOperatorArgs.model_validate_json(o.model_dump_json()).model_dump_json()
