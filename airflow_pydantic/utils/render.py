@@ -4,6 +4,6 @@ __all__ = ("RenderedCode",)
 
 Imports = List[str]
 Globals = List[str]
-InsideDag = List[bool]
+InsideDag = List[str]
 
 RenderedCode = Tuple[Imports, Globals, InsideDag]

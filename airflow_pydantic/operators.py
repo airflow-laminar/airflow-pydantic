@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from pydantic import Field, TypeAdapter, field_validator
 
-from .task import Task, _TaskSpecificArgs
+from .task import Task, TaskArgs
 from .utils import CallablePath, ImportPath, SSHHook, get_import_path
 
 __all__ = (
@@ -16,7 +16,7 @@ __all__ = (
 )
 
 
-class PythonOperatorArgs(_TaskSpecificArgs, extra="allow"):
+class PythonOperatorArgs(TaskArgs, extra="allow"):
     # python operator argss
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator
     python_callable: Optional[CallablePath] = Field(default=None, description="python_callable")
@@ -39,12 +39,11 @@ class PythonOperatorArgs(_TaskSpecificArgs, extra="allow"):
     )
 
 
-class PythonOperator(Task):
+class PythonOperator(Task, PythonOperatorArgs):
     operator: ImportPath = Field(default="airflow.operators.python.PythonOperator", description="airflow operator path", validate_default=True)
-    args: PythonOperatorArgs = Field(default_factory=PythonOperatorArgs)
 
 
-class BashOperatorArgs(_TaskSpecificArgs, extra="allow"):
+class BashOperatorArgs(TaskArgs, extra="allow"):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
     bash_command: Optional[str] = Field(default=None, description="bash_command")
@@ -57,12 +56,11 @@ class BashOperatorArgs(_TaskSpecificArgs, extra="allow"):
     output_processor: Optional[CallablePath] = None
 
 
-class BashOperator(Task):
+class BashOperator(Task, BashOperatorArgs):
     operator: ImportPath = Field(default="airflow.operators.bash.BashOperator", description="airflow operator path", validate_default=True)
-    args: BashOperatorArgs = Field(default_factory=BashOperatorArgs)
 
 
-class SSHOperatorArgs(_TaskSpecificArgs, extra="allow"):
+class SSHOperatorArgs(TaskArgs, extra="allow"):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
     ssh_hook: Optional[SSHHook] = Field(
@@ -117,8 +115,7 @@ class SSHOperatorArgs(_TaskSpecificArgs, extra="allow"):
         return v
 
 
-class SSHOperator(Task):
+class SSHOperator(Task, SSHOperatorArgs):
     operator: ImportPath = Field(
         default="airflow.providers.ssh.operators.ssh.SSHOperator", description="airflow operator path", validate_default=True
     )
-    args: SSHOperatorArgs = Field(default_factory=SSHOperatorArgs)

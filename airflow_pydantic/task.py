@@ -10,11 +10,10 @@ from .utils import CallablePath, DatetimeArg, ImportPath, RenderedCode, TriggerR
 __all__ = (
     "TaskArgs",
     "Task",
-    "_TaskSpecificArgs",
 )
 
 
-class TaskArgs(BaseModel):
+class TaskArgs(BaseModel, extra="allow"):
     # Operator Args
     # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator
 
@@ -28,8 +27,8 @@ class TaskArgs(BaseModel):
     email_on_retry: Optional[bool] = Field(default=None, description="Indicates whether email alerts should be sent when a task is retried")
     retries: Optional[int] = Field(default=None, description="the number of retries that should be performed before failing the task")
     retry_delay: Optional[timedelta] = Field(default=None, description="delay between retries")
-    retry_exponential_backoff: bool = Field(
-        default=False,
+    retry_exponential_backoff: Optional[bool] = Field(
+        default=None,
         description="allow progressively longer waits between retries by using exponential backoff algorithm on retry delay (delay will be converted into seconds)",
     )
     max_retry_delay: Optional[timedelta] = Field(default=None, description="maximum delay interval between retries")
@@ -113,55 +112,56 @@ class TaskArgs(BaseModel):
     # allow_nested_operators (bool) – if True, when an operator is executed within another one a warning message will be logged. If False, then an exception will be raised if the operator is badly used (e.g. nested within another one). In future releases of Airflow this parameter will be removed and an exception will always be thrown when operators are nested within each other (default is True).
 
 
-class _TaskSpecificArgs(BaseModel, extra="allow"): ...
-
-
 class Task(TaskArgs, extra="allow"):
     task_id: Optional[str] = Field(default=None, description="a unique, meaningful id for the task")
 
     operator: ImportPath = Field(description="airflow operator path")
-    args: Optional[_TaskSpecificArgs] = Field(default=None)
-
     dependencies: Optional[List[str]] = Field(default=None, description="dependencies")
 
     def instantiate(self, dag, **kwargs):
         if not self.task_id:
             raise ValueError("task_id must be set to instantiate a task")
-        args = {**(self.args.model_dump(exclude_none=True, exclude=["type_"]) if self.args else {}), **kwargs, "task_id": self.task_id}
+        args = {**self.model_dump(exclude_none=True, exclude=["type_", "operator", "dependencies"]) ** kwargs}
         return self.operator(dag=dag, **args)
 
-    def render(self, **kwargs: Dict[str, str]) -> RenderedCode:
+    def render(self, raw: bool = False, dag_from_context: bool = False, **kwargs: Dict[str, str]) -> RenderedCode:
         if not self.task_id:
             raise ValueError("task_id must be set to render a task")
 
         # Extract the importable from the operator path
         operator_import, operator_name = serialize_path_as_string(self.operator).rsplit(".", 1)
-        imports = [ast.unparse(ast.ImportFrom(module=operator_import, names=[ast.alias(name=operator_name)], level=0))]
+        imports = [ast.ImportFrom(module=operator_import, names=[ast.alias(name=operator_name)], level=0)]
         globals_ = []
 
-        args = {**(self.args.model_dump(exclude_none=True, exclude=["type_"]) if self.args else {}), **kwargs, "task_id": self.task_id}
-        for k, v in self.args.__class__.model_fields.items():
+        args = {**self.model_dump(exclude_none=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
+        for k, v in self.__class__.model_fields.items():
             if v.annotation in (ImportPath, CallablePath, Union[ImportPath, NoneType], Union[CallablePath, NoneType]) and k in args:
                 # If the field is an ImportPath or CallablePath, we need to serialize it as a string
                 # and add it to the imports
                 import_, name = serialize_path_as_string(args[k]).rsplit(".", 1)
-                imports.append(ast.unparse(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0)))
+                imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))
 
                 # Now swap the value in the args with the name
                 args[k] = ast.Name(id=name, ctx=ast.Load())
 
+        inside_dag = [
+            ast.Expr(
+                value=ast.Call(
+                    func=ast.Name(id=operator_name, ctx=ast.Load()),
+                    args=[],
+                    keywords=[ast.keyword(arg=k, value=ast.Constant(value=v) if not isinstance(v, ast.Name) else v) for k, v in args.items()]
+                    + ([] if not dag_from_context else [ast.keyword(arg="dag", value=ast.Name(id="dag", ctx=ast.Load()))]),
+                )
+            )
+        ]
+
+        if not raw:
+            # If not raw, we need to convert the imports and inside_dag to a string representation
+            imports = [ast.unparse(i) for i in imports]
+            globals_ = [ast.unparse(i) for i in globals_]
+            inside_dag = [ast.unparse(i) for i in inside_dag]
         return (
             imports,
             globals_,
-            [
-                ast.unparse(
-                    ast.Expr(
-                        value=ast.Call(
-                            func=ast.Name(id=operator_name, ctx=ast.Load()),
-                            args=[],
-                            keywords=[ast.keyword(arg=k, value=ast.Constant(value=v) if not isinstance(v, ast.Name) else v) for k, v in args.items()],
-                        )
-                    )
-                )
-            ],
+            inside_dag,
         )

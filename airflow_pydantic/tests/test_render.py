@@ -1,20 +1,6 @@
-from airflow_pydantic import PythonOperator, PythonOperatorArgs
-
-
 class TestRender:
-    def test_render_operator(self):
-        p = PythonOperator(
-            task_id="test_python_operator",
-            args=PythonOperatorArgs(
-                python_callable="airflow_pydantic.tests.test_operators.test",
-                op_args=["test"],
-                op_kwargs={"test": "test"},
-                templates_dict={"test": "test"},
-                templates_exts=[".sql", ".hql"],
-                show_return_value_in_logs=True,
-            ),
-        )
-        imports, globals_, task = p.render()
+    def test_render_operator(self, python_operator):
+        imports, globals_, task = python_operator.render()
         assert imports == [
             "from airflow.operators.python import PythonOperator",
             "from airflow_pydantic.tests.test_operators import test",
@@ -22,6 +8,38 @@ class TestRender:
         assert globals_ == []
         assert task == [
             "PythonOperator(python_callable=test, op_args=['test'], op_kwargs={'test': 'test'}, templates_dict={'test': 'test'}, templates_exts=['.sql', '.hql'], show_return_value_in_logs=True, task_id='test_python_operator')"
+        ]
+
+    def test_render_operator_dag_from_context(self, python_operator):
+        imports, globals_, task = python_operator.render(dag_from_context=True)
+        assert imports == [
+            "from airflow.operators.python import PythonOperator",
+            "from airflow_pydantic.tests.test_operators import test",
+        ]
+        assert globals_ == []
+        assert task == [
+            "PythonOperator(python_callable=test, op_args=['test'], op_kwargs={'test': 'test'}, templates_dict={'test': 'test'}, templates_exts=['.sql', '.hql'], show_return_value_in_logs=True, task_id='test_python_operator', dag=dag)"
+        ]
+
+    def test_render_operator_bash(self, bash_operator):
+        imports, globals_, task = bash_operator.render()
+        assert imports == [
+            "from airflow.operators.bash import BashOperator",
+            "from airflow_pydantic.tests.test_operators import test",
+        ]
+        assert globals_ == []
+        assert task == [
+            "BashOperator(bash_command='test', env={'test': 'test'}, append_env=True, output_encoding='utf-8', skip_exit_code=True, skip_on_exit_code=99, cwd='test', output_processor=test, task_id='test_bash_operator')",
+        ]
+
+    def test_render_operator_ssh(self, ssh_operator):
+        imports, globals_, task = ssh_operator.render()
+        assert imports == [
+            "from airflow.providers.ssh.operators.ssh import SSHOperator",
+        ]
+        assert globals_ == []
+        assert task == [
+            "SSHOperator(do_xcom_push=True, ssh_conn_id='test', command='test', get_pty=True, task_id='test_ssh_operator', timeout=10, env={'test': 'test'})",
         ]
 
     # def test_render(self):
