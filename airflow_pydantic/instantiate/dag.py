@@ -10,7 +10,8 @@ class DagInstantiateMixin:
 
         with DAG(
             dag_id=self.dag_id,
-            **self.model_dump(exclude_none=True, exclude=["type_", "tasks", "dag_id"]) ** kwargs,
+            **self.model_dump(exclude_none=True, exclude=["type_", "tasks", "dag_id"]),
+            **kwargs,
         ) as dag:
             task_instances = {}
 
