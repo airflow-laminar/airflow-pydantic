@@ -262,7 +262,11 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;PythonOperatorArgs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BranchPythonOperatorArgs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ShortCircuitOperatorArgs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;PythonOperator&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BranchPythonOperator&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ShortCircuitOperator&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -295,7 +299,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonOperatorArgs</span><span class="p">(</span><span class="n">PythonOperatorArgs</span><span class="p">):</span> <span class="o">...</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">ShortCircuitOperatorArgs</span><span class="p">(</span><span class="n">TaskArgs</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShortCircuitOperatorArgs</span><span class="p">(</span><span class="n">PythonOperatorArgs</span><span class="p">):</span>
     <span class="n">ignore_downstream_trigger_rules</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot; If set to True, all downstream tasks from this operator task will be skipped. This is the default behavior. If set to False, the direct, downstream task(s) will be skipped but the trigger_rule defined for a other downstream tasks will be respected.&quot;</span><span class="p">,</span>
