@@ -5,10 +5,10 @@ from pytest import fixture
 from airflow_pydantic import BashOperator, BashOperatorArgs, Dag, DagArgs, PythonOperator, PythonOperatorArgs, SSHOperator, SSHOperatorArgs, TaskArgs
 
 
-def test(**kwargs): ...
+def foo(**kwargs): ...
 
 
-def test_hook(**kwargs):
+def hook(**kwargs):
     from airflow.providers.ssh.hooks.ssh import SSHHook
 
     return SSHHook(remote_host="test", username="test")
@@ -17,7 +17,7 @@ def test_hook(**kwargs):
 @fixture
 def python_operator_args():
     return PythonOperatorArgs(
-        python_callable="airflow_pydantic.tests.conftest.test",
+        python_callable="airflow_pydantic.tests.conftest.foo",
         op_args=["test"],
         op_kwargs={"test": "test"},
         templates_dict={"test": "test"},
@@ -44,7 +44,7 @@ def bash_operator_args():
         skip_exit_code=True,
         skip_on_exit_code=99,
         cwd="test",
-        output_processor="airflow_pydantic.tests.conftest.test",
+        output_processor="airflow_pydantic.tests.conftest.foo",
     )
 
 
@@ -60,7 +60,7 @@ def bash_operator(bash_operator_args):
 def ssh_operator_args():
     return SSHOperatorArgs(
         ssh_conn_id="test",
-        ssh_hook="airflow_pydantic.tests.conftest.test_hook",
+        ssh_hook="airflow_pydantic.tests.conftest.hook",
         command="test",
         do_xcom_push=True,
         cmd_timeout=10,
@@ -132,7 +132,7 @@ def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator):
 
 @fixture
 def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator):
-    ssh_operator.ssh_hook = test_hook
+    ssh_operator.ssh_hook = hook
     return Dag(
         dag_id="a-dag",
         **dag_args.model_dump(),
