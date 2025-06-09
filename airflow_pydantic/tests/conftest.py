@@ -128,3 +128,18 @@ def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator):
             "task3": ssh_operator,
         },
     )
+
+
+@fixture
+def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator):
+    ssh_operator.ssh_hook = test_hook
+    return Dag(
+        dag_id="a-dag",
+        **dag_args.model_dump(),
+        default_args=task_args,
+        tasks={
+            "task1": python_operator,
+            "task2": bash_operator,
+            "task3": ssh_operator,
+        },
+    )
