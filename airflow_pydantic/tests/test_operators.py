@@ -1,6 +1,6 @@
-from conftest import test_hook
-
 from airflow_pydantic import BashOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
+
+from .conftest import hook
 
 
 class TestOperators:
@@ -20,7 +20,7 @@ class TestOperators:
 
     def test_ssh_operator_args(self, ssh_operator_args):
         o = SSHOperatorArgs(
-            ssh_hook=test_hook(),
+            ssh_hook=hook(),
             ssh_conn_id="test",
             command="test",
             do_xcom_push=True,

@@ -7,7 +7,11 @@ from ..utils import CallablePath, ImportPath
 
 __all__ = (
     "PythonOperatorArgs",
+    "BranchPythonOperatorArgs",
+    "ShortCircuitOperatorArgs",
     "PythonOperator",
+    "BranchPythonOperator",
+    "ShortCircuitOperator",
 )
 
 
@@ -37,7 +41,7 @@ class PythonOperatorArgs(TaskArgs, extra="allow"):
 class BranchPythonOperatorArgs(PythonOperatorArgs): ...
 
 
-class ShortCircuitOperatorArgs(TaskArgs, extra="allow"):
+class ShortCircuitOperatorArgs(PythonOperatorArgs):
     ignore_downstream_trigger_rules: Optional[bool] = Field(
         default=None,
         description=" If set to True, all downstream tasks from this operator task will be skipped. This is the default behavior. If set to False, the direct, downstream task(s) will be skipped but the trigger_rule defined for a other downstream tasks will be respected.",
