@@ -75,6 +75,6 @@ class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin):
         default=None, description="The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)"
     )
     default_args: Optional[TaskArgs] = Field(default=None, description="Default arguments for tasks in the DAG")
-    tasks: Optional[Dict[str, Task]] = Field(default_factory=list, description="List of tasks in the DAG")
+    tasks: Optional[Dict[str, Task]] = Field(default_factory=dict, description="List of tasks in the DAG")
 
     # TODO: Validate all task dependencies exist
