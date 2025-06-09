@@ -1,6 +1,6 @@
-from conftest import test_hook
-
 from airflow_pydantic import BashOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
+
+from .conftest import test_hook
 
 
 class TestOperators:

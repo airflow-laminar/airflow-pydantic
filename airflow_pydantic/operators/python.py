@@ -7,7 +7,11 @@ from ..utils import CallablePath, ImportPath
 
 __all__ = (
     "PythonOperatorArgs",
+    "BranchPythonOperatorArgs",
+    "ShortCircuitOperatorArgs",
     "PythonOperator",
+    "BranchPythonOperator",
+    "ShortCircuitOperator",
 )
 
 

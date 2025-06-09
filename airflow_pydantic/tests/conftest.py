@@ -63,9 +63,9 @@ def ssh_operator_args():
         ssh_hook="airflow_pydantic.tests.conftest.test_hook",
         command="test",
         do_xcom_push=True,
-        timeout=10,
+        cmd_timeout=10,
         get_pty=True,
-        env={"test": "test"},
+        environment={"test": "test"},
     )
 
 
