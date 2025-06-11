@@ -1,6 +1,7 @@
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from ccflow import BaseModel
+from pydantic import Field
 
 from .instantiate import DagInstantiateMixin
 from .render import DagRenderMixin

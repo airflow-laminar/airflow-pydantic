@@ -30,7 +30,7 @@ def python_operator_args():
 def python_operator(python_operator_args):
     return PythonOperator(
         task_id="test_python_operator",
-        **python_operator_args.model_dump(),
+        **python_operator_args.model_dump(exclude="type_"),
     )
 
 
@@ -52,7 +52,7 @@ def bash_operator_args():
 def bash_operator(bash_operator_args):
     return BashOperator(
         task_id="test_bash_operator",
-        **bash_operator_args.model_dump(),
+        **bash_operator_args.model_dump(exclude="type_"),
     )
 
 
@@ -71,10 +71,7 @@ def ssh_operator_args():
 
 @fixture
 def ssh_operator(ssh_operator_args):
-    return SSHOperator(
-        task_id="test_ssh_operator",
-        **ssh_operator_args.model_dump(),
-    )
+    return SSHOperator(task_id="test_ssh_operator", **ssh_operator_args.model_dump(exclude="type_"))
 
 
 @fixture
@@ -120,7 +117,7 @@ def task_args():
 def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator):
     return Dag(
         dag_id="a-dag",
-        **dag_args.model_dump(),
+        **dag_args.model_dump(exclude="type_"),
         default_args=task_args,
         tasks={
             "task1": python_operator,
@@ -135,7 +132,7 @@ def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_o
     ssh_operator.ssh_hook = hook
     return Dag(
         dag_id="a-dag",
-        **dag_args.model_dump(),
+        **dag_args.model_dump(exclude="type_"),
         default_args=task_args,
         tasks={
             "task1": python_operator,

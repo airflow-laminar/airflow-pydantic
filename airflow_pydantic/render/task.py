@@ -1,6 +1,6 @@
 import ast
 from types import NoneType
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 from ..utils import CallablePath, ImportPath, SSHHook, serialize_path_as_string
 from .utils import RenderedCode
@@ -20,14 +20,25 @@ class TaskRenderMixin:
 
         args = {**self.model_dump(exclude_none=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
         for k, v in self.__class__.model_fields.items():
-            if v.annotation in (ImportPath, CallablePath, Union[ImportPath, NoneType], Union[CallablePath, NoneType]) and k in args:
+            if (
+                v.annotation
+                in (
+                    ImportPath,
+                    CallablePath,
+                    Optional[ImportPath],
+                    Optional[CallablePath],
+                    Union[ImportPath, NoneType],
+                    Union[CallablePath, NoneType],
+                )
+                and k in args
+            ):
                 # If the field is an ImportPath or CallablePath, we need to serialize it as a string and add it to the imports
                 import_, name = serialize_path_as_string(args[k]).rsplit(".", 1)
                 imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))
 
                 # Now swap the value in the args with the name
                 args[k] = ast.Name(id=name, ctx=ast.Load())
-            elif v.annotation in (SSHHook, Union[SSHHook, NoneType]) and k in args:
+            elif v.annotation in (SSHHook, Optional[SSHHook], Union[SSHHook, NoneType]) and k in args:
                 # Add SSHHook to imports
                 import_, name = serialize_path_as_string(args[k]).rsplit(".", 1)
                 imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))

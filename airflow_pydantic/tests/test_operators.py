@@ -24,9 +24,9 @@ class TestOperators:
             ssh_conn_id="test",
             command="test",
             do_xcom_push=True,
-            timeout=10,
+            cmd_timeout=10,
             get_pty=True,
-            env={"test": "test"},
+            environment={"test": "test"},
         )
 
         o = ssh_operator_args

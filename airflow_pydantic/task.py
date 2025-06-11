@@ -1,7 +1,8 @@
 from datetime import timedelta
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from ccflow import BaseModel
+from pydantic import Field
 
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
@@ -13,7 +14,7 @@ __all__ = (
 )
 
 
-class TaskArgs(BaseModel, extra="allow"):
+class TaskArgs(BaseModel):
     # Operator Args
     # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator
 
@@ -112,7 +113,7 @@ class TaskArgs(BaseModel, extra="allow"):
     # allow_nested_operators (bool) – if True, when an operator is executed within another one a warning message will be logged. If False, then an exception will be raised if the operator is badly used (e.g. nested within another one). In future releases of Airflow this parameter will be removed and an exception will always be thrown when operators are nested within each other (default is True).
 
 
-class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow"):
+class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin):
     task_id: Optional[str] = Field(default=None, description="a unique, meaningful id for the task")
 
     operator: ImportPath = Field(description="airflow operator path")

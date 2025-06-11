@@ -1,10 +1,10 @@
 from types import FunctionType, MethodType
 from typing import Dict, Optional
 
-from pydantic import Field, TypeAdapter, field_validator
+from pydantic import Field, TypeAdapter, field_serializer, field_validator
 
 from ..task import Task, TaskArgs
-from ..utils import ImportPath, SSHHook, get_import_path
+from ..utils import ImportPath, SSHHook, get_import_path, serialize_path_as_string
 
 __all__ = (
     "SSHOperatorArgs",
@@ -12,7 +12,7 @@ __all__ = (
 )
 
 
-class SSHOperatorArgs(TaskArgs, extra="allow"):
+class SSHOperatorArgs(TaskArgs):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
     ssh_hook: Optional[SSHHook] = Field(
@@ -71,3 +71,7 @@ class SSHOperator(Task, SSHOperatorArgs):
     operator: ImportPath = Field(
         default="airflow.providers.ssh.operators.ssh.SSHOperator", description="airflow operator path", validate_default=True
     )
+
+    @field_serializer("ssh_hook", return_type=str, when_used="json")
+    def _serialize_ssh_hook(cls, v):
+        return serialize_path_as_string(v)

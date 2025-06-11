@@ -11,7 +11,7 @@ __all__ = (
 )
 
 
-class BashOperatorArgs(TaskArgs, extra="allow"):
+class BashOperatorArgs(TaskArgs):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
     bash_command: Optional[str] = Field(default=None, description="bash_command")

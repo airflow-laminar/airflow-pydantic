@@ -14,7 +14,6 @@ class TestTask:
             task_id="a-task",
             operator="airflow.operators.empty.EmptyOperator",
             dependencies=[],
-            args=None,
         )
 
         # Test roundtrips
