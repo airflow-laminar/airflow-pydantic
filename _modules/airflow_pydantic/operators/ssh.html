@@ -253,13 +253,19 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for airflow_pydantic.operators.ssh</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionType</span><span class="p">,</span> <span class="n">MethodType</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionType</span><span class="p">,</span> <span class="n">MethodType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">TypeAdapter</span><span class="p">,</span> <span class="n">field_validator</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..task</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskArgs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImportPath</span><span class="p">,</span> <span class="n">SSHHook</span><span class="p">,</span> <span class="n">get_import_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallablePath</span><span class="p">,</span> <span class="n">ImportPath</span><span class="p">,</span> <span class="n">SSHHook</span><span class="p">,</span> <span class="n">get_import_path</span>
+
+<span class="n">have_balancer</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;airflow_balancer&quot;</span><span class="p">):</span>
+    <span class="n">have_balancer</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow_balancer.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BalancerHostQueryConfiguration</span><span class="p">,</span> <span class="n">Host</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;SSHOperatorArgs&quot;</span><span class="p">,</span>
@@ -272,9 +278,14 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SSHOperatorArgs</span><span class="p">(</span><span class="n">TaskArgs</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">):</span>
     <span class="c1"># ssh operator args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html</span>
-    <span class="n">ssh_hook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SSHHook</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided.&quot;</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">have_balancer</span><span class="p">:</span>
+        <span class="n">ssh_hook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SSHHook</span><span class="p">,</span> <span class="n">CallablePath</span><span class="p">,</span> <span class="n">BalancerHostQueryConfiguration</span><span class="p">,</span> <span class="n">Host</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ssh_hook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SSHHook</span><span class="p">,</span> <span class="n">CallablePath</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided.&quot;</span>
+        <span class="p">)</span>
     <span class="n">ssh_conn_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ssh connection id from airflow Connections. ssh_conn_id will be ignored if ssh_hook is provided.&quot;</span>
     <span class="p">)</span>
@@ -314,12 +325,16 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">get_import_path</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BaseSSHHook</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">MethodType</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">MethodType</span><span class="p">)):</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">()</span>
+
+            <span class="c1"># if isinstance(v, BalancerHostQueryConfiguration):</span>
+            <span class="c1">#     # Locate balancer</span>
+            <span class="c1"># if isinstance(v, (Host,)):</span>
+            <span class="c1">#     v = v.hook()</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">TypeAdapter</span><span class="p">(</span><span class="n">SSHHook</span><span class="p">)</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BaseSSHHook</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span></div>
 
