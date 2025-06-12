@@ -1,10 +1,16 @@
+import importlib
 from types import FunctionType, MethodType
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from pydantic import Field, TypeAdapter, field_validator
 
 from ..task import Task, TaskArgs
-from ..utils import ImportPath, SSHHook, get_import_path
+from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
+
+have_balancer = False
+if importlib.util.find_spec("airflow_balancer"):
+    have_balancer = True
+    from airflow_balancer.config import BalancerHostQueryConfiguration, Host
 
 __all__ = (
     "SSHOperatorArgs",
@@ -15,9 +21,14 @@ __all__ = (
 class SSHOperatorArgs(TaskArgs, extra="allow"):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
-    ssh_hook: Optional[SSHHook] = Field(
-        default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
-    )
+    if have_balancer:
+        ssh_hook: Optional[Union[SSHHook, CallablePath, BalancerHostQueryConfiguration, Host]] = Field(
+            default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
+        )
+    else:
+        ssh_hook: Optional[Union[SSHHook, CallablePath]] = Field(
+            default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
+        )
     ssh_conn_id: Optional[str] = Field(
         default=None, description="ssh connection id from airflow Connections. ssh_conn_id will be ignored if ssh_hook is provided."
     )
@@ -57,12 +68,16 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
             if isinstance(v, str):
                 v = get_import_path(v)
 
-            if not isinstance(v, BaseSSHHook) and isinstance(v, (FunctionType, MethodType)):
+            if isinstance(v, (FunctionType, MethodType)):
                 v = v()
+
+            # if isinstance(v, BalancerHostQueryConfiguration):
+            #     # Locate balancer
+            # if isinstance(v, (Host,)):
+            #     v = v.hook()
 
             if isinstance(v, dict):
                 v = TypeAdapter(SSHHook).validate_python(v)
-
             assert isinstance(v, BaseSSHHook)
         return v
 

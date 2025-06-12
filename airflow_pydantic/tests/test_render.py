@@ -50,7 +50,7 @@ class TestRender:
             == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
-    def test_render(self, dag):
+    def test_render_dag(self, dag):
         assert isinstance(dag, Dag)
         assert (
             dag.render()
