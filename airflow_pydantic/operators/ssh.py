@@ -71,10 +71,13 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
             if isinstance(v, (FunctionType, MethodType)):
                 v = v()
 
-            # if isinstance(v, BalancerHostQueryConfiguration):
-            #     # Locate balancer
-            # if isinstance(v, (Host,)):
-            #     v = v.hook()
+            if have_balancer:
+                if isinstance(v, BalancerHostQueryConfiguration):
+                    if not v.kind == "select":
+                        raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
+                    v = v.execute().hook()
+                if isinstance(v, (Host,)):
+                    v = v.hook()
 
             if isinstance(v, dict):
                 v = TypeAdapter(SSHHook).validate_python(v)
