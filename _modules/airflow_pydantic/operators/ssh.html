@@ -328,10 +328,13 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">MethodType</span><span class="p">)):</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">()</span>
 
-            <span class="c1"># if isinstance(v, BalancerHostQueryConfiguration):</span>
-            <span class="c1">#     # Locate balancer</span>
-            <span class="c1"># if isinstance(v, (Host,)):</span>
-            <span class="c1">#     v = v.hook()</span>
+            <span class="k">if</span> <span class="n">have_balancer</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BalancerHostQueryConfiguration</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;select&quot;</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;BalancerHostQueryConfiguration must be of kind &#39;select&#39;&quot;</span><span class="p">)</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span><span class="o">.</span><span class="n">hook</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">Host</span><span class="p">,)):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">hook</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">TypeAdapter</span><span class="p">(</span><span class="n">SSHHook</span><span class="p">)</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
