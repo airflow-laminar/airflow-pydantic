@@ -1,8 +1,10 @@
 import ast
-from types import NoneType
-from typing import Dict, Union
+from types import FunctionType, MethodType
+from typing import Dict
 
-from ..utils import CallablePath, ImportPath, SSHHook, serialize_path_as_string
+from pkn.pydantic import serialize_path_as_string
+
+from ..utils import SSHHook
 from .utils import RenderedCode
 
 __all__ = ("TaskRenderMixin",)
@@ -19,36 +21,45 @@ class TaskRenderMixin:
         globals_ = []
 
         args = {**self.model_dump(exclude_none=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
-        for k, v in self.__class__.model_fields.items():
-            if v.annotation in (ImportPath, CallablePath, Union[ImportPath, NoneType], Union[CallablePath, NoneType]) and k in args:
-                # If the field is an ImportPath or CallablePath, we need to serialize it as a string and add it to the imports
-                import_, name = serialize_path_as_string(args[k]).rsplit(".", 1)
-                imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))
+        for k, v in args.items():
+            # Handle ssh_hook specifically
+            if k in ("ssh_hook", "python_callable", "output_processor"):
+                from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
 
-                # Now swap the value in the args with the name
-                args[k] = ast.Name(id=name, ctx=ast.Load())
-            elif v.annotation in (SSHHook, Union[SSHHook, NoneType]) and k in args:
-                # Add SSHHook to imports
-                import_, name = serialize_path_as_string(args[k]).rsplit(".", 1)
-                imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))
+                if isinstance(v, BaseSSHHook):
+                    # Add SSHHook to imports
+                    import_, name = serialize_path_as_string(v).rsplit(".", 1)
+                    imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))
 
-                # Add SSHHook builder to args
-                call = ast.Call(
-                    func=ast.Name(id=name, ctx=ast.Load()),
-                    args=[],
-                    keywords=[],
-                )
-                for arg_name in SSHHook.__metadata__[0].__annotations__:
-                    arg_value = getattr(args[k], arg_name, None)
-                    if arg_value is None:
-                        continue
-                    if isinstance(arg_value, (str, int, float, bool)):
-                        # If the value is a primitive type, we can use ast.Constant
-                        # NOTE: all types in SSHHook are primitives
-                        call.keywords.append(ast.keyword(arg=arg_name, value=ast.Constant(value=arg_value)))
+                    # Add SSHHook builder to args
+                    call = ast.Call(
+                        func=ast.Name(id=name, ctx=ast.Load()),
+                        args=[],
+                        keywords=[],
+                    )
+                    for arg_name in SSHHook.__metadata__[0].__annotations__:
+                        arg_value = getattr(v, arg_name, None)
+                        if arg_value is None:
+                            continue
+                        if isinstance(arg_value, (str, int, float, bool)):
+                            # If the value is a primitive type, we can use ast.Constant
+                            # NOTE: all types in SSHHook are primitives
+                            call.keywords.append(ast.keyword(arg=arg_name, value=ast.Constant(value=arg_value)))
+                        else:
+                            raise TypeError(f"Unsupported type for SSHHook argument '{arg_name}': {type(arg_value)}")
+                    args[k] = call
+
+                elif isinstance(v, (MethodType, FunctionType)):
+                    # If the field is an ImportPath or CallablePath, we need to serialize it as a string and add it to the imports
+                    import_, name = serialize_path_as_string(v).rsplit(".", 1)
+                    imports.append(ast.ImportFrom(module=import_, names=[ast.alias(name=name)], level=0))
+
+                    # Now swap the value in the args with the name
+                    if k in ("ssh_hook",):
+                        # For python_callable and output_processor, we need to use the name directly
+                        args[k] = ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=[], keywords=[])
                     else:
-                        raise TypeError(f"Unsupported type for SSHHook argument '{arg_name}': {type(arg_value)}")
-                args[k] = call
+                        args[k] = ast.Name(id=name, ctx=ast.Load())
 
         inside_dag = ast.Call(
             func=ast.Name(id=operator_name, ctx=ast.Load()),
