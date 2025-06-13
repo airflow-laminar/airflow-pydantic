@@ -143,3 +143,6 @@ target
 
 
 docs/html
+
+airflow_pydantic/tests/rendered
+
