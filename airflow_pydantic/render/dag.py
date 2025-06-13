@@ -46,10 +46,13 @@ class DagRenderMixin:
             else:
                 # Otherwise, we need to convert it to an AST node
                 dag_args[k] = ast.Constant(value=value)
-        dag_default_args_imports, dag_default_args_globals, dag_default_args_values = render_base_task_args(self.default_args, raw=True)
-        imports.extend(dag_default_args_imports)
-        globals_.extend(dag_default_args_globals)
-        dag_args["default_args"] = dag_default_args_values
+
+        if self.default_args:
+            dag_default_args_imports, dag_default_args_globals, dag_default_args_values = render_base_task_args(self.default_args, raw=True)
+            imports.extend(dag_default_args_imports)
+            globals_.extend(dag_default_args_globals)
+            dag_args["default_args"] = dag_default_args_values
+
         # reformat to keywords instance
         dag_args = [ast.keyword(arg=k, value=v) for k, v in dag_args.items()]
 
