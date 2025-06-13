@@ -9,9 +9,10 @@ class DagInstantiateMixin:
             raise ValueError("dag_id must be set to instantiate a DAG")
 
         # NOTE: accept dag as an argument to allow for instantiation from airflow-config
-        dag_instance = kwargs.pop(
-            "dag", DAG(dag_id=self.dag_id, **self.model_dump(exclude_none=True, exclude=["type_", "tasks", "dag_id"]), **kwargs)
-        )
+        dag_instance = kwargs.pop("dag", None)
+        if not dag_instance:
+            dag_instance = DAG(dag_id=self.dag_id, **self.model_dump(exclude_none=True, exclude=["type_", "tasks", "dag_id"]), **kwargs)
+
         with dag_instance:
             task_instances = {}
 
