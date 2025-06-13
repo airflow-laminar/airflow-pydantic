@@ -15,10 +15,15 @@ class DagInstantiateMixin:
 
         task_instances = {}
 
+        print("*" * 100)
+        print(self.tasks)
+
         # first pass, instantiate all
         for task_id, task in self.tasks.items():
             if not task_id:
                 raise ValueError("task_id must be set to instantiate a task")
+            if task_id in task_instances:
+                raise ValueError(f"Duplicate task_id found: {task_id}. Task IDs must be unique within a DAG.")
             task_instances[task_id] = task.instantiate(dag=dag_instance, **kwargs)
 
         # second pass, set dependencies
