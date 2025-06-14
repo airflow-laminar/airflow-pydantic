@@ -1,8 +1,8 @@
 import importlib
 from types import FunctionType, MethodType
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
-from pydantic import Field, TypeAdapter, field_validator
+from pydantic import Field, TypeAdapter, field_validator, model_validator
 
 from ..task import Task, TaskArgs
 from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
@@ -25,6 +25,7 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
         ssh_hook: Optional[Union[SSHHook, CallablePath, BalancerHostQueryConfiguration, Host]] = Field(
             default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
         )
+        ssh_hook_host: Optional[Host] = Field(default=None, exclude=True)
     else:
         ssh_hook: Optional[Union[SSHHook, CallablePath]] = Field(
             default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
@@ -58,6 +59,22 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
         default=None,
         description="If command exits with this exit code, leave the task in skipped state (default: None). If set to None, any non-zero exit code will be treated as a failure.",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _extract_host_from_ssh_hook(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "ssh_hook" in data:
+                ssh_hook = data["ssh_hook"]
+                if have_balancer and isinstance(ssh_hook, (BalancerHostQueryConfiguration, Host)):
+                    if isinstance(ssh_hook, BalancerHostQueryConfiguration):
+                        if not ssh_hook.kind == "select":
+                            raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
+                        data["ssh_hook"] = ssh_hook.execute()
+                        data["ssh_hook_host"] = data["ssh_hook"]
+                    else:
+                        data["ssh_hook_host"] = ssh_hook
+        return data
 
     @field_validator("ssh_hook", mode="before")
     @classmethod

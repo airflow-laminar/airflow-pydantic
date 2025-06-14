@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from airflow_balancer import BalancerConfiguration, BalancerHostQueryConfiguration, Host
+from airflow_balancer.testing import pools, variables
 from pytest import fixture
 
 from airflow_pydantic import BashOperator, BashOperatorArgs, Dag, DagArgs, PythonOperator, PythonOperatorArgs, SSHOperator, SSHOperatorArgs, TaskArgs
@@ -75,6 +77,35 @@ def ssh_operator(ssh_operator_args):
         task_id="test_ssh_operator",
         **ssh_operator_args.model_dump(),
     )
+
+
+@fixture
+def balancer():
+    with pools():
+        return BalancerConfiguration(
+            hosts=[
+                Host(
+                    name="test_host",
+                    username="test_user",
+                    password_variable="VAR",
+                    password_variable_key="password",
+                ),
+            ]
+        )
+
+
+@fixture
+def ssh_operator_balancer(ssh_operator_args, balancer):
+    with pools(), variables({"user": "test", "password": "password"}):
+        return SSHOperator(
+            task_id="test_ssh_operator",
+            **ssh_operator_args.model_dump(exclude=["ssh_hook"]),
+            ssh_hook=BalancerHostQueryConfiguration(
+                kind="select",
+                balancer=balancer,
+                name="test_host",
+            ),
+        )
 
 
 @fixture
