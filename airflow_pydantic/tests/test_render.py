@@ -50,6 +50,19 @@ class TestRender:
             == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
+    def test_render_operator_ssh_host_variable(self, ssh_operator_balancer):
+        imports, globals_, task = ssh_operator_balancer.render()
+        assert imports == [
+            "from airflow.providers.ssh.operators.ssh import SSHOperator",
+            "from airflow.providers.ssh.hooks.ssh import SSHHook",
+            "from airflow.models.variable import Variable",
+        ]
+        assert globals_ == []
+        assert (
+            task
+            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR')['password'], port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+        )
+
     def test_render_dag(self, dag):
         assert isinstance(dag, Dag)
         assert (

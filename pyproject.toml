@@ -44,6 +44,7 @@ develop = [
     "uv",
     "wheel",
     # SSH Operator testing
+    "airflow-balancer",
     "apache-airflow-providers-ssh",
 ]
 
