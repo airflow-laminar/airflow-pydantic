@@ -2,42 +2,6 @@ from airflow_pydantic import Dag
 
 
 class TestRender:
-    # def test_render_operator(self, python_operator):
-    #     imports, globals_, task = python_operator.render()
-    #     assert imports == [
-    #         "from airflow.operators.python import PythonOperator",
-    #         "from airflow_pydantic.tests.conftest import foo",
-    #     ]
-    #     assert globals_ == []
-    #     assert (
-    #         task
-    #         == "PythonOperator(python_callable=foo, op_args=['test'], op_kwargs={'test': 'test'}, templates_dict={'test': 'test'}, templates_exts=['.sql', '.hql'], show_return_value_in_logs=True, task_id='test_python_operator')"
-    #     )
-
-    # def test_render_operator_dag_from_context(self, python_operator):
-    #     imports, globals_, task = python_operator.render(dag_from_context=True)
-    #     assert imports == [
-    #         "from airflow.operators.python import PythonOperator",
-    #         "from airflow_pydantic.tests.conftest import foo",
-    #     ]
-    #     assert globals_ == []
-    #     assert (
-    #         task
-    #         == "PythonOperator(python_callable=foo, op_args=['test'], op_kwargs={'test': 'test'}, templates_dict={'test': 'test'}, templates_exts=['.sql', '.hql'], show_return_value_in_logs=True, task_id='test_python_operator', dag=dag)"
-    #     )
-
-    # def test_render_operator_bash(self, bash_operator):
-    #     imports, globals_, task = bash_operator.render()
-    #     assert imports == [
-    #         "from airflow.operators.bash import BashOperator",
-    #         "from airflow_pydantic.tests.conftest import foo",
-    #     ]
-    #     assert globals_ == []
-    #     assert (
-    #         task
-    #         == "BashOperator(bash_command='test', env={'test': 'test'}, append_env=True, output_encoding='utf-8', skip_exit_code=True, skip_on_exit_code=99, cwd='test', output_processor=foo, task_id='test_bash_operator')"
-    #     )
-
     def test_render_operator_ssh(self, ssh_operator):
         imports, globals_, task = ssh_operator.render()
         assert imports == [

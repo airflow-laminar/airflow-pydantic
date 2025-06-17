@@ -31,6 +31,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.11"]
+        with-laminar-dependencies: [true, false]
 
     steps:
     - uses: actions/checkout@v4
@@ -42,6 +43,10 @@ jobs:
     - name: Install dependencies
       run: make develop
 
+    - name: Install Laminar dependencies
+      run: uv pip install -e .[laminar]
+      if: ${{ matrix.with-laminar-dependencies }}
+
     - name: Lint
       run: make lint
 
@@ -52,29 +57,38 @@ jobs:
       run: make build
 
     - name: Test
+      run: make test
+      if: ${{ !matrix.with-laminar-dependencies }}
+
+    - name: Test
       run: make coverage
+      if: ${{ matrix.with-laminar-dependencies }}
 
     - name: Upload test results (Python)
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
         path: junit.xml
-      if: ${{ always() }}
+      if: ${{ matrix.with-laminar-dependencies }}
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         files: '**/junit.xml'
+      if: ${{ matrix.with-laminar-dependencies }}
 
     - name: Upload coverage
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+      if: ${{ matrix.with-laminar-dependencies }}
 
     - name: Make dist
       run: make dist
+      if: ${{ matrix.with-laminar-dependencies }}
 
     - uses: actions/upload-artifact@v4
       with:
         name: dist-${{matrix.os}}
         path: dist
+      if: ${{ matrix.with-laminar-dependencies }}
