@@ -1,4 +1,4 @@
-import importlib
+from importlib.util import find_spec
 from types import FunctionType, MethodType
 from typing import Any, Dict, Optional, Union
 
@@ -8,7 +8,7 @@ from ..task import Task, TaskArgs
 from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
 
 have_balancer = False
-if importlib.util.find_spec("airflow_balancer"):
+if find_spec("airflow_balancer"):
     have_balancer = True
     from airflow_balancer.config import BalancerHostQueryConfiguration, Host
 
@@ -37,7 +37,7 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
         default=None,
         description="remote host to connect (templated) Nullable. If provided, it will replace the remote_host which was defined in ssh_hook or predefined in the connection of ssh_conn_id.",
     )
-    command: Optional[str] = Field(default=None, description="command to execute on remote host. (templated)")
+    command: str = Field(default=None, description="command to execute on remote host. (templated)")
     conn_timeout: Optional[int] = Field(
         default=None,
         description="timeout (in seconds) for maintaining the connection. The default is 10 seconds. Nullable. If provided, it will replace the conn_timeout which was predefined in the connection of ssh_conn_id.",

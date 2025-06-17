@@ -1,6 +1,8 @@
 from .dag import *
-from .operators import *
 from .task import *
 from .utils import *
+
+# NOTE: last to avoid circular imports
+from .operators import *  # isort: skip
 
 __version__ = "1.2.2"
