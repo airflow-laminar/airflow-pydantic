@@ -253,7 +253,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for airflow_pydantic.operators.ssh</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_spec</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionType</span><span class="p">,</span> <span class="n">MethodType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -263,7 +263,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallablePath</span><span class="p">,</span> <span class="n">ImportPath</span><span class="p">,</span> <span class="n">SSHHook</span><span class="p">,</span> <span class="n">get_import_path</span>
 
 <span class="n">have_balancer</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;airflow_balancer&quot;</span><span class="p">):</span>
+<span class="k">if</span> <span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;airflow_balancer&quot;</span><span class="p">):</span>
     <span class="n">have_balancer</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">airflow_balancer.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BalancerHostQueryConfiguration</span><span class="p">,</span> <span class="n">Host</span>
 
@@ -294,7 +294,7 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;remote host to connect (templated) Nullable. If provided, it will replace the remote_host which was defined in ssh_hook or predefined in the connection of ssh_conn_id.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">command</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;command to execute on remote host. (templated)&quot;</span><span class="p">)</span>
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;command to execute on remote host. (templated)&quot;</span><span class="p">)</span>
     <span class="n">conn_timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;timeout (in seconds) for maintaining the connection. The default is 10 seconds. Nullable. If provided, it will replace the conn_timeout which was predefined in the connection of ssh_conn_id.&quot;</span><span class="p">,</span>
