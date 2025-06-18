@@ -59,7 +59,7 @@ class TaskRenderMixin:
         for k, v in args.items():
             import_, value = _get_parts_from_value(k, v)
             if import_:
-                imports.append(import_)
+                imports.extend(import_)
             if isinstance(value, ast.AST):
                 # If the value is already an AST node, we can use it directly
                 args[k] = value

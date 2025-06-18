@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import pytest
 from pytest import fixture
@@ -33,6 +34,14 @@ try:
     from airflow.providers.ssh.hooks.ssh import SSHHook
 
     has_ssh_hook = True
+except ImportError:
+    ...
+
+has_supervisor = False
+try:
+    from airflow_supervisor import AirflowConfiguration, ProgramConfiguration, SupervisorAirflowConfiguration, SupervisorTask
+
+    has_supervisor = True
 except ImportError:
     ...
 
@@ -183,6 +192,33 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
 
 
 @fixture
+def supervisor_cfg():
+    if not has_supervisor:
+        pytest.skip("airflow_supervisor is not installed, skipping supervisor fixtures")
+    with (
+        patch("supervisor_pydantic.config.supervisor.gettempdir") as p1,
+    ):
+        path = "/an/arbitrary/path"
+        p1.return_value = str(path)
+        cfg = SupervisorAirflowConfiguration(
+            airflow=AirflowConfiguration(port="*:9090"),
+            working_dir=path,
+            path=path,
+            program={
+                "test": ProgramConfiguration(
+                    command="bash -c 'sleep 60; exit 1'",
+                )
+            },
+        )
+        yield cfg
+
+
+@fixture
+def supervisor_operator(supervisor_cfg):
+    yield SupervisorTask(task_id="test_supervisor", cfg=supervisor_cfg)
+
+
+@fixture
 def dag_args():
     return DagArgs(
         description="",
@@ -256,5 +292,18 @@ def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_o
             "task1": python_operator,
             "task2": bash_operator,
             "task3": ssh_operator,
+        },
+    )
+
+
+@fixture
+def dag_with_supervisor(dag_args, task_args, supervisor_operator):
+    ssh_operator.ssh_hook = hook
+    return Dag(
+        dag_id="a-dag",
+        **dag_args.model_dump(),
+        default_args=task_args,
+        tasks={
+            "task": supervisor_operator,
         },
     )
