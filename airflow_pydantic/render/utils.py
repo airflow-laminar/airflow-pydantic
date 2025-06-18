@@ -35,8 +35,12 @@ def _get_parts_from_value(key, value):
                 keywords=[],
             )
             for arg_name in SSHHook.__metadata__[0].__annotations__:
+                default_value = getattr(SSHHook.__metadata__[0], arg_name).default
                 arg_value = getattr(value, arg_name, None)
                 if arg_value is None:
+                    continue
+                if arg_value == default_value:
+                    # Matches, can skip as well
                     continue
                 if isinstance(arg_value, (str, int, float, bool)):
                     # If the value is a primitive type, we can use ast.Constant
