@@ -440,6 +440,35 @@
 <span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Perform scheduler catchup (or only run latest)? Defaults to False&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Catchup&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;doc_md&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Markdown formatted documentation for the DAG. This will be rendered in the UI.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Doc Md&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">               </span><span class="p">},</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A dictionary of DAG-level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Params&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;is_paused_upon_creation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
@@ -506,12 +535,14 @@
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dag_display_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_view</span> <span class="pre">(Literal['grid',</span> <span class="pre">'graph',</span> <span class="pre">'duration',</span> <span class="pre">'gantt',</span> <span class="pre">'landing_times']</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">doc_md</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">enabled</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">end_date</span> <span class="pre">(datetime.datetime</span> <span class="pre">|</span> <span class="pre">Tuple[datetime.datetime,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_paused_upon_creation</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_active_runs</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_active_tasks</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">orientation</span> <span class="pre">(Literal['LR',</span> <span class="pre">'TB',</span> <span class="pre">'RL',</span> <span class="pre">'BT']</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">params</span> <span class="pre">(Dict[str,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schedule</span> <span class="pre">(datetime.timedelta</span> <span class="pre">|</span> <span class="pre">Literal['NOTSET']</span> <span class="pre">|</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_date</span> <span class="pre">(datetime.datetime</span> <span class="pre">|</span> <span class="pre">Tuple[datetime.datetime,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tags</span> <span class="pre">(List[str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
@@ -570,6 +601,18 @@
 <dt class="sig sig-object py" id="airflow_pydantic.DagArgs.catchup">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">catchup</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.DagArgs.catchup" title="Link to this definition">¶</a></dt>
 <dd><p>Perform scheduler catchup (or only run latest)? Defaults to False</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.DagArgs.doc_md">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">doc_md</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.DagArgs.doc_md" title="Link to this definition">¶</a></dt>
+<dd><p>Markdown formatted documentation for the DAG. This will be rendered in the UI.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.DagArgs.params">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.DagArgs.params" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary of DAG-level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
@@ -666,6 +709,8 @@
 <li><a class="reference internal" href="#airflow_pydantic.DagArgs.default_view"><code class="docutils literal notranslate"><span class="pre">DagArgs.default_view</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.DagArgs.orientation"><code class="docutils literal notranslate"><span class="pre">DagArgs.orientation</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.DagArgs.catchup"><code class="docutils literal notranslate"><span class="pre">DagArgs.catchup</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.DagArgs.doc_md"><code class="docutils literal notranslate"><span class="pre">DagArgs.doc_md</span></code></a></li>
+<li><a class="reference internal" href="#airflow_pydantic.DagArgs.params"><code class="docutils literal notranslate"><span class="pre">DagArgs.params</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.DagArgs.is_paused_upon_creation"><code class="docutils literal notranslate"><span class="pre">DagArgs.is_paused_upon_creation</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.DagArgs.tags"><code class="docutils literal notranslate"><span class="pre">DagArgs.tags</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.DagArgs.dag_display_name"><code class="docutils literal notranslate"><span class="pre">DagArgs.dag_display_name</span></code></a></li>

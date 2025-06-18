@@ -272,7 +272,7 @@
 <a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DagArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="c1"># DAG args</span>
-    <span class="c1"># https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG</span>
+    <span class="c1"># https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/dag/index.html</span>
 
     <span class="c1"># NOTE: All fields here should be default None</span>
     <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The description for the DAG to e.g. be shown on the webserver&quot;</span><span class="p">)</span>
@@ -308,8 +308,16 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Specify DAG orientation in graph view (LR, TB, RL, BT), default LR&quot;</span>
     <span class="p">)</span>
     <span class="n">catchup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Perform scheduler catchup (or only run latest)? Defaults to False&quot;</span><span class="p">)</span>
-    <span class="c1"># on_failure_callback (None | DagStateChangeCallback | list[DagStateChangeCallback]) – A function or list of functions to be called when a DagRun of this dag fails. A context dictionary is passed as a single parameter to this function.</span>
     <span class="c1"># on_success_callback (None | DagStateChangeCallback | list[DagStateChangeCallback]) – Much like the on_failure_callback except that it is executed when the dag succeeds.</span>
+    <span class="c1"># on_failure_callback (None | DagStateChangeCallback | list[DagStateChangeCallback]) – A function or list of functions to be called when a DagRun of this dag fails. A context dictionary is passed as a single parameter to this function.</span>
+    <span class="n">doc_md</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Markdown formatted documentation for the DAG. This will be rendered in the UI.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A dictionary of DAG-level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="c1"># access_control (dict | None) – Specify optional DAG-level actions, e.g., “{‘role1’: {‘can_read’}, ‘role2’: {‘can_read’, ‘can_edit’, ‘can_delete’}}”</span>
     <span class="n">is_paused_upon_creation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
