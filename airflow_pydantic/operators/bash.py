@@ -21,7 +21,7 @@ class BashOperatorArgs(TaskArgs, extra="allow"):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
     if have_common_operators:
-        bash_command: Union[str, BashCommands] = Field(default=None, description="bash command string, list of strings, or model")
+        bash_command: Union[str, List[str], BashCommands] = Field(default=None, description="bash command string, list of strings, or model")
     else:
         bash_command: Union[str, List[str]] = Field(default=None, description="bash command string, list of strings, or model")
     env: Optional[Dict[str, str]] = Field(default=None)
@@ -38,8 +38,6 @@ class BashOperatorArgs(TaskArgs, extra="allow"):
         if isinstance(v, str):
             return v
         elif isinstance(v, list) and have_common_operators and all(isinstance(item, str) for item in v):
-            from airflow_common_operators import BashCommands
-
             return BashCommands(commands=v)
         elif isinstance(v, list) and all(isinstance(item, str) for item in v):
             return "\n".join(v)
