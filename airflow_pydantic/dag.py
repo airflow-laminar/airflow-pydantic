@@ -15,7 +15,7 @@ __all__ = (
 
 class DagArgs(BaseModel):
     # DAG args
-    # https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG
+    # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/dag/index.html
 
     # NOTE: All fields here should be default None
     description: Optional[str] = Field(default=None, description="The description for the DAG to e.g. be shown on the webserver")
@@ -51,8 +51,16 @@ class DagArgs(BaseModel):
         default=None, description="Specify DAG orientation in graph view (LR, TB, RL, BT), default LR"
     )
     catchup: Optional[bool] = Field(default=None, description="Perform scheduler catchup (or only run latest)? Defaults to False")
-    # on_failure_callback (None | DagStateChangeCallback | list[DagStateChangeCallback]) – A function or list of functions to be called when a DagRun of this dag fails. A context dictionary is passed as a single parameter to this function.
     # on_success_callback (None | DagStateChangeCallback | list[DagStateChangeCallback]) – Much like the on_failure_callback except that it is executed when the dag succeeds.
+    # on_failure_callback (None | DagStateChangeCallback | list[DagStateChangeCallback]) – A function or list of functions to be called when a DagRun of this dag fails. A context dictionary is passed as a single parameter to this function.
+    doc_md: Optional[str] = Field(
+        default=None,
+        description="Markdown formatted documentation for the DAG. This will be rendered in the UI.",
+    )
+    params: Optional[Dict[str, str]] = Field(
+        default=None,
+        description="A dictionary of DAG-level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.",
+    )
     # access_control (dict | None) – Specify optional DAG-level actions, e.g., “{‘role1’: {‘can_read’}, ‘role2’: {‘can_read’, ‘can_edit’, ‘can_delete’}}”
     is_paused_upon_creation: Optional[bool] = Field(
         default=None,

@@ -103,10 +103,26 @@ class TaskArgs(BaseModel, extra="allow"):
     )
     # task_group (airflow.utils.task_group.TaskGroup | None) – The TaskGroup to which the task should belong. This is typically provided when not using a TaskGroup as a context manager.
     # doc (str | None) – Add documentation or notes to your Task objects that is visible in Task Instance details View in the Webserver
-    # doc_md (str | None) – Add documentation (in Markdown format) or notes to your Task objects that is visible in Task Instance details View in the Webserver
-    # doc_rst (str | None) – Add documentation (in RST format) or notes to your Task objects that is visible in Task Instance details View in the Webserver
-    # doc_json (str | None) – Add documentation (in JSON format) or notes to your Task objects that is visible in Task Instance details View in the Webserver
-    # doc_yaml (str | None) – Add documentation (in YAML format) or notes to your Task objects that is visible in Task Instance details View in the Webserver
+    doc: Optional[str] = Field(
+        default=None,
+        description="Add documentation or notes to your Task objects that is visible in Task Instance details View in the Webserver. This is a generic field that can be used for any format, but it is recommended to use specific fields for structured formats like Markdown, RST, JSON, or YAML.",
+    )
+    doc_md: Optional[str] = Field(
+        default=None,
+        description="Add documentation in Markdown format or notes to your Task objects that is visible in Task Instance details View in the Webserver.",
+    )
+    doc_rst: Optional[str] = Field(
+        default=None,
+        description="Add documentation in RST format or notes to your Task objects that is visible in Task Instance details View in the Webserver.",
+    )
+    doc_json: Optional[str] = Field(
+        default=None,
+        description="Add documentation in JSON format or notes to your Task objects that is visible in Task Instance details View in the Webserver.",
+    )
+    doc_yaml: Optional[str] = Field(
+        default=None,
+        description="Add documentation in YAML format or notes to your Task objects that is visible in Task Instance details View in the Webserver.",
+    )
     task_display_name: Optional[str] = Field(default=None, description="The display name of the task which appears on the UI.")
     # logger_name (str | None) – Name of the logger used by the Operator to emit logs. If set to None (default), the logger name will fall back to airflow.task.operators.{class.__module__}.{class.__name__} (e.g. SimpleHttpOperator will have airflow.task.operators.airflow.providers.http.operators.http.SimpleHttpOperator as logger).
     # allow_nested_operators (bool) – if True, when an operator is executed within another one a warning message will be logged. If False, then an exception will be raised if the operator is badly used (e.g. nested within another one). In future releases of Airflow this parameter will be removed and an exception will always be thrown when operators are nested within each other (default is True).
