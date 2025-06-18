@@ -11,7 +11,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test', port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
     def test_render_operator_ssh_host_variable(self, ssh_operator_balancer):
@@ -24,7 +24,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR')['password'], port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+            == "SSHOperator(do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR')['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
     def test_render_dag(self, dag):
@@ -97,7 +97,7 @@ with DAG(
     )
     task3 = SSHOperator(
         do_xcom_push=True,
-        ssh_hook=SSHHook(remote_host="test", username="test", port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0),
+        ssh_hook=SSHHook(remote_host="test", username="test"),
         ssh_conn_id="test",
         command="test",
         cmd_timeout=10,
@@ -182,7 +182,7 @@ with DAG(
     )
     task3 = SSHOperator(
         do_xcom_push=True,
-        ssh_hook=SSHHook(remote_host="test", username="test", port=22, cmd_timeout=10, keepalive_interval=30, banner_timeout=30.0),
+        ssh_hook=SSHHook(remote_host="test", username="test"),
         ssh_conn_id="test",
         command="test",
         cmd_timeout=10,
