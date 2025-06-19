@@ -1,16 +1,26 @@
+from importlib.metadata import version
+from logging import getLogger
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .instantiate import DagInstantiateMixin
 from .render import DagRenderMixin
 from .task import Task, TaskArgs
 from .utils import DatetimeArg, ScheduleArg
 
+if version("apache-airflow") >= "3.0.0":
+    _AIRFLOW_3 = True
+else:
+    _AIRFLOW_3 = False
+
 __all__ = (
     "DagArgs",
     "Dag",
 )
+
+
+_log = getLogger(__name__)
 
 
 class DagArgs(BaseModel):
@@ -76,6 +86,22 @@ class DagArgs(BaseModel):
 
     # Extras
     enabled: Optional[bool] = Field(default=None, description="Whether the DAG is enabled")
+
+    @field_validator("default_view")
+    @classmethod
+    def _validate_default_view(cls, v):
+        if _AIRFLOW_3:
+            _log.warning("default_view is deprecated in Airflow 3")
+            return None
+        return v
+
+    @field_validator("orientation")
+    @classmethod
+    def _validate_orientation(cls, v):
+        if _AIRFLOW_3:
+            _log.warning("orientation is deprecated in Airflow 3")
+            return None
+        return v
 
 
 class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin):
