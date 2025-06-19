@@ -700,18 +700,6 @@
 <span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Output encoding for the command, default is &#39;utf-8&#39;&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Output Encoding&quot;</span>
 <span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;skip_exit_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">         </span><span class="p">],</span>
-<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Skip Exit Code&quot;</span>
-<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;skip_on_exit_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
@@ -784,7 +772,6 @@
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">env</span> <span class="pre">(Dict[str,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_encoding</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_processor</span> <span class="pre">(object</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skip_exit_code</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skip_on_exit_code</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 </ul>
 </dd>
@@ -811,11 +798,6 @@
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_encoding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.BashOperatorArgs.output_encoding" title="Link to this definition">¶</a></dt>
 <dd><p>Output encoding for the command, default is ‘utf-8’</p>
 </dd></dl>
-
-<dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="airflow_pydantic.BashOperatorArgs.skip_exit_code">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">skip_exit_code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.BashOperatorArgs.skip_exit_code" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.BashOperatorArgs.skip_on_exit_code">
@@ -903,7 +885,6 @@
 <li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.env"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.env</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.append_env"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.append_env</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.output_encoding"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.output_encoding</span></code></a></li>
-<li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.skip_exit_code"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.skip_exit_code</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.skip_on_exit_code"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.skip_on_exit_code</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.cwd"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.cwd</span></code></a></li>
 <li><a class="reference internal" href="#airflow_pydantic.BashOperatorArgs.output_processor"><code class="docutils literal notranslate"><span class="pre">BashOperatorArgs.output_processor</span></code></a></li>

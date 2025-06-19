@@ -262,9 +262,11 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;PythonOperatorArgs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PythonSensorArgs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;BranchPythonOperatorArgs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ShortCircuitOperatorArgs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;PythonOperator&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PythonSensor&quot;</span><span class="p">,</span>
     <span class="s2">&quot;BranchPythonOperator&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ShortCircuitOperator&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -273,7 +275,7 @@
 <div class="viewcode-block" id="PythonOperatorArgs">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.PythonOperatorArgs.html#airflow_pydantic.PythonOperatorArgs">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PythonOperatorArgs</span><span class="p">(</span><span class="n">TaskArgs</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">):</span>
-    <span class="c1"># python operator argss</span>
+    <span class="c1"># python operator args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator</span>
     <span class="n">python_callable</span><span class="p">:</span> <span class="n">CallablePath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;python_callable&quot;</span><span class="p">)</span>
     <span class="n">op_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
@@ -296,6 +298,22 @@
 
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">PythonSensorArgs</span><span class="p">(</span><span class="n">TaskArgs</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">):</span>
+    <span class="c1"># python sensor args</span>
+    <span class="c1"># https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/python/index.html#airflow.providers.standard.sensors.python.PythonSensor</span>
+    <span class="n">python_callable</span><span class="p">:</span> <span class="n">CallablePath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;python_callable&quot;</span><span class="p">)</span>
+    <span class="n">op_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;a list of positional arguments that will get unpacked when calling your callable&quot;</span>
+    <span class="p">)</span>
+    <span class="n">op_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;a dictionary of keyword arguments that will get unpacked in your function&quot;</span>
+    <span class="p">)</span>
+    <span class="n">templates_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;a dictionary where the values are templates that will get templated by the Airflow engine sometime between __init__ and execute takes place and are made available in your callable’s context after the template has been applied. (templated)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonOperatorArgs</span><span class="p">(</span><span class="n">PythonOperatorArgs</span><span class="p">):</span> <span class="o">...</span>
 
 
@@ -308,6 +326,10 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">PythonOperator</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">PythonOperatorArgs</span><span class="p">):</span>
     <span class="n">operator</span><span class="p">:</span> <span class="n">ImportPath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;airflow.operators.python.PythonOperator&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;airflow operator path&quot;</span><span class="p">,</span> <span class="n">validate_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PythonSensor</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">PythonSensorArgs</span><span class="p">):</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="n">ImportPath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;airflow.sensors.python.PythonSensor&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;airflow sensor path&quot;</span><span class="p">,</span> <span class="n">validate_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonOperator</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">BranchPythonOperatorArgs</span><span class="p">):</span>
