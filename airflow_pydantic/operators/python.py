@@ -7,16 +7,18 @@ from ..utils import CallablePath, ImportPath
 
 __all__ = (
     "PythonOperatorArgs",
+    "PythonSensorArgs",
     "BranchPythonOperatorArgs",
     "ShortCircuitOperatorArgs",
     "PythonOperator",
+    "PythonSensor",
     "BranchPythonOperator",
     "ShortCircuitOperator",
 )
 
 
 class PythonOperatorArgs(TaskArgs, extra="allow"):
-    # python operator argss
+    # python operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator
     python_callable: CallablePath = Field(default=None, description="python_callable")
     op_args: Optional[List[object]] = Field(
@@ -38,6 +40,22 @@ class PythonOperatorArgs(TaskArgs, extra="allow"):
     )
 
 
+class PythonSensorArgs(TaskArgs, extra="allow"):
+    # python sensor args
+    # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/python/index.html#airflow.providers.standard.sensors.python.PythonSensor
+    python_callable: CallablePath = Field(default=None, description="python_callable")
+    op_args: Optional[List[object]] = Field(
+        default=None, description="a list of positional arguments that will get unpacked when calling your callable"
+    )
+    op_kwargs: Optional[Dict[str, object]] = Field(
+        default=None, description="a dictionary of keyword arguments that will get unpacked in your function"
+    )
+    templates_dict: Optional[Dict[str, object]] = Field(
+        default=None,
+        description="a dictionary where the values are templates that will get templated by the Airflow engine sometime between __init__ and execute takes place and are made available in your callable’s context after the template has been applied. (templated)",
+    )
+
+
 class BranchPythonOperatorArgs(PythonOperatorArgs): ...
 
 
@@ -50,6 +68,10 @@ class ShortCircuitOperatorArgs(PythonOperatorArgs):
 
 class PythonOperator(Task, PythonOperatorArgs):
     operator: ImportPath = Field(default="airflow.operators.python.PythonOperator", description="airflow operator path", validate_default=True)
+
+
+class PythonSensor(Task, PythonSensorArgs):
+    operator: ImportPath = Field(default="airflow.sensors.python.PythonSensor", description="airflow sensor path", validate_default=True)
 
 
 class BranchPythonOperator(Task, BranchPythonOperatorArgs):

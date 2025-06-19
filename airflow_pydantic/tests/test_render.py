@@ -37,6 +37,8 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.providers.ssh.operators.ssh import SSHOperator
+from airflow.sensors.bash import BashSensor
+from airflow.sensors.python import PythonSensor
 from airflow_pydantic.tests.conftest import foo
 from datetime import datetime
 from datetime import timedelta
@@ -88,7 +90,6 @@ with DAG(
         env={"test": "test"},
         append_env=True,
         output_encoding="utf-8",
-        skip_exit_code=True,
         skip_on_exit_code=99,
         cwd="test",
         output_processor=foo,
@@ -106,6 +107,8 @@ with DAG(
         task_id="test_ssh_operator",
         dag=dag,
     )
+    task4 = BashSensor(bash_command="test", task_id="test_bash_sensor", cwd="test", dag=dag)
+    task5 = PythonSensor(python_callable=foo, op_args=["test"], op_kwargs={"test": "test"}, task_id="test_python_sensor", dag=dag)
 """
         )
 
@@ -122,6 +125,8 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.providers.ssh.operators.ssh import SSHOperator
+from airflow.sensors.bash import BashSensor
+from airflow.sensors.python import PythonSensor
 from airflow_pydantic.tests.conftest import foo
 from datetime import datetime
 from datetime import timedelta
@@ -173,7 +178,6 @@ with DAG(
         env={"test": "test"},
         append_env=True,
         output_encoding="utf-8",
-        skip_exit_code=True,
         skip_on_exit_code=99,
         cwd="test",
         output_processor=foo,
@@ -191,6 +195,8 @@ with DAG(
         task_id="test_ssh_operator",
         dag=dag,
     )
+    task4 = BashSensor(bash_command="test", task_id="test_bash_sensor", cwd="test", dag=dag)
+    task5 = PythonSensor(python_callable=foo, op_args=["test"], op_kwargs={"test": "test"}, task_id="test_python_sensor", dag=dag)
     task1 >> task2
     task1 >> task3
     task2 >> task3
@@ -258,7 +264,6 @@ with DAG(
         env={"test": "test"},
         append_env=True,
         output_encoding="utf-8",
-        skip_exit_code=True,
         skip_on_exit_code=99,
         cwd="test",
         output_processor=foo,
