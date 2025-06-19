@@ -25,10 +25,10 @@ class BashOperatorArgs(TaskArgs, extra="allow"):
     else:
         bash_command: Union[str, List[str]] = Field(default=None, description="bash command string, list of strings, or model")
     env: Optional[Dict[str, str]] = Field(default=None)
-    append_env: Optional[bool] = Field(default=False)
-    output_encoding: Optional[str] = Field(default="utf-8")
+    append_env: Optional[bool] = Field(default=None, description="Append environment variables to the existing environment. Default is False")
+    output_encoding: Optional[str] = Field(default=None, description="Output encoding for the command, default is 'utf-8'")
     skip_exit_code: Optional[bool] = Field(default=None)
-    skip_on_exit_code: Optional[int] = Field(default=99)
+    skip_on_exit_code: Optional[int] = Field(default=None, description="Exit code to skip on, default is 99")
     cwd: Optional[str] = Field(default=None)
     output_processor: Optional[CallablePath] = None
 
