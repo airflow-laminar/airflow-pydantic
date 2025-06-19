@@ -3,7 +3,21 @@ from datetime import datetime, timedelta
 import pytest
 from pytest import fixture
 
-from airflow_pydantic import BashOperator, BashOperatorArgs, Dag, DagArgs, PythonOperator, PythonOperatorArgs, SSHOperator, SSHOperatorArgs, TaskArgs
+from airflow_pydantic import (
+    BashOperator,
+    BashOperatorArgs,
+    BashSensor,
+    BashSensorArgs,
+    Dag,
+    DagArgs,
+    PythonOperator,
+    PythonOperatorArgs,
+    PythonSensor,
+    PythonSensorArgs,
+    SSHOperator,
+    SSHOperatorArgs,
+    TaskArgs,
+)
 
 has_balancer = False
 try:
@@ -46,10 +60,27 @@ def python_operator_args():
 
 
 @fixture
+def python_sensor_args():
+    return PythonSensorArgs(
+        python_callable="airflow_pydantic.tests.conftest.foo",
+        op_args=["test"],
+        op_kwargs={"test": "test"},
+    )
+
+
+@fixture
 def python_operator(python_operator_args):
     return PythonOperator(
         task_id="test_python_operator",
         **python_operator_args.model_dump(),
+    )
+
+
+@fixture
+def python_sensor(python_sensor_args):
+    return PythonSensor(
+        task_id="test_python_sensor",
+        **python_sensor_args.model_dump(),
     )
 
 
@@ -60,10 +91,17 @@ def bash_operator_args():
         env={"test": "test"},
         append_env=True,
         output_encoding="utf-8",
-        skip_exit_code=True,
         skip_on_exit_code=99,
         cwd="test",
         output_processor="airflow_pydantic.tests.conftest.foo",
+    )
+
+
+@fixture
+def bash_sensor_args():
+    return BashSensorArgs(
+        bash_command="test",
+        cwd="test",
     )
 
 
@@ -72,6 +110,14 @@ def bash_operator(bash_operator_args):
     return BashOperator(
         task_id="test_bash_operator",
         **bash_operator_args.model_dump(),
+    )
+
+
+@fixture
+def bash_sensor(bash_sensor_args):
+    return BashSensor(
+        task_id="test_bash_sensor",
+        **bash_sensor_args.model_dump(),
     )
 
 
@@ -176,7 +222,7 @@ def task_args():
 
 
 @fixture
-def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator):
+def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator, bash_sensor, python_sensor):
     return Dag(
         dag_id="a-dag",
         **dag_args.model_dump(),
@@ -185,6 +231,8 @@ def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator):
             "task1": python_operator,
             "task2": bash_operator,
             "task3": ssh_operator,
+            "task4": bash_sensor,
+            "task5": python_sensor,
         },
     )
 
