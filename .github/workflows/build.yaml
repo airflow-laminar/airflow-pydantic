@@ -31,7 +31,11 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.11"]
+        airflow: ["<3", ">=3"]
         with-laminar-dependencies: [true, false]
+        exclude:
+          - airflow: ">=3"
+            with-laminar-dependencies: true
 
     steps:
     - uses: actions/checkout@v4
@@ -46,6 +50,10 @@ jobs:
     - name: Install Laminar dependencies
       run: uv pip install -e .[laminar]
       if: ${{ matrix.with-laminar-dependencies }}
+
+    - name: Install Airflow
+      run: uv pip install "apache-airflow${{ matrix.airflow }}"
+      if: ${{ !matrix.with-laminar-dependencies }}
 
     - name: Lint
       run: make lint
