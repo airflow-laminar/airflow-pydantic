@@ -68,12 +68,23 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
                 ssh_hook = data["ssh_hook"]
                 if have_balancer and isinstance(ssh_hook, (BalancerHostQueryConfiguration, Host)):
                     if isinstance(ssh_hook, BalancerHostQueryConfiguration):
+                        # Ensure that the BalancerHostQueryConfiguration is of kind 'select'
                         if not ssh_hook.kind == "select":
                             raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
+
+                        # Execute the query to get the Host, just set as it will
+                        # be handled by the field validator
                         data["ssh_hook"] = ssh_hook.execute()
+
+                        # Save the host for later use
                         data["ssh_hook_host"] = data["ssh_hook"]
                     else:
+                        # If it's a Host instance, set it for later use
                         data["ssh_hook_host"] = ssh_hook
+
+                    # Override pool from host if not otherwise set
+                    if data["ssh_hook"].pool and not data.get("pool"):
+                        data["pool"] = data["ssh_hook"].pool
         return data
 
     @field_validator("ssh_hook", mode="before")
