@@ -1,4 +1,4 @@
-from airflow_pydantic import BashOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
+from airflow_pydantic import BashCommands, BashOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
 
 from .conftest import hook
 
@@ -36,3 +36,12 @@ class TestOperators:
 
         # NOTE: sshhook has no __eq__, so compare via json serialization
         assert o.model_dump_json() == SSHOperatorArgs.model_validate_json(o.model_dump_json()).model_dump_json()
+
+    def test_bash(self):
+        cmds = BashCommands(
+            commands=[
+                "echo 'hello world'",
+                "echo 'goodbye world'",
+            ]
+        )
+        assert cmds.model_dump() == "bash -lc 'set -ex\necho 'hello world'\necho 'goodbye world''"

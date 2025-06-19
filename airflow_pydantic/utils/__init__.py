@@ -5,5 +5,6 @@ from pkn.pydantic import (
     serialize_path_as_string,
 )
 
+from .bash import *
 from .common import *
 from .ssh_hook import *
