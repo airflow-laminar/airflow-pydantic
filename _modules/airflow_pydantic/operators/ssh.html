@@ -325,12 +325,23 @@
                 <span class="n">ssh_hook</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">have_balancer</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ssh_hook</span><span class="p">,</span> <span class="p">(</span><span class="n">BalancerHostQueryConfiguration</span><span class="p">,</span> <span class="n">Host</span><span class="p">)):</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ssh_hook</span><span class="p">,</span> <span class="n">BalancerHostQueryConfiguration</span><span class="p">):</span>
+                        <span class="c1"># Ensure that the BalancerHostQueryConfiguration is of kind &#39;select&#39;</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">ssh_hook</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;select&quot;</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;BalancerHostQueryConfiguration must be of kind &#39;select&#39;&quot;</span><span class="p">)</span>
+
+                        <span class="c1"># Execute the query to get the Host, just set as it will</span>
+                        <span class="c1"># be handled by the field validator</span>
                         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ssh_hook</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+
+                        <span class="c1"># Save the host for later use</span>
                         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook_host&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># If it&#39;s a Host instance, set it for later use</span>
                         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook_host&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ssh_hook</span>
+
+                    <span class="c1"># Override pool from host if not otherwise set</span>
+                    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pool</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pool&quot;</span><span class="p">):</span>
+                        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;pool&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pool</span>
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;ssh_hook&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
