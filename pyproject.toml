@@ -117,7 +117,8 @@ testpaths = "airflow_pydantic/tests"
 line-length = 150
 
 [tool.ruff.lint]
-extend-select = ["I"]
+extend-select = ["I", "AIR301"]
+preview = true
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
