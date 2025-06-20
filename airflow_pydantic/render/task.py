@@ -16,7 +16,7 @@ def render_base_task_args(self, raw: bool = False, **kwargs: Dict[str, str]) -> 
     imports = []
     globals_ = []
 
-    args = {**self.model_dump(exclude_none=True, exclude=["type_"]), **kwargs}
+    args = {**self.model_dump(exclude_unset=True, exclude=["type_"]), **kwargs}
     for k, v in args.items():
         new_imports, value = _get_parts_from_value(k, v)
         if new_imports:
@@ -55,7 +55,7 @@ class TaskRenderMixin:
         imports = [ast.ImportFrom(module=operator_import, names=[ast.alias(name=operator_name)], level=0)]
         globals_ = []
 
-        args = {**self.model_dump(exclude_none=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
+        args = {**self.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
         for k, v in args.items():
             import_, value = _get_parts_from_value(k, v)
             if import_:

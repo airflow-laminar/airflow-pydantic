@@ -72,7 +72,7 @@ def python_sensor_args():
 def python_operator(python_operator_args):
     return PythonOperator(
         task_id="test_python_operator",
-        **python_operator_args.model_dump(),
+        **python_operator_args.model_dump(exclude_unset=True),
     )
 
 
@@ -80,7 +80,7 @@ def python_operator(python_operator_args):
 def python_sensor(python_sensor_args):
     return PythonSensor(
         task_id="test_python_sensor",
-        **python_sensor_args.model_dump(),
+        **python_sensor_args.model_dump(exclude_unset=True),
     )
 
 
@@ -109,7 +109,7 @@ def bash_sensor_args():
 def bash_operator(bash_operator_args):
     return BashOperator(
         task_id="test_bash_operator",
-        **bash_operator_args.model_dump(),
+        **bash_operator_args.model_dump(exclude_unset=True),
     )
 
 
@@ -117,7 +117,7 @@ def bash_operator(bash_operator_args):
 def bash_sensor(bash_sensor_args):
     return BashSensor(
         task_id="test_bash_sensor",
-        **bash_sensor_args.model_dump(),
+        **bash_sensor_args.model_dump(exclude_unset=True),
     )
 
 
@@ -144,7 +144,7 @@ def ssh_operator(ssh_operator_args):
         return
     return SSHOperator(
         task_id="test_ssh_operator",
-        **ssh_operator_args.model_dump(),
+        **ssh_operator_args.model_dump(exclude_unset=True),
     )
 
 
@@ -173,7 +173,7 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHOperator(
             task_id="test_ssh_operator",
-            **ssh_operator_args.model_dump(exclude=["ssh_hook"]),
+            **ssh_operator_args.model_dump(exclude_unset=True, exclude=["ssh_hook"]),
             ssh_hook=BalancerHostQueryConfiguration(
                 kind="select",
                 balancer=balancer,
@@ -223,7 +223,7 @@ def task_args():
 def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator, bash_sensor, python_sensor):
     return Dag(
         dag_id="a-dag",
-        **dag_args.model_dump(),
+        **dag_args.model_dump(exclude_unset=True),
         default_args=task_args,
         tasks={
             "task1": python_operator,
@@ -236,11 +236,21 @@ def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator, bash_
 
 
 @fixture
+def dag_none_schedule(dag_args):
+    return Dag(
+        dag_id="a-dag",
+        schedule=None,
+        **dag_args.model_dump(exclude_unset=True, exclude={"schedule"}),
+        tasks={},
+    )
+
+
+@fixture
 def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator):
     ssh_operator.ssh_hook = hook
     return Dag(
         dag_id="a-dag",
-        **dag_args.model_dump(),
+        **dag_args.model_dump(exclude_unset=True),
         default_args=task_args,
         tasks={
             "task1": python_operator,
