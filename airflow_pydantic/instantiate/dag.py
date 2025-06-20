@@ -15,7 +15,8 @@ class DagInstantiateMixin:
         # NOTE: accept dag as an argument to allow for instantiation from airflow-config
         dag_instance = kwargs.pop("dag", None)
         if not dag_instance:
-            dag_instance = DAG(dag_id=self.dag_id, **self.model_dump(exclude_none=True, exclude=["type_", "tasks", "dag_id"]), **kwargs)
+            dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"])
+            dag_instance = DAG(dag_id=self.dag_id, **dag_args, **kwargs)
 
         task_instances = {}
 
@@ -30,7 +31,7 @@ class DagInstantiateMixin:
                     raise ValueError(f"Duplicate task_id found: {task_id}. Task IDs must be unique within a DAG.")
 
                 _log.info("Instantiating task: %s", task_id)
-                _log.info("Task args: %s", task.model_dump(exclude_none=True, exclude=["type_", "operator", "dependencies"]))
+                _log.info("Task args: %s", task.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]))
                 task_instances[task_id] = task.instantiate(**kwargs)
 
             # second pass, set dependencies

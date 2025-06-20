@@ -6,8 +6,8 @@ class TestTask:
         t = task_args
 
         # Test roundtrips
-        assert t == TaskArgs.model_validate(t.model_dump())
-        assert t == TaskArgs.model_validate_json(t.model_dump_json())
+        assert t == TaskArgs.model_validate(t.model_dump(exclude_unset=True))
+        assert t == TaskArgs.model_validate_json(t.model_dump_json(exclude_unset=True))
 
     def test_task(self):
         t = Task(
@@ -18,5 +18,5 @@ class TestTask:
         )
 
         # Test roundtrips
-        assert t == Task.model_validate(t.model_dump())
-        assert t == Task.model_validate_json(t.model_dump_json())
+        assert t == Task.model_validate(t.model_dump(exclude_unset=True))
+        assert t == Task.model_validate_json(t.model_dump_json(exclude_unset=True))

@@ -109,4 +109,7 @@ def _get_parts_from_value(key, value):
     if isinstance(value, TriggerRule):
         # If the value is a TriggerRule, we can use a string
         return imports, ast.Constant(value=value.value)
+    if value is None:
+        # If the value is None, we can use ast.Constant with None
+        return [], ast.Constant(value=None)
     raise TypeError(f"Unsupported type for key: {key}, value: {type(value)}")
