@@ -1,16 +1,10 @@
 __all__ = ("DagInstantiateMixin",)
 
-from importlib.metadata import version
 from logging import getLogger
 
 from airflow.models import DAG
 
 _log = getLogger(__name__)
-
-if version("apache-airflow") >= "3.0.0":
-    _AIRFLOW_3 = True
-else:
-    _AIRFLOW_3 = False
 
 
 class DagInstantiateMixin:
@@ -22,9 +16,6 @@ class DagInstantiateMixin:
         dag_instance = kwargs.pop("dag", None)
         if not dag_instance:
             dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"])
-            # Deal with annoying alias issue
-            if "schedule" in dag_args and dag_args["schedule"] is None and not _AIRFLOW_3:
-                dag_args["schedule_interval"] = dag_args.pop("schedule", None)
             dag_instance = DAG(dag_id=self.dag_id, **dag_args, **kwargs)
 
         task_instances = {}
