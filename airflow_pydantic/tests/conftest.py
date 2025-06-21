@@ -5,18 +5,18 @@ import pytest
 from pytest import fixture
 
 from airflow_pydantic import (
-    BashOperator,
-    BashOperatorArgs,
     BashSensor,
     BashSensorArgs,
+    BashTask,
+    BashTaskArgs,
     Dag,
     DagArgs,
-    PythonOperator,
-    PythonOperatorArgs,
     PythonSensor,
     PythonSensorArgs,
-    SSHOperator,
-    SSHOperatorArgs,
+    PythonTask,
+    PythonTaskArgs,
+    SSHTask,
+    SSHTaskArgs,
     TaskArgs,
 )
 
@@ -58,7 +58,7 @@ def hook(**kwargs):
 
 @fixture
 def python_operator_args():
-    return PythonOperatorArgs(
+    return PythonTaskArgs(
         python_callable="airflow_pydantic.tests.conftest.foo",
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -79,7 +79,7 @@ def python_sensor_args():
 
 @fixture
 def python_operator(python_operator_args):
-    return PythonOperator(
+    return PythonTask(
         task_id="test_python_operator",
         **python_operator_args.model_dump(exclude_unset=True),
     )
@@ -95,7 +95,7 @@ def python_sensor(python_sensor_args):
 
 @fixture
 def bash_operator_args():
-    return BashOperatorArgs(
+    return BashTaskArgs(
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -116,7 +116,7 @@ def bash_sensor_args():
 
 @fixture
 def bash_operator(bash_operator_args):
-    return BashOperator(
+    return BashTask(
         task_id="test_bash_operator",
         **bash_operator_args.model_dump(exclude_unset=True),
     )
@@ -135,7 +135,7 @@ def ssh_operator_args():
     if not has_ssh_hook:
         pytest.skip("SSHHook is not installed, skipping SSHHook fixtures")
         return
-    return SSHOperatorArgs(
+    return SSHTaskArgs(
         ssh_conn_id="test",
         ssh_hook="airflow_pydantic.tests.conftest.hook",
         command="test",
@@ -151,7 +151,7 @@ def ssh_operator(ssh_operator_args):
     if not has_ssh_hook:
         pytest.skip("SSHHook is not installed, skipping SSHHook fixtures")
         return
-    return SSHOperator(
+    return SSHTask(
         task_id="test_ssh_operator",
         **ssh_operator_args.model_dump(exclude_unset=True),
     )
@@ -180,7 +180,7 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
     if not has_balancer:
         pytest.skip("airflow_balancer is not installed, skipping balancer fixtures")
     with pools(), variables({"user": "test", "password": "password"}):
-        return SSHOperator(
+        return SSHTask(
             task_id="test_ssh_operator",
             **ssh_operator_args.model_dump(exclude_unset=True, exclude=["ssh_hook"]),
             ssh_hook=BalancerHostQueryConfiguration(

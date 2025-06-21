@@ -1,23 +1,35 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Type
 
-from pydantic import Field
+from airflow.operators.python import (
+    BranchPythonOperator as BaseBranchPythonOperator,
+    PythonOperator as BasePythonOperator,
+    ShortCircuitOperator as BaseShortCircuitOperator,
+)
+from airflow.sensors.python import PythonSensor as BasePythonSensor
+from pydantic import Field, field_validator
 
 from ..task import Task, TaskArgs
 from ..utils import CallablePath, ImportPath
 
 __all__ = (
     "PythonOperatorArgs",
+    "PythonTaskArgs",
     "PythonSensorArgs",
     "BranchPythonOperatorArgs",
+    "BranchPythonTaskArgs",
     "ShortCircuitOperatorArgs",
+    "ShortCircuitTaskArgs",
     "PythonOperator",
+    "PythonTask",
     "PythonSensor",
     "BranchPythonOperator",
+    "BranchPythonTask",
     "ShortCircuitOperator",
+    "ShortCircuitTask",
 )
 
 
-class PythonOperatorArgs(TaskArgs, extra="allow"):
+class PythonTaskArgs(TaskArgs, extra="allow"):
     # python operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator
     python_callable: CallablePath = Field(default=None, description="python_callable")
@@ -40,6 +52,9 @@ class PythonOperatorArgs(TaskArgs, extra="allow"):
     )
 
 
+PythonOperatorArgs = PythonTaskArgs
+
+
 class PythonSensorArgs(TaskArgs, extra="allow"):
     # python sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/python/index.html#airflow.providers.standard.sensors.python.PythonSensor
@@ -56,27 +71,75 @@ class PythonSensorArgs(TaskArgs, extra="allow"):
     )
 
 
-class BranchPythonOperatorArgs(PythonOperatorArgs): ...
+class BranchPythonTaskArgs(PythonTaskArgs): ...
 
 
-class ShortCircuitOperatorArgs(PythonOperatorArgs):
+# Alias
+BranchPythonOperatorArgs = BranchPythonTaskArgs
+
+
+class ShortCircuitTaskArgs(PythonTaskArgs):
     ignore_downstream_trigger_rules: Optional[bool] = Field(
         default=None,
         description=" If set to True, all downstream tasks from this operator task will be skipped. This is the default behavior. If set to False, the direct, downstream task(s) will be skipped but the trigger_rule defined for a other downstream tasks will be respected.",
     )
 
 
-class PythonOperator(Task, PythonOperatorArgs):
+# Alias
+ShortCircuitOperatorArgs = ShortCircuitTaskArgs
+
+
+class PythonTask(Task, PythonTaskArgs):
     operator: ImportPath = Field(default="airflow.operators.python.PythonOperator", description="airflow operator path", validate_default=True)
+
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> ImportPath:
+        if not isinstance(v, Type) and issubclass(v, BasePythonOperator):
+            raise ValueError(f"operator must be 'airflow.operators.python.PythonOperator', got: {v}")
+        return v
+
+
+# Alias
+PythonOperator = PythonTask
 
 
 class PythonSensor(Task, PythonSensorArgs):
     operator: ImportPath = Field(default="airflow.sensors.python.PythonSensor", description="airflow sensor path", validate_default=True)
 
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> Type:
+        if not isinstance(v, Type) and issubclass(v, BasePythonSensor):
+            raise ValueError(f"operator must be 'airflow.sensors.python.PythonSensor', got: {v}")
+        return v
 
-class BranchPythonOperator(Task, BranchPythonOperatorArgs):
+
+class BranchPythonTask(Task, BranchPythonTaskArgs):
     operator: ImportPath = Field(default="airflow.operators.python.BranchPythonOperator", description="airflow operator path", validate_default=True)
 
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> Type:
+        if not isinstance(v, Type) and issubclass(v, BaseBranchPythonOperator):
+            raise ValueError(f"operator must be 'airflow.operators.python.BranchPythonOperator', got: {v}")
+        return v
 
-class ShortCircuitOperator(Task, ShortCircuitOperatorArgs):
+
+# Alias
+BranchPythonOperator = BranchPythonTask
+
+
+class ShortCircuitTask(Task, ShortCircuitTaskArgs):
     operator: ImportPath = Field(default="airflow.operators.python.ShortCircuitOperator", description="airflow operator path", validate_default=True)
+
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> Type:
+        if not isinstance(v, Type) and issubclass(v, BaseShortCircuitOperator):
+            raise ValueError(f"operator must be 'airflow.operators.python.ShortCircuitOperator', got: {v}")
+        return v
+
+
+# Alias
+ShortCircuitOperator = ShortCircuitTask
