@@ -1,5 +1,6 @@
 import ast
 from datetime import datetime, timedelta
+from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Tuple
 
@@ -62,7 +63,10 @@ def _get_parts_from_value(key, value):
             return imports, ast.Name(id=name, ctx=ast.Load())
     if isinstance(value, (str, int, float, bool)):
         # If the value is a primitive type, we can use ast.Constant
-        return [], ast.Constant(value=value)
+        return imports, ast.Constant(value=value)
+    if value is None:
+        # If the value is None, we can use ast.Constant with None
+        return imports, ast.Constant(value=None)
     if isinstance(value, list):
         new_values = []
         for v in value:
@@ -79,13 +83,21 @@ def _get_parts_from_value(key, value):
             new_imports, new_value = _get_parts_from_value(k, v)
             if new_imports:
                 # If we have imports, we need to add them to the imports list
+
                 imports.extend(new_imports)
             new_keys.append(ast.Constant(value=k))
             new_values.append(new_value)
         # If the value is a dict, we can use ast.Dict
-        return None, ast.Dict(
+        return imports, ast.Dict(
             keys=new_keys,
             values=new_values,
+        )
+    if isinstance(value, Path):
+        imports.append(ast.ImportFrom(module="pathlib", names=[ast.alias(name="Path")], level=0))
+        return imports, ast.Call(
+            func=ast.Name(id="Path", ctx=ast.Load()),
+            args=[ast.Constant(value=str(value))],
+            keywords=[],
         )
     if isinstance(value, datetime):
         # If the value is a datetime, we can use datetime.fromisoformat
@@ -109,7 +121,5 @@ def _get_parts_from_value(key, value):
     if isinstance(value, TriggerRule):
         # If the value is a TriggerRule, we can use a string
         return imports, ast.Constant(value=value.value)
-    if value is None:
-        # If the value is None, we can use ast.Constant with None
-        return [], ast.Constant(value=None)
+
     raise TypeError(f"Unsupported type for key: {key}, value: {type(value)}")
