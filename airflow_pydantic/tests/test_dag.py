@@ -74,6 +74,6 @@ with DAG(
     },
     dag_id="a-dag",
 ) as dag:
-    "..."
+    ...
 """
         )
