@@ -262,7 +262,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.instantiate</span><span class="w"> </span><span class="kn">import</span> <span class="n">DagInstantiateMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.render</span><span class="w"> </span><span class="kn">import</span> <span class="n">DagRenderMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.task</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskArgs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatetimeArg</span><span class="p">,</span> <span class="n">ScheduleArg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatetimeArg</span><span class="p">,</span> <span class="n">Param</span><span class="p">,</span> <span class="n">ParamType</span><span class="p">,</span> <span class="n">ScheduleArg</span>
 
 <span class="k">if</span> <span class="n">version</span><span class="p">(</span><span class="s2">&quot;apache-airflow&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="s2">&quot;3.0.0&quot;</span><span class="p">:</span>
     <span class="n">_AIRFLOW_3</span> <span class="o">=</span> <span class="kc">True</span>
@@ -324,7 +324,7 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Markdown formatted documentation for the DAG. This will be rendered in the UI.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Param</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A dictionary of DAG-level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -343,6 +343,42 @@
 
     <span class="c1"># Extras</span>
     <span class="n">enabled</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the DAG is enabled&quot;</span><span class="p">)</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="c1"># Automatically convert BaseModel to dict for params</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.task</span><span class="w"> </span><span class="kn">import</span> <span class="n">__all_task_fields__</span>
+
+            <span class="c1"># Naively convert to dict if it&#39;s a BaseModel</span>
+            <span class="n">new_v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">__all_task_fields__</span> <span class="o">+</span> <span class="n">__all_dag_fields__</span><span class="p">)</span>
+            <span class="n">new_v</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">new_v</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">__pydantic_fields__</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="o">.</span><span class="n">__fields__</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">new_v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
+                <span class="n">resolved_type</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="o">.</span><span class="n">__fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">resolved_type</span> <span class="o">==</span> <span class="s2">&quot;Optional&quot;</span><span class="p">:</span>
+                    <span class="c1"># If the type is Optional, we need to extract the inner type</span>
+                    <span class="n">inner_type</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">v</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="n">v</span><span class="o">.</span><span class="n">__fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inner_type</span> <span class="o">=</span> <span class="nb">str</span>
+                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">_resolve_type</span><span class="p">(</span><span class="n">inner_type</span><span class="p">)</span>
+                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">description</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="o">.</span><span class="n">__fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">description</span>
+                <span class="p">)</span>
+                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span><span class="o">.</span><span class="n">__fields__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">new_v</span>
+            <span class="c1"># TODO: exclude none, but extract the type into airflow params</span>
+        <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;default_view&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
@@ -373,6 +409,9 @@
 
 
     <span class="c1"># TODO: Validate all task dependencies exist</span>
+
+
+<span class="n">__all_dag_fields__</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Dag</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">Dag</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">Dag</span><span class="o">.</span><span class="n">__fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 </pre></div>
         </article>
       </div>
