@@ -139,11 +139,16 @@ def _get_parts_from_value(key, value):
         if default_value is None and value["schema"].get("type") == ["null", "object"]:
             default_value = {}
 
-        new_imports, new_schema = _get_parts_from_value(key, value["schema"])
+        # Process title
+        if "title" in value["schema"]:
+            keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=value["schema"]["title"])))
+
+        # Process type
+        new_imports, new_type = _get_parts_from_value(key, value["schema"]["type"])
+        keywords.append(ast.keyword(arg="type", value=new_type))
         if new_imports:
             # If we have imports, we need to add them to the imports list
             imports.extend(new_imports)
-        keywords.append(ast.keyword(arg="schema", value=new_schema))
 
         new_imports, new_value = _get_parts_from_value(key, value["value"])
         if new_imports:
