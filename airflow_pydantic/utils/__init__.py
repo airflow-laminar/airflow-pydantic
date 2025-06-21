@@ -7,4 +7,5 @@ from pkn.pydantic import (
 
 from .bash import *
 from .common import *
+from .param import *
 from .ssh_hook import *

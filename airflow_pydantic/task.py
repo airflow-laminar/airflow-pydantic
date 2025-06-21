@@ -133,3 +133,6 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow"):
 
     operator: ImportPath = Field(description="airflow operator path")
     dependencies: Optional[List[str]] = Field(default=None, description="dependencies")
+
+
+__all_task_fields__ = list(Task.__pydantic_fields__.keys() if hasattr(Task, "__pydantic_fields__") else Task.__fields__.keys())
