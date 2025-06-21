@@ -125,10 +125,20 @@ def _get_parts_from_value(key, value):
     if isinstance(value, Param):
         # If the value is a Param, we can use a dict with the properties
         imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
+
+        # pull out the description
         value = value.serialize()
         keywords = [
             ast.keyword(arg="description", value=ast.Constant(value=value["description"])),
         ]
+
+        # Grab the default value from the schema if it exists
+        default_value = value["schema"].pop("value", None)
+
+        # If the default value is None and the schema type is object, reset to empty dict
+        if default_value is None and value["schema"].get("type") == ["null", "object"]:
+            default_value = {}
+
         new_imports, new_schema = _get_parts_from_value(key, value["schema"])
         if new_imports:
             # If we have imports, we need to add them to the imports list
@@ -139,10 +149,10 @@ def _get_parts_from_value(key, value):
         if new_imports:
             # If we have imports, we need to add them to the imports list
             imports.extend(new_imports)
-        if new_value.value is None and "value" in value["schema"]:
-            keywords.insert(0, ast.keyword(arg="value", value=_get_parts_from_value(key, value["schema"]["value"])[1]))
+        if new_value.value is None:
+            keywords.insert(0, ast.keyword(arg="default", value=_get_parts_from_value(key, default_value)[1]))
         else:
-            keywords.insert(0, ast.keyword(arg="value", value=new_value))
+            keywords.insert(0, ast.keyword(arg="default", value=new_value))
 
         return imports, ast.Call(
             func=ast.Name(id="Param", ctx=ast.Load()),
