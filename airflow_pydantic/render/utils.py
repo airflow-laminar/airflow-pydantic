@@ -4,6 +4,7 @@ from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Tuple
 
+from airflow.models.param import Param
 from airflow.utils.trigger_rule import TriggerRule
 from pkn.pydantic import serialize_path_as_string
 
@@ -121,5 +122,24 @@ def _get_parts_from_value(key, value):
     if isinstance(value, TriggerRule):
         # If the value is a TriggerRule, we can use a string
         return imports, ast.Constant(value=value.value)
+    if isinstance(value, Param):
+        # If the value is a Param, we can use a dict with the properties
+        imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
+        value = value.serialize()
+        keywords = [
+            ast.keyword(arg="description", value=ast.Constant(value=value["description"])),
+        ]
+        for key in ("value", "schema"):
+            new_imports, new_value = _get_parts_from_value(key, value[key])
+            if new_imports:
+                # If we have imports, we need to add them to the imports list
+                imports.extend(new_imports)
+            keywords.append(ast.keyword(arg=key, value=new_value))
+
+        return imports, ast.Call(
+            func=ast.Name(id="Param", ctx=ast.Load()),
+            args=[],
+            keywords=keywords,
+        )
 
     raise TypeError(f"Unsupported type for key: {key}, value: {type(value)}")

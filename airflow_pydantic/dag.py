@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, field_validator
 from .instantiate import DagInstantiateMixin
 from .render import DagRenderMixin
 from .task import Task, TaskArgs
-from .utils import DatetimeArg, ScheduleArg
+from .utils import DatetimeArg, Param, ParamType, ScheduleArg
 
 if version("apache-airflow") >= "3.0.0":
     _AIRFLOW_3 = True
@@ -67,7 +67,7 @@ class DagArgs(BaseModel):
         default=None,
         description="Markdown formatted documentation for the DAG. This will be rendered in the UI.",
     )
-    params: Optional[Dict[str, str]] = Field(
+    params: Optional[Dict[str, Param]] = Field(
         default=None,
         description="A dictionary of DAG-level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.",
     )
@@ -86,6 +86,42 @@ class DagArgs(BaseModel):
 
     # Extras
     enabled: Optional[bool] = Field(default=None, description="Whether the DAG is enabled")
+
+    @field_validator("params", mode="before")
+    @classmethod
+    def _validate_params(cls, v):
+        # Automatically convert BaseModel to dict for params
+        if isinstance(v, BaseModel):
+            from .task import __all_task_fields__
+
+            # Naively convert to dict if it's a BaseModel
+            new_v = v.model_dump(exclude_unset=False, exclude=__all_task_fields__ + __all_dag_fields__)
+            new_v = {
+                key: value for key, value in new_v.items() if key in (v.__pydantic_fields__ if hasattr(v, "__pydantic_fields__") else v.__fields__)
+            }
+            for key, value in new_v.items():
+                new_v[key] = {"value": value}
+                resolved_type = (
+                    v.__pydantic_fields__[key].annotation.__name__ if hasattr(v, "__pydantic_fields__") else v.__fields__[key].annotation.__name__
+                )
+                if resolved_type == "Optional":
+                    # If the type is Optional, we need to extract the inner type
+                    inner_type = (
+                        v.__pydantic_fields__[key].annotation.__args__[0]
+                        if hasattr(v, "__pydantic_fields__")
+                        else v.__fields__[key].annotation.__args__[0]
+                    )
+                else:
+                    inner_type = str
+                new_v[key]["type"] = ParamType._resolve_type(inner_type)
+                new_v[key]["title"] = key.replace("_", " ").title()
+                new_v[key]["description"] = (
+                    v.__pydantic_fields__[key].description if hasattr(v, "__pydantic_fields__") else v.__fields__[key].description
+                )
+                new_v[key]["default"] = v.__pydantic_fields__[key].default if hasattr(v, "__pydantic_fields__") else v.__fields__[key].default
+            v = new_v
+            # TODO: exclude none, but extract the type into airflow params
+        return v
 
     @field_validator("default_view")
     @classmethod
@@ -112,3 +148,6 @@ class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin):
     tasks: Optional[Dict[str, Task]] = Field(default_factory=dict, description="List of tasks in the DAG")
 
     # TODO: Validate all task dependencies exist
+
+
+__all_dag_fields__ = list(Dag.__pydantic_fields__.keys() if hasattr(Dag, "__pydantic_fields__") else Dag.__fields__.keys())

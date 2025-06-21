@@ -116,6 +116,10 @@ class DagRenderMixin:
                     value=task,
                 )
             )
+        if not tasks:
+            _log.warning("No tasks found in the DAG. Ensure that tasks are defined correctly.")
+            # Add an ellipsis to indicate no tasks
+            dag_block.body.append(ast.Expr(value=ast.Constant(value="...")))
 
         # Handle task dependencies
         for task_id, dependencies in task_dependencies.items():
