@@ -1,6 +1,5 @@
 import ast
 import os
-from importlib.metadata import version
 from logging import getLogger
 from pathlib import Path
 from shutil import which
@@ -14,12 +13,6 @@ from .utils import _get_parts_from_value
 __all__ = ("DagRenderMixin",)
 
 _log = getLogger(__name__)
-
-
-if version("apache-airflow") >= "3.0.0":
-    _AIRFLOW_3 = True
-else:
-    _AIRFLOW_3 = False
 
 
 def _task_id_to_better_name(task_id):
@@ -42,9 +35,6 @@ class DagRenderMixin:
         # First, Prepare DAG kwargs
         # dag_kwargs = [ast.keyword("dag_id", ast.Constant(value=self.dag_id))]
         dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "default_args"])
-        # Deal with annoying alias issue
-        if "schedule" in dag_args and dag_args["schedule"] is None and not _AIRFLOW_3:
-            dag_args["schedule_interval"] = dag_args.pop("schedule", None)
 
         for k, v in dag_args.items():
             new_imports, value = _get_parts_from_value(k, v)
