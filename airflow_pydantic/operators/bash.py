@@ -1,5 +1,7 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
+from airflow.operators.bash import BashOperator as BaseBashOperator
+from airflow.sensors.bash import BashSensor as BaseBashSensor
 from pydantic import Field, field_validator
 
 from ..task import Task, TaskArgs
@@ -7,13 +9,15 @@ from ..utils import BashCommands, CallablePath, ImportPath
 
 __all__ = (
     "BashOperatorArgs",
+    "BashTaskArgs",
     "BashSensorArgs",
     "BashOperator",
+    "BashTask",
     "BashSensor",
 )
 
 
-class BashOperatorArgs(TaskArgs, extra="allow"):
+class BashTaskArgs(TaskArgs, extra="allow"):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
     bash_command: Union[str, List[str], BashCommands] = Field(default=None, description="bash command string, list of strings, or model")
@@ -38,6 +42,10 @@ class BashOperatorArgs(TaskArgs, extra="allow"):
             raise ValueError("bash_command must be a string, list of strings, or a BashCommands model")
 
 
+# Alias
+BashOperatorArgs = BashTaskArgs
+
+
 class BashSensorArgs(TaskArgs, extra="allow"):
     # bash sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/bash/index.html#airflow.providers.standard.sensors.bash.BashSensor
@@ -59,9 +67,27 @@ class BashSensorArgs(TaskArgs, extra="allow"):
             raise ValueError("bash_command must be a string, list of strings, or a BashCommands model")
 
 
-class BashOperator(Task, BashOperatorArgs):
+class BashTask(Task, BashTaskArgs):
     operator: ImportPath = Field(default="airflow.operators.bash.BashOperator", description="airflow operator path", validate_default=True)
+
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> Type:
+        if not isinstance(v, Type) and issubclass(v, BaseBashOperator):
+            raise ValueError(f"operator must be 'airflow.operators.bash.BashOperator', got: {v}")
+        return v
+
+
+# Alias
+BashOperator = BashTask
 
 
 class BashSensor(Task, BashSensorArgs):
     operator: ImportPath = Field(default="airflow.sensors.bash.BashSensor", description="airflow sensor path", validate_default=True)
+
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> Type:
+        if not isinstance(v, Type) and issubclass(v, BaseBashSensor):
+            raise ValueError(f"operator must be 'airflow.sensors.bash.BashSensor', got: {v}")
+        return v

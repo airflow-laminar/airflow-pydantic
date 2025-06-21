@@ -1,6 +1,6 @@
 from importlib.util import find_spec
 from types import FunctionType, MethodType
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Type, Union
 
 from pydantic import Field, TypeAdapter, field_validator, model_validator
 
@@ -12,13 +12,20 @@ if find_spec("airflow_balancer"):
     have_balancer = True
     from airflow_balancer.config import BalancerHostQueryConfiguration, Host
 
+have_ssh_provider = False
+if find_spec("apache-airflow-providers-ssh"):
+    have_ssh_provider = True
+    from airflow.providers.ssh.operators.ssh import SSHOperator as BaseSSHOperator
+
 __all__ = (
     "SSHOperatorArgs",
+    "SSHTaskArgs",
     "SSHOperator",
+    "SSHTask",
 )
 
 
-class SSHOperatorArgs(TaskArgs, extra="allow"):
+class SSHTaskArgs(TaskArgs, extra="allow"):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
     if have_balancer:
@@ -113,7 +120,24 @@ class SSHOperatorArgs(TaskArgs, extra="allow"):
         return v
 
 
-class SSHOperator(Task, SSHOperatorArgs):
+# Alias
+SSHOperatorArgs = SSHTaskArgs
+
+
+class SSHTask(Task, SSHTaskArgs):
     operator: ImportPath = Field(
         default="airflow.providers.ssh.operators.ssh.SSHOperator", description="airflow operator path", validate_default=True
     )
+
+    if have_ssh_provider:
+
+        @field_validator("operator")
+        @classmethod
+        def validate_operator(cls, v: Type) -> Type:
+            if not isinstance(v, Type) and issubclass(v, BaseSSHOperator):
+                raise ValueError(f"operator must be 'airflow.providers.ssh.operators.ssh.SSHOperator', got: {v}")
+            return v
+
+
+# Alias
+SSHOperator = SSHTask
