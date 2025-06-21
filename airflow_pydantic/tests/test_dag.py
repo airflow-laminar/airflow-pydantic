@@ -60,15 +60,13 @@ from airflow.models.param import Param
 with DAG(
     params={
         "bash_command": Param(
-            default="test", description="bash command string, list of strings, or model", schema={"type": ["null", "string"], "title": "Bash Command"}
+            default="test", title="Bash Command", description="bash command string, list of strings, or model", type=["null", "string"]
         ),
-        "env": Param(default={}, description=None, schema={"type": ["null", "object"], "title": "Env"}),
+        "env": Param(default={}, title="Env", description=None, type=["null", "object"]),
         "output_encoding": Param(
-            default=None,
-            description="Output encoding for the command, default is 'utf-8'",
-            schema={"type": ["null", "string"], "title": "Output Encoding"},
+            default=None, title="Output Encoding", description="Output encoding for the command, default is 'utf-8'", type=["null", "string"]
         ),
-        "retry_exit_code": Param(default=None, description=None, schema={"type": ["null", "boolean"], "title": "Retry Exit Code"}),
+        "retry_exit_code": Param(default=None, title="Retry Exit Code", description=None, type=["null", "boolean"]),
     },
     dag_id="a-dag",
 ) as dag:
