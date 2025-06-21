@@ -129,12 +129,20 @@ def _get_parts_from_value(key, value):
         keywords = [
             ast.keyword(arg="description", value=ast.Constant(value=value["description"])),
         ]
-        for key in ("value", "schema"):
-            new_imports, new_value = _get_parts_from_value(key, value[key])
-            if new_imports:
-                # If we have imports, we need to add them to the imports list
-                imports.extend(new_imports)
-            keywords.append(ast.keyword(arg=key, value=new_value))
+        new_imports, new_schema = _get_parts_from_value(key, value["schema"])
+        if new_imports:
+            # If we have imports, we need to add them to the imports list
+            imports.extend(new_imports)
+        keywords.append(ast.keyword(arg="schema", value=new_schema))
+
+        new_imports, new_value = _get_parts_from_value(key, value["value"])
+        if new_imports:
+            # If we have imports, we need to add them to the imports list
+            imports.extend(new_imports)
+        if new_value.value is None and "value" in value["schema"]:
+            keywords.insert(0, ast.keyword(arg="value", value=_get_parts_from_value(key, value["schema"]["value"])[1]))
+        else:
+            keywords.insert(0, ast.keyword(arg="value", value=new_value))
 
         return imports, ast.Call(
             func=ast.Name(id="Param", ctx=ast.Load()),

@@ -110,7 +110,6 @@ def bash_operator_args():
 def bash_sensor_args():
     return BashSensorArgs(
         bash_command="test",
-        cwd="test",
     )
 
 

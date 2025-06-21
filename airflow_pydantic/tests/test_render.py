@@ -105,7 +105,7 @@ with DAG(
         task_id="test_ssh_operator",
         dag=dag,
     )
-    task4 = BashSensor(bash_command="test", task_id="test_bash_sensor", cwd="test", dag=dag)
+    task4 = BashSensor(bash_command="test", task_id="test_bash_sensor", dag=dag)
     task5 = PythonSensor(python_callable=foo, op_args=["test"], op_kwargs={"test": "test"}, task_id="test_python_sensor", dag=dag)
 """
         )
@@ -191,7 +191,7 @@ with DAG(
         task_id="test_ssh_operator",
         dag=dag,
     )
-    task4 = BashSensor(bash_command="test", task_id="test_bash_sensor", cwd="test", dag=dag)
+    task4 = BashSensor(bash_command="test", task_id="test_bash_sensor", dag=dag)
     task5 = PythonSensor(python_callable=foo, op_args=["test"], op_kwargs={"test": "test"}, task_id="test_python_sensor", dag=dag)
     task1 >> task2
     task1 >> task3
