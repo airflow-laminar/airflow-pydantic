@@ -64,13 +64,13 @@ with DAG(
             value=None,
             schema={"value": "test", "type": "string", "title": "Bash Command"},
         ),
-        "env": Param(description=None, value=None, schema={"value": None, "type": "object", "title": "Env"}),
+        "env": Param(description=None, value=None, schema={"value": None, "type": ["null", "object"], "title": "Env"}),
         "output_encoding": Param(
             description="Output encoding for the command, default is 'utf-8'",
             value=None,
-            schema={"value": None, "type": "string", "title": "Output Encoding"},
+            schema={"value": None, "type": ["null", "string"], "title": "Output Encoding"},
         ),
-        "retry_exit_code": Param(description=None, value=None, schema={"value": None, "type": "boolean", "title": "Retry Exit Code"}),
+        "retry_exit_code": Param(description=None, value=None, schema={"value": None, "type": ["null", "boolean"], "title": "Retry Exit Code"}),
     },
     dag_id="a-dag",
 ) as dag:

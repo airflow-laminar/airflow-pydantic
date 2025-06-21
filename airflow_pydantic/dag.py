@@ -101,19 +101,21 @@ class DagArgs(BaseModel):
             }
             for key, value in new_v.items():
                 new_v[key] = {"value": value}
-                resolved_type = (
-                    v.__pydantic_fields__[key].annotation.__name__ if hasattr(v, "__pydantic_fields__") else v.__fields__[key].annotation.__name__
-                )
-                if resolved_type == "Optional":
+                resolved_type = v.__pydantic_fields__[key].annotation if hasattr(v, "__pydantic_fields__") else v.__fields__[key].annotation
+                if resolved_type.__name__ == "Optional":
+                    optional = True
                     # If the type is Optional, we need to extract the inner type
-                    inner_type = (
-                        v.__pydantic_fields__[key].annotation.__args__[0]
-                        if hasattr(v, "__pydantic_fields__")
-                        else v.__fields__[key].annotation.__args__[0]
-                    )
+                    resolved_type = resolved_type.__args__[0]
                 else:
-                    inner_type = str
-                new_v[key]["type"] = ParamType._resolve_type(inner_type)
+                    optional = False
+                if resolved_type.__name__ == "Union":
+                    resolved_type = str
+
+                if optional:
+                    type = ["null", ParamType._resolve_type(resolved_type)]
+                else:
+                    type = ParamType._resolve_type(resolved_type)
+                new_v[key]["type"] = type
                 new_v[key]["title"] = key.replace("_", " ").title()
                 new_v[key]["description"] = (
                     v.__pydantic_fields__[key].description if hasattr(v, "__pydantic_fields__") else v.__fields__[key].description
