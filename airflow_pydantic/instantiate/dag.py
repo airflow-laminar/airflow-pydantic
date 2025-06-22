@@ -24,6 +24,7 @@ class DagInstantiateMixin:
                     # If a config instance is provided, we will use the airflow_config DAG wrapper
                     _log.info("Using airflow_config Configuration instance: %s", config_instance)
                     dag_class = AirflowConfigDAG
+                    dag_args = {"config": config_instance}
                 else:
                     # Config provided as an argument but wrong type
                     raise TypeError(f"config must be an instance of airflow_config.Configuration, got {type(config_instance)} instead.")
@@ -31,14 +32,16 @@ class DagInstantiateMixin:
                 # If airflow_config is not available, we will use the Airflow DAG class directly
                 _log.warning("airflow_config is not available. Using AirflowDAG directly without configuration support.")
                 dag_class = AirflowDAG
+                dag_args = {}
         else:
             # If no config instance is provided, we will use the AirflowDAG class directly
             dag_class = AirflowDAG
+            dag_args = {}
 
         # NOTE: accept dag as an argument to allow for instantiation from airflow-config
         dag_instance = kwargs.pop("dag", None)
         if not dag_instance:
-            dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"])
+            dag_args = {**dag_args, **self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"])}
             dag_instance = dag_class(dag_id=self.dag_id, **dag_args, **kwargs)
 
         task_instances = {}

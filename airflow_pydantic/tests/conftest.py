@@ -315,4 +315,4 @@ def airflow_config_instance():
     except ImportError:
         pytest.skip("airflow_config is not installed, skipping airflow_config fixtures")
         return
-    return Configuration()
+    return Configuration(default_task_args=TaskArgs(owner="test"))

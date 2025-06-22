@@ -33,13 +33,13 @@ class TestDag:
     def test_dag_context(self, dag_args):
         # Test direct context manager usage
         with Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True)) as dag:
-            assert dag
+            assert "owner" not in dag.default_args
 
         # Test instantiation context manager usage
         model = Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True))
 
         with model.instantiate() as dag:
-            assert dag
+            assert "owner" not in dag.default_args
 
     def test_dag_selection(self, dag_args, airflow_config_instance):
         from airflow_config import DAG as AirflowConfigDAG
@@ -47,9 +47,11 @@ class TestDag:
         model = Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True))
         with model.instantiate() as dag:
             assert isinstance(dag, AirflowDAG)
+            assert "owner" not in dag.default_args
 
         with model.instantiate(config=airflow_config_instance) as dag:
             assert isinstance(dag, AirflowConfigDAG)
+            assert dag.default_args["owner"] == "test"
 
         with pytest.raises(TypeError):
             with model.instantiate(config="wrong"):
