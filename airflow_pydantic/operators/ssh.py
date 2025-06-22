@@ -40,6 +40,9 @@ class SSHTaskArgs(TaskArgs, extra="allow"):
 
     # Track source of hook in order to defer
     ssh_hook_foo: Optional[CallablePath] = Field(default=None, exclude=True)
+    ssh_hook_external: Optional[bool] = Field(
+        default=False, exclude=True, description="Whether to force the ssh_hook to be an external call or not. Only works when ssh_hook is a Callable"
+    )
 
     ssh_conn_id: Optional[str] = Field(
         default=None, description="ssh connection id from airflow Connections. ssh_conn_id will be ignored if ssh_hook is provided."
@@ -96,12 +99,23 @@ class SSHTaskArgs(TaskArgs, extra="allow"):
                     # Override pool from host if not otherwise set
                     if data["ssh_hook"].pool and not data.get("pool"):
                         data["pool"] = data["ssh_hook"].pool
-                elif isinstance(ssh_hook, (FunctionType, MethodType)):
+
+                if isinstance(ssh_hook, str):
+                    # If ssh_hook is a string, we assume it's an import path
+                    data["ssh_hook_foo"] = get_import_path(ssh_hook)
+
+                    try:
+                        data["ssh_hook"] = data["ssh_hook_foo"]()
+                    except Exception:
+                        # Skip, might only run in situ
+                        data["ssh_hook"] = None
+
+                if isinstance(ssh_hook, (FunctionType, MethodType)):
                     # If ssh_hook is a callable, we need to call it to get the SSHHook instance
                     data["ssh_hook_foo"] = get_import_path(ssh_hook)
 
                     try:
-                        data["ssh_hook"] = ssh_hook()
+                        data["ssh_hook"] = data["ssh_hook_foo"]()
                     except Exception:
                         # Skip, might only run in situ
                         data["ssh_hook"] = None

@@ -283,6 +283,7 @@ def dag_none_schedule(dag_args):
 @fixture
 def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator):
     ssh_operator.ssh_hook = hook
+    ssh_operator.ssh_hook_external = True
     return Dag(
         dag_id="a-dag",
         **dag_args.model_dump(exclude_unset=True),
