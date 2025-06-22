@@ -1,7 +1,7 @@
 from datetime import timedelta
-from typing import Iterable, List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
@@ -14,7 +14,7 @@ __all__ = (
 )
 
 
-class TaskArgs(BaseModel, extra="allow"):
+class TaskArgs(BaseModel, extra="allow", validate_assignment=True):
     # Operator Args
     # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator
 
@@ -129,46 +129,79 @@ class TaskArgs(BaseModel, extra="allow"):
     # allow_nested_operators (bool) – if True, when an operator is executed within another one a warning message will be logged. If False, then an exception will be raised if the operator is badly used (e.g. nested within another one). In future releases of Airflow this parameter will be removed and an exception will always be thrown when operators are nested within each other (default is True).
 
 
-class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow"):
+TaskReference = Union[str, "Task"]
+TaskAttribute = Union[str, Tuple[str, str], Tuple["Task", str]]
+
+
+class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow", validate_assignment=True):
     task_id: Optional[str] = Field(default=None, description="a unique, meaningful id for the task")
 
     operator: ImportPath = Field(description="airflow operator path")
-    dependencies: Optional[List[str]] = Field(default=None, description="dependencies")
+    dependencies: Optional[Union[List[TaskReference], List[TaskAttribute]]] = Field(default=None, description="dependencies")
 
-    def __lshift__(self, other: Union["Task", Iterable["Task"]]) -> "Task":
+    @field_validator("dependencies", mode="before")
+    def _validate_dependencies(cls, v):
+        """Normalize to List[Union[str, Tuple[str, str]]]"""
+        if isinstance(v, str):
+            v = [v]
+        if isinstance(v, tuple):
+            v = [v]
+        if isinstance(v, Task):
+            # NOTE: keep as task for now in case period in task_id
+            v = [v]
+
+        for i, element in enumerate(v):
+            if isinstance(element, tuple):
+                assert len(element) == 2, "Tuple dependencies must be of length 2 (task_id, attribute)"
+                if isinstance(element[0], Task):
+                    # If the first element is a Task, convert to string representation
+                    element = (element[0].task_id, element[1])
+                if not isinstance(element[1], str):
+                    raise ValueError("The second element of the tuple must be a string representing the attribute name.")
+            if isinstance(element, str) and "." in element:
+                # If the string contains a period, it is likely a task reference
+                task_id, attribute = element.rsplit(".", 1)
+                element = (task_id, attribute)
+            if isinstance(element, Task):
+                # If the element is a Task, convert to its task_id
+                element = element.task_id
+            v[i] = element
+        return v
+
+    def __lshift__(self, other: Union["Task", List["Task"]]) -> "Task":
         """e.g. a << Task() << b"""
         if isinstance(other, Task):
             self.dependencies = self.dependencies or []
             self.dependencies.append(other.task_id)
-        elif isinstance(other, Iterable):
+        elif isinstance(other, List):
             for task in other:
                 self.__lshift__(task)
         return self
 
-    def __rshift__(self, other: Union["Task", Iterable["Task"]]) -> "Task":
+    def __rshift__(self, other: Union["Task", List["Task"]]) -> "Task":
         """e.g. a >> Task() >> b"""
         if isinstance(other, Task):
             other.dependencies = other.dependencies or []
             other.dependencies.append(self.task_id)
-        elif isinstance(other, Iterable):
+        elif isinstance(other, List):
             for task in other:
                 self.__rshift__(task)
         return self
 
-    def set_upstream(self, other: Union["Task", Iterable["Task"]]):
+    def set_upstream(self, other: Union["Task", List["Task"]]):
         if isinstance(other, Task):
             self.dependencies = self.dependencies or []
             self.dependencies.append(other.task_id)
-        elif isinstance(other, Iterable):
+        elif isinstance(other, List):
             for task in other:
                 self.set_upstream(task)
         return self
 
-    def set_downstream(self, other: Union["Task", Iterable["Task"]]):
+    def set_downstream(self, other: Union["Task", List["Task"]]):
         if isinstance(other, Task):
             other.dependencies = other.dependencies or []
             other.dependencies.append(self.task_id)
-        elif isinstance(other, Iterable):
+        elif isinstance(other, List):
             for task in other:
                 self.set_downstream(task)
         return self

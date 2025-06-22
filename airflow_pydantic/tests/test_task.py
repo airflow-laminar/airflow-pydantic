@@ -88,3 +88,60 @@ class TestTask:
         assert t2.dependencies == [t1.task_id]
         assert t3.dependencies == [t2.task_id, t1.task_id]
         assert t4.dependencies == [t2.task_id, t3.task_id, t1.task_id]
+
+    def test_task_dependency_normalization(self):
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies="a",
+        )
+        assert t1.dependencies == ["a"]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies=["a"],
+        )
+        assert t1.dependencies == ["a"]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies="a.b",
+        )
+        assert t1.dependencies == [("a", "b")]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies=["a.b", "a.b.c"],
+        )
+        assert t1.dependencies == [("a", "b"), ("a.b", "c")]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies=t1,
+        )
+        assert t1.dependencies == ["a-task"]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies=[t1],
+        )
+        assert t1.dependencies == ["a-task"]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies=[(t1, "c")],
+        )
+        assert t1.dependencies == [("a-task", "c")]
+
+        t1 = Task(
+            task_id="a-task",
+            operator="airflow.operators.empty.EmptyOperator",
+            dependencies=["a", "a.b.c", t1, ("a.b", "c"), (t1, "c")],
+        )
+        assert t1.dependencies == ["a", ("a.b", "c"), "a-task", ("a.b", "c"), ("a-task", "c")]
