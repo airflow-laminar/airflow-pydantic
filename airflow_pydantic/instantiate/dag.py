@@ -75,7 +75,7 @@ class DagInstantiateMixin:
                     raise ValueError(f"Duplicate task_id found: {task_id}. Task IDs must be unique within a DAG.")
 
                 _log.info(
-                    "Instantiating task: %s\nTask args: %d",
+                    "Instantiating task: %s\nTask args: %s",
                     task_id,
                     task.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]),
                 )

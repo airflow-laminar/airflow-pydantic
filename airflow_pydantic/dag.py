@@ -24,7 +24,7 @@ __all__ = (
 _log = getLogger(__name__)
 
 
-class DagArgs(BaseModel):
+class DagArgs(BaseModel, validate_assignment=True):
     # DAG args
     # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/dag/index.html
 
@@ -107,7 +107,6 @@ class DagArgs(BaseModel):
                 new_v = {k: v for k, v in v.model_fields.items() if k not in all_omit}
 
             for key, value in new_v.items():
-                new_v[key] = {"value": value}
                 resolved_type = v.__pydantic_fields__[key].annotation if hasattr(v, "__pydantic_fields__") else v.__fields__[key].annotation
                 if resolved_type.__name__ == "Optional":
                     # If the type is Optional, we need to extract the inner type
@@ -115,14 +114,23 @@ class DagArgs(BaseModel):
                 if resolved_type.__name__ == "Union":
                     resolved_type = str
 
-                param_type = ["null", ParamType._resolve_type(resolved_type)]
+                check_param_type = ParamType._resolve_type(resolved_type)
+                if not check_param_type:
+                    # Ignore, cannot be resolved
+                    _log.info(f"Cannot resolve type for param '{key}' with type {resolved_type}. It will be set to 'null'.")
+                    new_v[key] = None
+                    continue
+
+                param_type = ["null", check_param_type]
+                new_v[key] = {"value": value}
                 new_v[key]["type"] = param_type
                 new_v[key]["title"] = key.replace("_", " ").title()
                 new_v[key]["description"] = (
                     v.__pydantic_fields__[key].description if hasattr(v, "__pydantic_fields__") else v.__fields__[key].description
                 )
                 new_v[key]["default"] = v.__pydantic_fields__[key].default if hasattr(v, "__pydantic_fields__") else v.__fields__[key].default
-            v = new_v
+
+            v = {k: v for k, v in new_v.items() if v is not None}
             # TODO: exclude none, but extract the type into airflow params
         return v
 
@@ -143,7 +151,7 @@ class DagArgs(BaseModel):
         return v
 
 
-class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin):
+class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin, validate_assignment=True):
     dag_id: Optional[str] = Field(
         default=None, description="The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)"
     )

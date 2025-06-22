@@ -37,6 +37,13 @@ class SSHTaskArgs(TaskArgs, extra="allow"):
         ssh_hook: Optional[Union[SSHHook, CallablePath]] = Field(
             default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
         )
+
+    # Track source of hook in order to defer
+    ssh_hook_foo: Optional[CallablePath] = Field(default=None, exclude=True)
+    ssh_hook_external: Optional[bool] = Field(
+        default=False, exclude=True, description="Whether to force the ssh_hook to be an external call or not. Only works when ssh_hook is a Callable"
+    )
+
     ssh_conn_id: Optional[str] = Field(
         default=None, description="ssh connection id from airflow Connections. ssh_conn_id will be ignored if ssh_hook is provided."
     )
@@ -92,6 +99,26 @@ class SSHTaskArgs(TaskArgs, extra="allow"):
                     # Override pool from host if not otherwise set
                     if data["ssh_hook"].pool and not data.get("pool"):
                         data["pool"] = data["ssh_hook"].pool
+
+                if isinstance(ssh_hook, str):
+                    # If ssh_hook is a string, we assume it's an import path
+                    data["ssh_hook_foo"] = get_import_path(ssh_hook)
+
+                    try:
+                        data["ssh_hook"] = data["ssh_hook_foo"]()
+                    except Exception:
+                        # Skip, might only run in situ
+                        data["ssh_hook"] = None
+
+                if isinstance(ssh_hook, (FunctionType, MethodType)):
+                    # If ssh_hook is a callable, we need to call it to get the SSHHook instance
+                    data["ssh_hook_foo"] = get_import_path(ssh_hook)
+
+                    try:
+                        data["ssh_hook"] = data["ssh_hook_foo"]()
+                    except Exception:
+                        # Skip, might only run in situ
+                        data["ssh_hook"] = None
         return data
 
     @field_validator("ssh_hook", mode="before")
@@ -104,7 +131,12 @@ class SSHTaskArgs(TaskArgs, extra="allow"):
                 v = get_import_path(v)
 
             if isinstance(v, (FunctionType, MethodType)):
-                v = v()
+                try:
+                    # If it's a callable, we need to call it to get the SSHHook instance
+                    v = v()
+                except Exception:
+                    # Skip, might only run in situ
+                    v = None
 
             if have_balancer:
                 if isinstance(v, BalancerHostQueryConfiguration):
@@ -116,7 +148,7 @@ class SSHTaskArgs(TaskArgs, extra="allow"):
 
             if isinstance(v, dict):
                 v = TypeAdapter(SSHHook).validate_python(v)
-            assert isinstance(v, BaseSSHHook)
+            assert v is None or isinstance(v, BaseSSHHook), f"ssh_hook must be an instance of SSHHook, got: {type(v)}"
         return v
 
 

@@ -283,6 +283,7 @@ def dag_none_schedule(dag_args):
 @fixture
 def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator):
     ssh_operator.ssh_hook = hook
+    ssh_operator.ssh_hook_external = True
     return Dag(
         dag_id="a-dag",
         **dag_args.model_dump(exclude_unset=True),
@@ -306,6 +307,51 @@ def dag_with_supervisor(dag_args, task_args, supervisor_operator):
             "task": supervisor_operator,
         },
     )
+
+
+# @fixture
+# def dag_with_attribute_dependencies(dag_args, task_args, supervisor_operator):
+#     from airflow_ha import HighAvailabilityTask
+
+#     _pre = lambda **kwargs: "test"
+#     def fail():
+#         raise AirflowFailException
+
+#     ha = HighAvailabilityTask(task_id="ha", python_callable=lambda **kwargs: None, dependencies=[_pre.task_id])
+
+#     pre = PythonTask(task_id="pre", python_callable=_pre)
+#     pre >> ha
+
+#     retrigger_fail = PythonTask(task_id="retrigger_fail", python_callable=_pre)
+#     ha.retrigger_fail >> retrigger_fail
+
+#     stop_fail = PythonTask(task_id="stop_fail", python_callable=fail, trigger_rule="all_failed")
+#     ha.stop_fail >> stop_fail
+
+#     retrigger_pass = PythonTask(task_id="retrigger_pass", python_callable=_pre)
+#     ha.retrigger_pass >> retrigger_pass
+
+#     stop_pass = PythonTask(task_id="lam-stop_pass", python_callable=_pre)
+#     ha.stop_pass >> stop_pass
+
+#     retrigger_fail = PythonTask(
+#         task_id="retrigger_fail",
+#         python_callable=lambda **kwargs: None,
+#         dependencies=[ha.task_id],
+#     )
+#     return Dag(
+#         dag_id="a-dag",
+#         **dag_args.model_dump(),
+#         default_args=task_args,
+#         tasks={
+#             "ha": ha,
+#         },
+#     )
+
+#   #     lam_retrigger_fail:
+#   #       _target_: airflow_pydantic.PythonOperator
+#   #       python_callable: validation_dags.ha_foo._pre
+#   #       dependencies: [lam_ha]
 
 
 @fixture

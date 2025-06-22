@@ -1,7 +1,9 @@
+from types import FunctionType, MethodType
 from typing import Annotated, Any, Literal, Optional
 
 from airflow.models.param import Param as BaseParam
 from pydantic import (
+    BaseModel,
     Field,
     GetCoreSchemaHandler,
 )
@@ -73,7 +75,12 @@ class ParamType:
             return "array"
         if typ_ is None:
             return "null"
-        return "object"
+        if isinstance(typ_, (FunctionType, MethodType)):
+            return None
+        if isinstance(typ_, BaseModel):
+            return "object"
+        # Can't resolve
+        return None
 
 
 Param = Annotated[BaseParam, ParamType]

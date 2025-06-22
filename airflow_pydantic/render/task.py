@@ -57,6 +57,28 @@ class TaskRenderMixin:
 
         args = {**self.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
         for k, v in args.items():
+            # For a specific SSH Hook, we want to replace the password with a variable invocation
+            if (
+                k == "ssh_hook"
+                and (v is None or (hasattr(self, "ssh_hook_external") and self.ssh_hook_external))
+                and hasattr(self, "ssh_hook_foo")
+                and self.ssh_hook_foo
+            ):
+                # If we have a callable, we want to import it
+                foo_import, foo_name = serialize_path_as_string(self.ssh_hook_foo).rsplit(".", 1)
+                imports.append(
+                    ast.ImportFrom(
+                        module=foo_import,
+                        names=[ast.alias(name=foo_name)],
+                        level=0,
+                    )
+                )
+                # Replace the ssh_hook with the callable
+                args[k] = ast.Call(func=ast.Name(id=foo_name, ctx=ast.Load()), args=[], keywords=[])
+                self.ssh_hook = None  # Clear the ssh_hook to avoid confusion
+                continue
+
+            # Default case
             import_, value = _get_parts_from_value(k, v)
             if import_:
                 imports.extend(import_)
@@ -67,36 +89,35 @@ class TaskRenderMixin:
                 # Otherwise, we need to convert it to an AST node
                 args[k] = ast.Constant(value=value)
 
-            # For a specific SSH Hook, we want to replace the password with a variable invocation
-            if k == "ssh_hook":
-                # If it was a balancer hook using a variable, we want to handle differently
-                if hasattr(self, "ssh_hook_host") and self.ssh_hook_host:
-                    # If we have a host, and the host looks in a variable, lets
-                    # use that instead of printing the password.
-                    if self.ssh_hook_host.username and not self.ssh_hook_host.password and self.ssh_hook_host.password_variable:
-                        imports.append(
-                            ast.ImportFrom(
-                                module="airflow.models.variable",
-                                names=[ast.alias(name="Variable")],
-                                level=0,
-                            )
+            # If it was a balancer hook using a variable, we want to handle differently
+            if k == "ssh_hook" and hasattr(self, "ssh_hook_host") and self.ssh_hook_host:
+                # If we have a host, and the host looks in a variable, lets
+                # use that instead of printing the password.
+                if self.ssh_hook_host.username and not self.ssh_hook_host.password and self.ssh_hook_host.password_variable:
+                    imports.append(
+                        ast.ImportFrom(
+                            module="airflow.models.variable",
+                            names=[ast.alias(name="Variable")],
+                            level=0,
                         )
-                        call: ast.Call = args[k]
-                        for k in call.keywords:
-                            if k.arg == "password":
-                                variable_get = ast.Call(
-                                    func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
-                                    args=[ast.Constant(value=self.ssh_hook_host.password_variable)],
-                                    keywords=[],
+                    )
+
+                    call: ast.Call = args[k]
+                    for k in call.keywords:
+                        if k.arg == "password":
+                            variable_get = ast.Call(
+                                func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
+                                args=[ast.Constant(value=self.ssh_hook_host.password_variable)],
+                                keywords=[],
+                            )
+                            if self.ssh_hook_host.password_variable_key:
+                                # Use bracket operator to get the key called password_variable_key
+                                k.value = ast.Subscript(
+                                    value=variable_get,
+                                    slice=ast.Constant(value=self.ssh_hook_host.password_variable_key),
                                 )
-                                if self.ssh_hook_host.password_variable_key:
-                                    # Use bracket operator to get the key called password_variable_key
-                                    k.value = ast.Subscript(
-                                        value=variable_get,
-                                        slice=ast.Constant(value=self.ssh_hook_host.password_variable_key),
-                                    )
-                                else:
-                                    k.value = variable_get
+                            else:
+                                k.value = variable_get
 
         inside_dag = ast.Call(
             func=ast.Name(id=operator_name, ctx=ast.Load()),
