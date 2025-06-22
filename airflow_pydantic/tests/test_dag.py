@@ -147,3 +147,7 @@ with DAG(
     ...
 """
         )
+
+    def test_dag_with_attribute_dependencies(self, dag_with_attribute_dependencies):
+        d = dag_with_attribute_dependencies.instantiate()
+        assert len(d.tasks) == 12

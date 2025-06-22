@@ -86,8 +86,13 @@ class DagInstantiateMixin:
             for task_id, task in self.tasks.items():
                 if task.dependencies:
                     for dep in task.dependencies:
-                        _log.info("Setting dependency: %s >> %s", dep, task_id)
-                        task_instances[dep] >> task_instances[task_id]
+                        if isinstance(dep, tuple):
+                            dep, attr = dep
+                            _log.info("Setting dependency: %s.%s >> %s", dep, attr, task_id)
+                            getattr(task_instances[dep], attr) >> task_instances[task_id]
+                        else:
+                            _log.info("Setting dependency: %s >> %s", dep, task_id)
+                            task_instances[dep] >> task_instances[task_id]
             return dag_instance
 
     def __enter__(self):
