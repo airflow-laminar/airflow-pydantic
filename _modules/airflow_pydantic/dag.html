@@ -368,8 +368,12 @@
                 <span class="k">if</span> <span class="n">resolved_type</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Optional&quot;</span><span class="p">:</span>
                     <span class="c1"># If the type is Optional, we need to extract the inner type</span>
                     <span class="n">resolved_type</span> <span class="o">=</span> <span class="n">resolved_type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">resolved_type</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Literal&quot;</span><span class="p">:</span>
+                    <span class="c1"># If the type is Literal, we need to extract the inner type</span>
+                    <span class="n">resolved_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">resolved_type</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;Union&quot;</span><span class="p">:</span>
-                    <span class="n">resolved_type</span> <span class="o">=</span> <span class="nb">str</span>
+                    <span class="c1"># Resolve to the first non-null type in the union</span>
+                    <span class="n">resolved_type</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">resolved_type</span><span class="o">.</span><span class="n">__args__</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="nb">str</span><span class="p">)</span>
 
                 <span class="n">check_param_type</span> <span class="o">=</span> <span class="n">ParamType</span><span class="o">.</span><span class="n">_resolve_type</span><span class="p">(</span><span class="n">resolved_type</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">check_param_type</span><span class="p">:</span>
@@ -378,6 +382,9 @@
                     <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="k">continue</span>
 
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+                    <span class="c1"># TODO double check this</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">param_type</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;null&quot;</span><span class="p">,</span> <span class="n">check_param_type</span><span class="p">]</span>
                 <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
                 <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_type</span>
