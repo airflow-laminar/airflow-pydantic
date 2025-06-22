@@ -10,6 +10,7 @@ from .utils import DatetimeArg, ImportPath, TriggerRule
 __all__ = (
     "TaskArgs",
     "Task",
+    "TaskModel",
 )
 
 
@@ -136,3 +137,6 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow"):
 
 
 __all_task_fields__ = list(Task.__pydantic_fields__.keys() if hasattr(Task, "__pydantic_fields__") else Task.__fields__.keys())
+
+# Alias
+TaskModel = Task

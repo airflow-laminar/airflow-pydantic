@@ -1,9 +1,13 @@
 from importlib.metadata import version
 
+import pytest
+
 if version("apache-airflow") >= "3.0.0":
     _AIRFLOW_3 = True
 else:
     _AIRFLOW_3 = False
+
+from airflow.models import DAG as AirflowDAG
 
 from airflow_pydantic import Dag, DagArgs
 
@@ -25,6 +29,31 @@ class TestDag:
         # Test roundtrips
         assert d == Dag.model_validate(d.model_dump(exclude_unset=True))
         assert d == Dag.model_validate_json(d.model_dump_json(exclude_unset=True))
+
+    def test_dag_context(self, dag_args):
+        # Test direct context manager usage
+        with Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True)) as dag:
+            assert dag
+
+        # Test instantiation context manager usage
+        model = Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True))
+
+        with model.instantiate() as dag:
+            assert dag
+
+    def test_dag_selection(self, dag_args, airflow_config_instance):
+        from airflow_config import DAG as AirflowConfigDAG
+
+        model = Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True))
+        with model.instantiate() as dag:
+            assert isinstance(dag, AirflowDAG)
+
+        with model.instantiate(config=airflow_config_instance) as dag:
+            assert isinstance(dag, AirflowConfigDAG)
+
+        with pytest.raises(TypeError):
+            with model.instantiate(config="wrong"):
+                ...
 
     def test_dag_none_schedule(self, dag_none_schedule):
         d = dag_none_schedule

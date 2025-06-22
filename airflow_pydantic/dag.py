@@ -17,6 +17,7 @@ else:
 __all__ = (
     "DagArgs",
     "Dag",
+    "DagModel",
 )
 
 
@@ -153,3 +154,6 @@ class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin):
 
 
 __all_dag_fields__ = list(Dag.__pydantic_fields__.keys() if hasattr(Dag, "__pydantic_fields__") else Dag.__fields__.keys())
+
+# Alias
+DagModel = Dag
