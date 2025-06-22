@@ -154,14 +154,13 @@ def _get_parts_from_value(key, value):
         if new_imports:
             # If we have imports, we need to add them to the imports list
             imports.extend(new_imports)
+
         if new_value.value is None:
-            keywords.insert(0, ast.keyword(arg="default", value=_get_parts_from_value(key, default_value)[1]))
-        else:
-            keywords.insert(0, ast.keyword(arg="default", value=new_value))
+            new_value = _get_parts_from_value(key, default_value)[1]
 
         return imports, ast.Call(
             func=ast.Name(id="Param", ctx=ast.Load()),
-            args=[],
+            args=[new_value],
             keywords=keywords,
         )
 
