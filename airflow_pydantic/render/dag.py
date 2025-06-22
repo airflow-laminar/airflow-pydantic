@@ -72,7 +72,13 @@ class DagRenderMixin:
 
             # Grab dependencies and add them
             if task.dependencies:
-                task_dependencies[task_id] = [_task_id_to_better_name(dependency) for dependency in task.dependencies]
+                to_set = []
+                for dependency in task.dependencies:
+                    if isinstance(dependency, tuple):
+                        # Normalize first element of tuple to task_id
+                        dependency = (_task_id_to_better_name(dependency[0]), dependency[1])
+                    to_set.append(dependency)
+                task_dependencies[task_id] = to_set
 
         # Imports
         imports.append(ast.ImportFrom(module="airflow.models", names=[ast.alias(name="DAG")], level=0))
@@ -124,15 +130,30 @@ class DagRenderMixin:
         # Handle task dependencies
         for task_id, dependencies in task_dependencies.items():
             for dependency in dependencies:
+                # Extract attribute accessor if it exists
+                if isinstance(dependency, tuple):
+                    dependency, accessor = dependency
+                else:
+                    accessor = None
+
                 # NOTE: this should have already been validated in the DAG,
                 # but do again here for safety
                 if dependency not in tasks:
                     raise ValueError(f"Task Dependency for {task_id} not found: {dependency}")
 
+                if accessor:
+                    # Access attribute `accessor` of the dependency task
+                    dependency_ast = ast.Attribute(
+                        value=ast.Name(id=dependency, ctx=ast.Load()),
+                        attr=accessor,
+                        ctx=ast.Load(),
+                    )
+                else:
+                    dependency_ast = ast.Name(id=dependency)
                 dag_block.body.append(
                     ast.Expr(
                         value=ast.BinOp(
-                            left=ast.Name(id=dependency),
+                            left=dependency_ast,
                             op=ast.RShift(),
                             right=ast.Name(id=task_id),
                         )

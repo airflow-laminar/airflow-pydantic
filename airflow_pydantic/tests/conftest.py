@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import pytest
+from airflow.exceptions import AirflowFailException
 from pytest import fixture
 
 from airflow_pydantic import (
@@ -301,7 +302,7 @@ def dag_with_supervisor(dag_args, task_args, supervisor_operator):
     ssh_operator.ssh_hook = hook
     return Dag(
         dag_id="a-dag",
-        **dag_args.model_dump(),
+        **dag_args.model_dump(exclude_unset=True),
         default_args=task_args,
         tasks={
             "task": supervisor_operator,
@@ -309,49 +310,47 @@ def dag_with_supervisor(dag_args, task_args, supervisor_operator):
     )
 
 
-# @fixture
-# def dag_with_attribute_dependencies(dag_args, task_args, supervisor_operator):
-#     from airflow_ha import HighAvailabilityTask
+def _null(**kwargs):
+    return "test"
 
-#     _pre = lambda **kwargs: "test"
-#     def fail():
-#         raise AirflowFailException
 
-#     ha = HighAvailabilityTask(task_id="ha", python_callable=lambda **kwargs: None, dependencies=[_pre.task_id])
+def fail():
+    raise AirflowFailException
 
-#     pre = PythonTask(task_id="pre", python_callable=_pre)
-#     pre >> ha
 
-#     retrigger_fail = PythonTask(task_id="retrigger_fail", python_callable=_pre)
-#     ha.retrigger_fail >> retrigger_fail
+def _choose(**kwargs):
+    from airflow_ha import Action, Result
 
-#     stop_fail = PythonTask(task_id="stop_fail", python_callable=fail, trigger_rule="all_failed")
-#     ha.stop_fail >> stop_fail
+    return (Result.PASS, Action.CONTINUE)  # noqa: E731
 
-#     retrigger_pass = PythonTask(task_id="retrigger_pass", python_callable=_pre)
-#     ha.retrigger_pass >> retrigger_pass
 
-#     stop_pass = PythonTask(task_id="lam-stop_pass", python_callable=_pre)
-#     ha.stop_pass >> stop_pass
+@fixture
+def dag_with_attribute_dependencies(dag_args, task_args, supervisor_operator):
+    try:
+        from airflow_ha import HighAvailabilityTask
+    except ImportError:
+        pytest.skip("airflow_ha is not installed, skipping HighAvailabilityTask fixtures")
+        return
 
-#     retrigger_fail = PythonTask(
-#         task_id="retrigger_fail",
-#         python_callable=lambda **kwargs: None,
-#         dependencies=[ha.task_id],
-#     )
-#     return Dag(
-#         dag_id="a-dag",
-#         **dag_args.model_dump(),
-#         default_args=task_args,
-#         tasks={
-#             "ha": ha,
-#         },
-#     )
-
-#   #     lam_retrigger_fail:
-#   #       _target_: airflow_pydantic.PythonOperator
-#   #       python_callable: validation_dags.ha_foo._pre
-#   #       dependencies: [lam_ha]
+    pre = PythonTask(task_id="pre", python_callable=_null)
+    ha = HighAvailabilityTask(task_id="ha", python_callable=_choose, dependencies=["pre"])
+    retrigger_fail = PythonTask(task_id="retrigger_fail", python_callable=_null, dependencies=[(ha, "retrigger_fail")])
+    stop_fail = PythonTask(task_id="stop_fail", python_callable=fail, trigger_rule="all_failed", dependencies=[(ha, "stop_fail")])
+    retrigger_pass = PythonTask(task_id="retrigger_pass", python_callable=_null, dependencies=[(ha, "retrigger_pass")])
+    stop_pass = PythonTask(task_id="lam-stop_pass", python_callable=_null, dependencies=[(ha, "stop_pass")])
+    return Dag(
+        dag_id="a-dag",
+        **dag_args.model_dump(exclude_unset=True),
+        default_args=task_args,
+        tasks={
+            "pre": pre,
+            "ha": ha,
+            "retrigger_fail": retrigger_fail,
+            "stop_fail": stop_fail,
+            "retrigger_pass": retrigger_pass,
+            "stop_pass": stop_pass,
+        },
+    )
 
 
 @fixture

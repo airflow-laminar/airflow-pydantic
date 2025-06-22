@@ -18,10 +18,20 @@ TaskCode = str
 
 RenderedCode = Tuple[Imports, Globals, TaskCode]
 
+_LAMBDA_TYPE = type(lambda: 0)
+
+
+def _islambda(v):
+    return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
+
 
 def _get_parts_from_value(key, value):
     imports = []
 
+    if _islambda(value):
+        raise NotImplementedError(
+            f"Got lambda for {key}:Lambda functions are not supported in the configuration. Please use a regular function instead."
+        )
     if key in ("ssh_hook", "python_callable", "output_processor"):
         from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
 
@@ -62,6 +72,12 @@ def _get_parts_from_value(key, value):
                 # For python_callable and output_processor, we need to use the name directly
                 return imports, ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=[], keywords=[])
             return imports, ast.Name(id=name, ctx=ast.Load())
+
+    if isinstance(value, TriggerRule):
+        # NOTE: put before the basics types below
+        # If the value is a TriggerRule, we can use a string
+        return imports, ast.Constant(value=value.value)
+
     if isinstance(value, (str, int, float, bool)):
         # If the value is a primitive type, we can use ast.Constant
         return imports, ast.Constant(value=value)
@@ -119,9 +135,6 @@ def _get_parts_from_value(key, value):
             args=[ast.Constant(value=value.total_seconds())],
             keywords=[],
         )
-    if isinstance(value, TriggerRule):
-        # If the value is a TriggerRule, we can use a string
-        return imports, ast.Constant(value=value.value)
     if isinstance(value, Param):
         # If the value is a Param, we can use a dict with the properties
         imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
