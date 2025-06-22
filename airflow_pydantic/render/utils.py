@@ -135,15 +135,18 @@ def _get_parts_from_value(key, value):
         # Grab the default value from the schema if it exists
         default_value = value["schema"].pop("value", None)
 
-        # If the default value is None and the schema type is object, reset to empty dict
-        if default_value is None and value["schema"].get("type") == ["null", "object"]:
-            default_value = {}
-
         # Process title
         if "title" in value["schema"]:
             keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=value["schema"]["title"])))
 
         # Process type
+        if default_value is not None:
+            # We can remove the "null" from the type if it exists
+            if "null" in value["schema"]["type"]:
+                value["schema"]["type"].remove("null")
+        if isinstance(value["schema"]["type"], list) and len(value["schema"]["type"]) == 1:
+            # If the type is a single item list, we can use it directly
+            value["schema"]["type"] = value["schema"]["type"][0]
         new_imports, new_type = _get_parts_from_value(key, value["schema"]["type"])
         keywords.append(ast.keyword(arg="type", value=new_type))
         if new_imports:
