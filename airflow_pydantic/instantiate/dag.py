@@ -42,3 +42,17 @@ class DagInstantiateMixin:
                         task_instances[dep] >> task_instances[task_id]
 
             return dag_instance
+
+    def __enter__(self, **kwargs):
+        """
+        Allows the DagInstantiateMixin to be used as a context manager.
+        """
+        return self.instantiate(**kwargs)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Allows the DagInstantiateMixin to be used as a context manager.
+        """
+        if exc_type is not None:
+            _log.error("An error occurred during DAG instantiation: %s", exc_value)
+        return False

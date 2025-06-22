@@ -91,14 +91,20 @@ class DagArgs(BaseModel):
     @classmethod
     def _validate_params(cls, v):
         # Automatically convert BaseModel to dict for params
-        if isinstance(v, BaseModel):
+        if isinstance(v, BaseModel) or (isinstance(v, type) and issubclass(v, BaseModel)):
             from .task import __all_task_fields__
 
+            all_omit = __all_task_fields__ + __all_dag_fields__
             # Naively convert to dict if it's a BaseModel
-            new_v = v.model_dump(exclude_unset=False, exclude=__all_task_fields__ + __all_dag_fields__)
-            new_v = {
-                key: value for key, value in new_v.items() if key in (v.__pydantic_fields__ if hasattr(v, "__pydantic_fields__") else v.__fields__)
-            }
+            if isinstance(v, BaseModel):
+                new_v = {
+                    key: value
+                    for key, value in v.model_dump(exclude_unset=False, exclude=all_omit).items()
+                    if key in (v.__pydantic_fields__ if hasattr(v, "__pydantic_fields__") else v.__fields__)
+                }
+            else:
+                new_v = {k: v for k, v in v.model_fields.items() if k not in all_omit}
+
             for key, value in new_v.items():
                 new_v[key] = {"value": value}
                 resolved_type = v.__pydantic_fields__[key].annotation if hasattr(v, "__pydantic_fields__") else v.__fields__[key].annotation
@@ -108,8 +114,8 @@ class DagArgs(BaseModel):
                 if resolved_type.__name__ == "Union":
                     resolved_type = str
 
-                type = ["null", ParamType._resolve_type(resolved_type)]
-                new_v[key]["type"] = type
+                param_type = ["null", ParamType._resolve_type(resolved_type)]
+                new_v[key]["type"] = param_type
                 new_v[key]["title"] = key.replace("_", " ").title()
                 new_v[key]["description"] = (
                     v.__pydantic_fields__[key].description if hasattr(v, "__pydantic_fields__") else v.__fields__[key].description
