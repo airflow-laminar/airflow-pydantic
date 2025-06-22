@@ -129,6 +129,7 @@ section-order = ["future", "standard-library", "third-party", "first-party", "lo
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
+"airflow_pydantic/tests/rendered/*" = ["AIR301"]
 
 [tool.yardang]
 title = "airflow-pydantic"
