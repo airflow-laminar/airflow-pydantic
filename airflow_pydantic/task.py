@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import List, Optional
+from typing import Iterable, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -134,6 +134,44 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow"):
 
     operator: ImportPath = Field(description="airflow operator path")
     dependencies: Optional[List[str]] = Field(default=None, description="dependencies")
+
+    def __lshift__(self, other: Union["Task", Iterable["Task"]]) -> "Task":
+        """e.g. a << Task() << b"""
+        if isinstance(other, Task):
+            self.dependencies = self.dependencies or []
+            self.dependencies.append(other.task_id)
+        elif isinstance(other, Iterable):
+            for task in other:
+                self.__lshift__(task)
+        return self
+
+    def __rshift__(self, other: Union["Task", Iterable["Task"]]) -> "Task":
+        """e.g. a >> Task() >> b"""
+        if isinstance(other, Task):
+            other.dependencies = other.dependencies or []
+            other.dependencies.append(self.task_id)
+        elif isinstance(other, Iterable):
+            for task in other:
+                self.__rshift__(task)
+        return self
+
+    def set_upstream(self, other: Union["Task", Iterable["Task"]]):
+        if isinstance(other, Task):
+            self.dependencies = self.dependencies or []
+            self.dependencies.append(other.task_id)
+        elif isinstance(other, Iterable):
+            for task in other:
+                self.set_upstream(task)
+        return self
+
+    def set_downstream(self, other: Union["Task", Iterable["Task"]]):
+        if isinstance(other, Task):
+            other.dependencies = other.dependencies or []
+            other.dependencies.append(self.task_id)
+        elif isinstance(other, Iterable):
+            for task in other:
+                self.set_downstream(task)
+        return self
 
 
 __all_task_fields__ = list(Task.__pydantic_fields__.keys() if hasattr(Task, "__pydantic_fields__") else Task.__fields__.keys())
