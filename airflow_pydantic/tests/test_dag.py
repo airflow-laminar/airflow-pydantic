@@ -1,4 +1,5 @@
 from importlib.metadata import version
+from unittest.mock import patch
 
 import pytest
 
@@ -44,14 +45,27 @@ class TestDag:
     def test_dag_selection(self, dag_args, airflow_config_instance):
         from airflow_config import DAG as AirflowConfigDAG
 
-        model = Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True))
-        with model.instantiate() as dag:
-            assert isinstance(dag, AirflowDAG)
-            assert "owner" not in dag.default_args
+        # NOTE: we will use the log as a sentinel to check that things
+        # are only called once, since airflow_config will call
+        # instantiate() itself
+        with patch("airflow_pydantic.instantiate.dag._log") as _log:
+            model = Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True))
+            with model.instantiate() as dag:
+                assert isinstance(dag, AirflowDAG)
+                assert "owner" not in dag.default_args
+            assert _log.info.call_count == 1
+            assert _log.info.call_args_list[0][0][0] == "Available tasks: %s\nInstantiating tasks for DAG: %s"
 
-        with model.instantiate(config=airflow_config_instance) as dag:
-            assert isinstance(dag, AirflowConfigDAG)
-            assert dag.default_args["owner"] == "test"
+        with patch("airflow_pydantic.instantiate.dag._log") as _log:
+            with model.instantiate(config=airflow_config_instance) as dag:
+                assert isinstance(dag, AirflowConfigDAG)
+                assert dag.default_args["owner"] == "test"
+                assert "test" in dag.tags
+            assert _log.info.call_count == 4
+            assert _log.info.call_args_list[0][0][0] == "Using airflow_config.Configuration instance: %s"
+            assert _log.info.call_args_list[1][0][0] == "DAG %s found in airflow_config.Configuration instance, applying its settings."
+            assert _log.info.call_args_list[2][0][0] == "DAG %s overriding %s with value: %s"
+            assert _log.info.call_args_list[3][0][0] == "Available tasks: %s\nInstantiating tasks for DAG: %s"
 
         with pytest.raises(TypeError):
             with model.instantiate(config="wrong"):
