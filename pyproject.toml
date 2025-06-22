@@ -48,6 +48,7 @@ laminar = [
     # SSH Operator testing
     "airflow-balancer",
     "airflow-common-operators",
+    "airflow-ha",
     "airflow-supervisor>=1.7.4",
     "apache-airflow-providers-ssh",
     "supervisor-pydantic",

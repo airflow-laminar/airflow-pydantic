@@ -306,3 +306,13 @@ def dag_with_supervisor(dag_args, task_args, supervisor_operator):
             "task": supervisor_operator,
         },
     )
+
+
+@fixture
+def airflow_config_instance():
+    try:
+        from airflow_config import Configuration
+    except ImportError:
+        pytest.skip("airflow_config is not installed, skipping airflow_config fixtures")
+        return
+    return Configuration()

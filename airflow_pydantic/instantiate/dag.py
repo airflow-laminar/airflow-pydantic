@@ -1,8 +1,11 @@
-__all__ = ("DagInstantiateMixin",)
-
+from importlib.util import find_spec
 from logging import getLogger
 
-from airflow.models import DAG
+from airflow.models import DAG as AirflowDAG
+
+__all__ = ("DagInstantiateMixin",)
+
+have_airflow_config = find_spec("airflow_config") is not None
 
 _log = getLogger(__name__)
 
@@ -12,11 +15,31 @@ class DagInstantiateMixin:
         if not self.dag_id:
             raise ValueError("dag_id must be set to instantiate a DAG")
 
+        config_instance = kwargs.pop("config", None)
+        if config_instance:
+            if have_airflow_config:
+                from airflow_config import DAG as AirflowConfigDAG, Configuration
+
+                if isinstance(config_instance, Configuration):
+                    # If a config instance is provided, we will use the airflow_config DAG wrapper
+                    _log.info("Using airflow_config Configuration instance: %s", config_instance)
+                    dag_class = AirflowConfigDAG
+                else:
+                    # Config provided as an argument but wrong type
+                    raise TypeError(f"config must be an instance of airflow_config.Configuration, got {type(config_instance)} instead.")
+            else:
+                # If airflow_config is not available, we will use the Airflow DAG class directly
+                _log.warning("airflow_config is not available. Using AirflowDAG directly without configuration support.")
+                dag_class = AirflowDAG
+        else:
+            # If no config instance is provided, we will use the AirflowDAG class directly
+            dag_class = AirflowDAG
+
         # NOTE: accept dag as an argument to allow for instantiation from airflow-config
         dag_instance = kwargs.pop("dag", None)
         if not dag_instance:
             dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"])
-            dag_instance = DAG(dag_id=self.dag_id, **dag_args, **kwargs)
+            dag_instance = dag_class(dag_id=self.dag_id, **dag_args, **kwargs)
 
         task_instances = {}
 
@@ -43,11 +66,12 @@ class DagInstantiateMixin:
 
             return dag_instance
 
-    def __enter__(self, **kwargs):
+    def __enter__(self):
         """
         Allows the DagInstantiateMixin to be used as a context manager.
         """
-        return self.instantiate(**kwargs)
+        with self.instantiate() as dag_instance:
+            return dag_instance
 
     def __exit__(self, exc_type, exc_value, traceback):
         """
