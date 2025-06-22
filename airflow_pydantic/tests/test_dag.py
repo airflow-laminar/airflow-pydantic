@@ -59,14 +59,12 @@ from airflow.models.param import Param
 
 with DAG(
     params={
-        "bash_command": Param(
-            default="test", title="Bash Command", description="bash command string, list of strings, or model", type=["null", "string"]
-        ),
-        "env": Param(default={}, title="Env", description=None, type=["null", "object"]),
+        "bash_command": Param("test", title="Bash Command", description="bash command string, list of strings, or model", type=["null", "string"]),
+        "env": Param({}, title="Env", description=None, type=["null", "object"]),
         "output_encoding": Param(
-            default=None, title="Output Encoding", description="Output encoding for the command, default is 'utf-8'", type=["null", "string"]
+            None, title="Output Encoding", description="Output encoding for the command, default is 'utf-8'", type=["null", "string"]
         ),
-        "retry_exit_code": Param(default=None, title="Retry Exit Code", description=None, type=["null", "boolean"]),
+        "retry_exit_code": Param(None, title="Retry Exit Code", description=None, type=["null", "boolean"]),
     },
     dag_id="a-dag",
 ) as dag:
