@@ -376,16 +376,16 @@ with DAG(
     max_active_runs=1,
     catchup=False,
     params={
-        "poke_interval": Param(None, title="Poke Interval", description=None, type=["null", "string"]),
-        "timeout": Param(None, title="Timeout", description=None, type=["null", "string"]),
+        "poke_interval": Param(None, title="Poke Interval", description=None, type=["null", "number"]),
+        "timeout": Param(None, title="Timeout", description=None, type=["null", "number"]),
         "soft_fail": Param(None, title="Soft Fail", description=None, type=["null", "boolean"]),
-        "mode": Param(None, title="Mode", description=None, type=["null", "object"]),
+        "mode": Param(None, title="Mode", description=None, type=["null", "string"]),
         "exponential_backoff": Param(None, title="Exponential Backoff", description=None, type=["null", "boolean"]),
-        "max_wait": Param(None, title="Max Wait", description=None, type=["null", "string"]),
+        "max_wait": Param(None, title="Max Wait", description=None, type=["null", "number"]),
         "silent_fail": Param(None, title="Silent Fail", description=None, type=["null", "boolean"]),
         "never_fail": Param(None, title="Never Fail", description=None, type=["null", "boolean"]),
         "op_args": Param(
-            ["test"], title="Op Args", description="a list of positional arguments that will get unpacked when calling your callable", type="object"
+            ["test"], title="Op Args", description="a list of positional arguments that will get unpacked when calling your callable", type="array"
         ),
         "op_kwargs": Param(
             {"test": "test"},

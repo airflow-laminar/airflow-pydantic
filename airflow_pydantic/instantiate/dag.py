@@ -44,12 +44,13 @@ class DagInstantiateMixin:
                     if self.dag_id in config_instance.dags:
                         _log.info("DAG %s found in airflow_config.Configuration instance, applying its settings.", self.dag_id)
                         config_dag = config_instance.dags[self.dag_id]
-                        for k, v in config_dag.model_dump(exclude_unset=True, exclude_defaults=True).items():
+                        for k, v in config_dag.model_dump(exclude_unset=True, exclude_defaults=True, exclude=["type_", "tasks"]).items():
                             _log.info("DAG %s overriding %s with value: %s", self.dag_id, k, v)
                             setattr(self, k, v)
 
-                        # Return here and let the config instance handle the instantiation
-                        return AirflowConfigDAG(dag_id=self.dag_id, config=config_instance)
+                        # Finish here and let the config instance handle the instantiation
+                        if not dag_instance:
+                            dag_instance = AirflowConfigDAG(dag_id=self.dag_id, config=config_instance)
                 else:
                     # Config provided as an argument but wrong type
                     raise TypeError(f"config must be an instance of airflow_config.Configuration, got {type(config_instance)} instead.")
@@ -79,7 +80,7 @@ class DagInstantiateMixin:
                     task_id,
                     task.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]),
                 )
-                task_instances[task_id] = task.instantiate(**kwargs)
+                task_instances[task_id] = task.instantiate(dag=dag_instance, **kwargs)
 
             # second pass, set dependencies
             for task_id, task in self.tasks.items():
@@ -87,7 +88,6 @@ class DagInstantiateMixin:
                     for dep in task.dependencies:
                         _log.info("Setting dependency: %s >> %s", dep, task_id)
                         task_instances[dep] >> task_instances[task_id]
-
             return dag_instance
 
     def __enter__(self):

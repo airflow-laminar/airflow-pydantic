@@ -1,5 +1,6 @@
+from datetime import datetime, timedelta
 from types import FunctionType, MethodType
-from typing import Annotated, Any, Literal, Optional
+from typing import Annotated, Any, Literal, Optional, get_origin
 
 from airflow.models.param import Param as BaseParam
 from pydantic import (
@@ -61,8 +62,22 @@ class ParamType:
 
     @classmethod
     def _resolve_type(cls, typ_) -> str:
-        if not isinstance(typ_, type):
+        if isinstance(typ_, list):
+            return "array"
+        if isinstance(typ_, dict):
             return "object"
+        if not isinstance(typ_, type):
+            try:
+                if get_origin(typ_) is dict:
+                    # Handle generic dict types
+                    return "object"
+                if get_origin(typ_) is list:
+                    # Handle generic list types
+                    return "array"
+            except Exception:
+                # Ignore and return None
+                ...
+            return None
         if issubclass(typ_, bool):
             return "boolean"
         if issubclass(typ_, str):
@@ -73,11 +88,17 @@ class ParamType:
             return "number"
         if issubclass(typ_, list):
             return "array"
+        if issubclass(typ_, datetime):
+            # epoch
+            return "number"
+        if issubclass(typ_, timedelta):
+            # seconds
+            return "number"
         if typ_ is None:
             return "null"
-        if isinstance(typ_, (FunctionType, MethodType)):
+        if issubclass(typ_, (FunctionType, MethodType)):
             return None
-        if isinstance(typ_, BaseModel):
+        if issubclass(typ_, BaseModel):
             return "object"
         # Can't resolve
         return None
