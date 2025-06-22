@@ -111,8 +111,12 @@ class DagArgs(BaseModel, validate_assignment=True):
                 if resolved_type.__name__ == "Optional":
                     # If the type is Optional, we need to extract the inner type
                     resolved_type = resolved_type.__args__[0]
+                if resolved_type.__name__ == "Literal":
+                    # If the type is Literal, we need to extract the inner type
+                    resolved_type = type(resolved_type.__args__[0])
                 if resolved_type.__name__ == "Union":
-                    resolved_type = str
+                    # Resolve to the first non-null type in the union
+                    resolved_type = next((arg for arg in resolved_type.__args__ if arg is not type(None)), str)
 
                 check_param_type = ParamType._resolve_type(resolved_type)
                 if not check_param_type:
@@ -121,6 +125,9 @@ class DagArgs(BaseModel, validate_assignment=True):
                     new_v[key] = None
                     continue
 
+                if value is not None and not isinstance(value, (str, int, float, bool, list, dict)):
+                    # TODO double check this
+                    value = None
                 param_type = ["null", check_param_type]
                 new_v[key] = {"value": value}
                 new_v[key]["type"] = param_type
