@@ -272,6 +272,7 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;DagArgs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;Dag&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DagModel&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -414,6 +415,9 @@
 
 
 <span class="n">__all_dag_fields__</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Dag</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">Dag</span><span class="p">,</span> <span class="s2">&quot;__pydantic_fields__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">Dag</span><span class="o">.</span><span class="n">__fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1"># Alias</span>
+<span class="n">DagModel</span> <span class="o">=</span> <span class="n">Dag</span>
 </pre></div>
         </article>
       </div>
