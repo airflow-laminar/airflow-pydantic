@@ -33,34 +33,38 @@ def _get_parts_from_value(key, value):
             f"Got lambda for {key}:Lambda functions are not supported in the configuration. Please use a regular function instead."
         )
     if key in ("ssh_hook", "python_callable", "output_processor"):
-        from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
+        try:
+            from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
 
-        if isinstance(value, BaseSSHHook):
-            # Add SSHHook to imports
-            import_module, name = serialize_path_as_string(value).rsplit(".", 1)
-            imports.append(ast.ImportFrom(module=import_module, names=[ast.alias(name=name)], level=0))
+            if isinstance(value, BaseSSHHook):
+                # Add SSHHook to imports
+                import_module, name = serialize_path_as_string(value).rsplit(".", 1)
+                imports.append(ast.ImportFrom(module=import_module, names=[ast.alias(name=name)], level=0))
 
-            # Add SSHHook builder to args
-            call = ast.Call(
-                func=ast.Name(id=name, ctx=ast.Load()),
-                args=[],
-                keywords=[],
-            )
-            for arg_name in SSHHook.__metadata__[0].__annotations__:
-                default_value = getattr(SSHHook.__metadata__[0], arg_name).default
-                arg_value = getattr(value, arg_name, None)
-                if arg_value is None:
-                    continue
-                if arg_value == default_value:
-                    # Matches, can skip as well
-                    continue
-                if isinstance(arg_value, (str, int, float, bool)):
-                    # If the value is a primitive type, we can use ast.Constant
-                    # NOTE: all types in SSHHook are primitives
-                    call.keywords.append(ast.keyword(arg=arg_name, value=ast.Constant(value=arg_value)))
-                else:
-                    raise TypeError(f"Unsupported type for SSHHook argument '{arg_name}': {type(arg_value)}")
-            return imports, call
+                # Add SSHHook builder to args
+                call = ast.Call(
+                    func=ast.Name(id=name, ctx=ast.Load()),
+                    args=[],
+                    keywords=[],
+                )
+                for arg_name in SSHHook.__metadata__[0].__annotations__:
+                    default_value = getattr(SSHHook.__metadata__[0], arg_name).default
+                    arg_value = getattr(value, arg_name, None)
+                    if arg_value is None:
+                        continue
+                    if arg_value == default_value:
+                        # Matches, can skip as well
+                        continue
+                    if isinstance(arg_value, (str, int, float, bool)):
+                        # If the value is a primitive type, we can use ast.Constant
+                        # NOTE: all types in SSHHook are primitives
+                        call.keywords.append(ast.keyword(arg=arg_name, value=ast.Constant(value=arg_value)))
+                    else:
+                        raise TypeError(f"Unsupported type for SSHHook argument '{arg_name}': {type(arg_value)}")
+                return imports, call
+        except ImportError:
+            # If SSHHook is not available, we can skip it
+            pass
 
         if isinstance(value, (MethodType, FunctionType)):
             # If the field is an ImportPath or CallablePath, we need to serialize it as a string and add it to the imports
