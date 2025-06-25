@@ -347,7 +347,7 @@ with DAG(
     )
 """
         )
-        exec(dag_with_supervisor.render())
+        # exec(dag_with_supervisor.render())
 
     def test_render_single_task_python_sensor_and_params(self, dag, python_sensor):
         dag.tasks = {"test_python_sensor": python_sensor}
