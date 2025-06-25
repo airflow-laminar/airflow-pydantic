@@ -16,7 +16,7 @@ __all__ = (
 )
 
 
-class BaseSensorArgs(TaskArgs, extra="allow"):
+class BaseSensorArgs(TaskArgs):
     poke_interval: Optional[Union[timedelta, float]] = None
     timeout: Optional[Union[timedelta, float]] = None
     soft_fail: Optional[bool] = None
@@ -54,7 +54,7 @@ class PythonSensor(Task, PythonSensorArgs):
         return v
 
 
-class BashSensorArgs(TaskArgs, extra="allow"):
+class BashSensorArgs(TaskArgs):
     # bash sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/bash/index.html#airflow.providers.standard.sensors.bash.BashSensor
     bash_command: Union[str, List[str], BashCommands] = Field(default=None, description="bash command string, list of strings, or model")

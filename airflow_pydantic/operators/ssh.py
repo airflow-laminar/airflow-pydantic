@@ -25,7 +25,7 @@ __all__ = (
 )
 
 
-class SSHTaskArgs(TaskArgs, extra="allow"):
+class SSHTaskArgs(TaskArgs):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
     if have_balancer:

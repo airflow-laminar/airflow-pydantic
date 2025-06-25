@@ -14,7 +14,7 @@ __all__ = (
 )
 
 
-class BashTaskArgs(TaskArgs, extra="allow"):
+class BashTaskArgs(TaskArgs):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
     bash_command: Union[str, List[str], BashCommands] = Field(default=None, description="bash command string, list of strings, or model")

@@ -25,6 +25,7 @@ class DagInstantiateMixin:
         if not self.dag_id and dag_instance:
             # If a DAG instance is provided, we will use its dag_id
             self.dag_id = dag_instance.dag_id
+
         elif not self.dag_id:
             raise ValueError("dag_id must be set to instantiate a DAG")
 
@@ -50,7 +51,7 @@ class DagInstantiateMixin:
 
                         # Finish here and let the config instance handle the instantiation
                         if not dag_instance:
-                            dag_instance = AirflowConfigDAG(dag_id=self.dag_id, config=config_instance)
+                            return AirflowConfigDAG(dag_id=self.dag_id, config=config_instance)
                 else:
                     # Config provided as an argument but wrong type
                     raise TypeError(f"config must be an instance of airflow_config.Configuration, got {type(config_instance)} instead.")
