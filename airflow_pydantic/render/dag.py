@@ -34,7 +34,7 @@ class DagRenderMixin:
         new_dag = ast.Module(body=[], type_ignores=[])
         # First, Prepare DAG kwargs
         # dag_kwargs = [ast.keyword("dag_id", ast.Constant(value=self.dag_id))]
-        dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "default_args"])
+        dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "default_args", "enabled"])
 
         for k, v in dag_args.items():
             new_imports, value = _get_parts_from_value(k, v)

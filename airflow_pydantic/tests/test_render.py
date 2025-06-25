@@ -54,7 +54,6 @@ with DAG(
     is_paused_upon_creation=True,
     tags=["a", "b"],
     dag_display_name="test",
-    enabled=True,
     dag_id="a-dag",
     default_args={
         "owner": "airflow",
@@ -109,6 +108,7 @@ with DAG(
     task5 = PythonSensor(python_callable=foo, op_args=["test"], op_kwargs={"test": "test"}, task_id="test_python_sensor", dag=dag)
 """
         )
+        exec(dag.render())
 
     def test_render_with_dependencies(self, dag):
         dag.tasks["task1"].dependencies = []
@@ -140,7 +140,6 @@ with DAG(
     is_paused_upon_creation=True,
     tags=["a", "b"],
     dag_display_name="test",
-    enabled=True,
     dag_id="a-dag",
     default_args={
         "owner": "airflow",
@@ -198,6 +197,7 @@ with DAG(
     task2 >> task3
 """
         )
+        exec(dag.render())
 
     def test_render_with_externals(self, dag_with_external):
         assert isinstance(dag_with_external, Dag)
@@ -224,7 +224,6 @@ with DAG(
     is_paused_upon_creation=True,
     tags=["a", "b"],
     dag_display_name="test",
-    enabled=True,
     dag_id="a-dag",
     default_args={
         "owner": "airflow",
@@ -277,6 +276,7 @@ with DAG(
     )
 """
         )
+        exec(dag_with_external.render())
 
     def test_render_with_external_supervisor_config(self, dag_with_supervisor):
         assert isinstance(dag_with_supervisor, Dag)
@@ -301,7 +301,6 @@ with DAG(
     is_paused_upon_creation=True,
     tags=["a", "b"],
     dag_display_name="test",
-    enabled=True,
     dag_id="a-dag",
     default_args={
         "owner": "airflow",
@@ -348,6 +347,7 @@ with DAG(
     )
 """
         )
+        exec(dag_with_supervisor.render())
 
     def test_render_single_task_python_sensor_and_params(self, dag, python_sensor):
         dag.tasks = {"test_python_sensor": python_sensor}
@@ -400,7 +400,6 @@ with DAG(
     is_paused_upon_creation=True,
     tags=["a", "b"],
     dag_display_name="test",
-    enabled=True,
     dag_id="a-dag",
     default_args={
         "owner": "airflow",
@@ -447,7 +446,6 @@ with DAG(
     is_paused_upon_creation=True,
     tags=["a", "b"],
     dag_display_name="test",
-    enabled=True,
     dag_id="a-dag",
     default_args={
         "owner": "airflow",
@@ -479,3 +477,5 @@ with DAG(
     ha.stop_pass >> stop_pass
 """
         )
+
+        exec(dag_with_attribute_dependencies.render())
