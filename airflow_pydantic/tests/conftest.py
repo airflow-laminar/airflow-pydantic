@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from unittest.mock import patch
 
 import pytest
@@ -201,7 +201,7 @@ def supervisor_cfg():
         path = "/an/arbitrary/path"
         p1.return_value = str(path)
         cfg = SupervisorAirflowConfiguration(
-            airflow=AirflowConfiguration(port="*:9090"),
+            airflow=AirflowConfiguration(port="*:9090", endtime=time(23, 59)),
             working_dir=path,
             path=path,
             program={
