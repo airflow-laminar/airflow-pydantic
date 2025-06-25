@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import List, Optional, Tuple, Union
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
@@ -14,7 +14,7 @@ __all__ = (
 )
 
 
-class TaskArgs(BaseModel, extra="allow", validate_assignment=True):
+class TaskArgs(BaseModel, validate_assignment=True):
     # Operator Args
     # https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator
 
@@ -133,11 +133,28 @@ TaskReference = Union[str, "Task"]
 TaskAttribute = Union[str, Tuple[str, str], Tuple["Task", str]]
 
 
-class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, extra="allow", validate_assignment=True):
+class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=True):
     task_id: Optional[str] = Field(default=None, description="a unique, meaningful id for the task")
 
     operator: ImportPath = Field(description="airflow operator path")
     dependencies: Optional[Union[List[TaskReference], List[TaskAttribute]]] = Field(default=None, description="dependencies")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_model(cls, values):
+        if "template" in values:
+            template: TaskArgs = values.pop("template")
+            # Do field-by-field for larger types
+            for key, value in template.model_dump(exclude_unset=True).items():
+                if key not in values:
+                    values[key] = value
+                elif isinstance(value, dict):
+                    # If the field is a BaseModel, we need to update it
+                    # with the new values from the template
+                    for subkey, subvalue in value.items():
+                        if subkey not in values[key]:
+                            values[key][subkey] = subvalue
+        return values
 
     @field_validator("dependencies", mode="before")
     def _validate_dependencies(cls, v):

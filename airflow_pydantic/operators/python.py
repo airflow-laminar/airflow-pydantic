@@ -26,7 +26,7 @@ __all__ = (
 )
 
 
-class PythonTaskArgs(TaskArgs, extra="allow"):
+class PythonTaskArgs(TaskArgs):
     # python operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/python/index.html#airflow.providers.standard.operators.python.PythonOperator
     python_callable: CallablePath = Field(default=None, description="python_callable")

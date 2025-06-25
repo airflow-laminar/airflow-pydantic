@@ -2,7 +2,7 @@ from importlib.metadata import version
 from logging import getLogger
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .instantiate import DagInstantiateMixin
 from .render import DagRenderMixin
@@ -43,7 +43,7 @@ class DagArgs(BaseModel, validate_assignment=True):
     # template_undefined (type[jinja2.StrictUndefined]) – Template undefined type.
     # user_defined_macros (dict | None) – a dictionary of macros that will be exposed in your jinja templates. For example, passing dict(foo='bar') to this argument allows you to {{ foo }} in all jinja templates related to this DAG. Note that you can pass any type of object here.
     # user_defined_filters (dict | None) – a dictionary of filters that will be exposed in your jinja templates. For example, passing dict(hello=lambda name: 'Hello %s' % name) to this argument allows you to {{ 'world' | hello }} in all jinja templates related to this DAG.
-    # default_args (dict | None) – A dictionary of default parameters to be used as constructor keyword parameters when initialising operators. Note that operators have the same hook, and precede those defined here, meaning that if your dict contains ‘depends_on_past’: True here and ‘depends_on_past’: False in the operator’s call default_args, the actual value will be False.
+    default_args: Optional[TaskArgs] = Field(default=None, description="Default arguments for tasks in the DAG")
     # params (collections.abc.MutableMapping | None) – a dictionary of DAG level parameters that are made accessible in templates, namespaced under params. These params can be overridden at the task level.
     max_active_tasks: Optional[int] = Field(default=None, description="the number of task instances allowed to run concurrently", gt=0)
     max_active_runs: Optional[int] = Field(
@@ -162,10 +162,26 @@ class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin, validate_assignment=True
     dag_id: Optional[str] = Field(
         default=None, description="The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)"
     )
-    default_args: Optional[TaskArgs] = Field(default=None, description="Default arguments for tasks in the DAG")
     tasks: Optional[Dict[str, Task]] = Field(default_factory=dict, description="List of tasks in the DAG")
 
     # TODO: Validate all task dependencies exist
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_model(cls, values):
+        if "template" in values:
+            template: DagArgs = values.pop("template")
+            # Do field-by-field for larger types
+            for key, value in template.model_dump(exclude_unset=True).items():
+                if key not in values:
+                    values[key] = value
+                elif isinstance(value, dict):
+                    # If the field is a BaseModel, we need to update it
+                    # with the new values from the template
+                    for subkey, subvalue in value.items():
+                        if subkey not in values[key]:
+                            values[key][subkey] = subvalue
+        return values
 
 
 __all_dag_fields__ = list(Dag.__pydantic_fields__.keys() if hasattr(Dag, "__pydantic_fields__") else Dag.__fields__.keys())
