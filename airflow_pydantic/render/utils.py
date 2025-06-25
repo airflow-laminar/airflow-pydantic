@@ -1,5 +1,5 @@
 import ast
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Tuple
@@ -137,6 +137,22 @@ def _get_parts_from_value(key, value):
         return imports, ast.Call(
             func=ast.Name(id="timedelta", ctx=ast.Load()),
             args=[ast.Constant(value=value.total_seconds())],
+            keywords=[],
+        )
+    if isinstance(value, time):
+        value: time
+        # If the value is a time, we can use time.fromisoformat
+        imports.append(ast.ImportFrom(module="datetime", names=[ast.alias(name="time")], level=0))
+
+        return imports, ast.Call(
+            func=ast.Name(id="time", ctx=ast.Load()),
+            args=[
+                ast.Constant(value=value.hour),
+                ast.Constant(value=value.minute),
+                ast.Constant(value=value.second),
+                ast.Constant(value=value.microsecond),
+                # TODO tzinfo
+            ],
             keywords=[],
         )
     if isinstance(value, Param):

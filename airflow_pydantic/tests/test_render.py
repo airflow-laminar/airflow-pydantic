@@ -286,6 +286,7 @@ with DAG(
 from airflow.models import DAG
 from airflow_supervisor.airflow.local import Supervisor
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from pathlib import Path
 
@@ -340,7 +341,7 @@ with DAG(
             "rpcinterface": {"supervisor": {"rpcinterface_factory": "supervisor.rpcinterface:make_main_rpcinterface"}},
             "config_path": Path("/an/arbitrary/path/supervisor.cfg"),
             "working_dir": Path("/an/arbitrary/path"),
-            "airflow": {},
+            "airflow": {"endtime": time(23, 59, 0, 0)},
         },
         task_id="test_supervisor",
         dag=dag,
