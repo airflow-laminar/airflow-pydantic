@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>airflow_pydantic.task - airflow-pydantic v1.3.0</title>
+        <title>airflow_pydantic.task - airflow-pydantic v1.3.1</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -171,7 +171,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.3.0</code></div></a>
+      <a href="../../index.html"><div class="brand">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.3.1</code></div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -195,7 +195,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.3.0</code></span>
+  <span class="sidebar-brand-text">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.3.1</code></span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -256,7 +256,7 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span><span class="p">,</span> <span class="n">model_validator</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.instantiate</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskInstantiateMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.render</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskRenderMixin</span>
@@ -271,7 +271,7 @@
 
 <div class="viewcode-block" id="TaskArgs">
 <a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.TaskArgs.html#airflow_pydantic.TaskArgs">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># Operator Args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow/2.10.4/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator</span>
 
@@ -393,11 +393,28 @@
 
 <div class="viewcode-block" id="Task">
 <a class="viewcode-back" href="../../docs/src/_build/airflow_pydantic.Task.html#airflow_pydantic.Task">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Task</span><span class="p">(</span><span class="n">TaskArgs</span><span class="p">,</span> <span class="n">TaskRenderMixin</span><span class="p">,</span> <span class="n">TaskInstantiateMixin</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Task</span><span class="p">(</span><span class="n">TaskArgs</span><span class="p">,</span> <span class="n">TaskRenderMixin</span><span class="p">,</span> <span class="n">TaskInstantiateMixin</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;a unique, meaningful id for the task&quot;</span><span class="p">)</span>
 
     <span class="n">operator</span><span class="p">:</span> <span class="n">ImportPath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;airflow operator path&quot;</span><span class="p">)</span>
     <span class="n">dependencies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TaskReference</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskAttribute</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;dependencies&quot;</span><span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;template&quot;</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="n">template</span><span class="p">:</span> <span class="n">TaskArgs</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;template&quot;</span><span class="p">)</span>
+            <span class="c1"># Do field-by-field for larger types</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                    <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="c1"># If the field is a BaseModel, we need to update it</span>
+                    <span class="c1"># with the new values from the template</span>
+                    <span class="k">for</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">subkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                            <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">subvalue</span>
+        <span class="k">return</span> <span class="n">values</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;dependencies&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
@@ -510,7 +527,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=1f29e9d3"></script>
+</div><script src="../../_static/documentation_options.js?v=bb516dca"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
