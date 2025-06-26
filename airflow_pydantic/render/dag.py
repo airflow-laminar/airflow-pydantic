@@ -37,7 +37,7 @@ class DagRenderMixin:
         dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "default_args", "enabled"])
 
         for k, v in dag_args.items():
-            new_imports, value = _get_parts_from_value(k, v)
+            new_imports, value = _get_parts_from_value(k, v, self)
             if new_imports:
                 imports.extend(new_imports)
             if isinstance(value, ast.AST):
