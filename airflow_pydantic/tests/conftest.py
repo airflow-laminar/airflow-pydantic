@@ -23,7 +23,7 @@ from airflow_pydantic import (
 
 has_balancer = False
 try:
-    from airflow_balancer import BalancerConfiguration, BalancerHostQueryConfiguration, Host
+    from airflow_balancer import BalancerConfiguration, BalancerHostQueryConfiguration, Host, Port
     from airflow_balancer.testing import pools, variables
 
     has_balancer = True
@@ -40,7 +40,15 @@ except ImportError:
 
 has_supervisor = False
 try:
-    from airflow_supervisor import AirflowConfiguration, ProgramConfiguration, SupervisorAirflowConfiguration, SupervisorTask
+    from airflow_supervisor import (
+        AirflowConfiguration,
+        ConvenienceConfiguration,
+        ProgramConfiguration,
+        SupervisorAirflowConfiguration,
+        SupervisorSSHAirflowConfiguration,
+        SupervisorSSHTask,
+        SupervisorTask,
+    )
 
     has_supervisor = True
 except ImportError:
@@ -214,8 +222,44 @@ def supervisor_cfg():
 
 
 @fixture
+def supervisor_ssh_cfg():
+    if not has_supervisor:
+        pytest.skip("airflow_supervisor is not installed, skipping supervisor fixtures")
+    with (
+        patch("supervisor_pydantic.config.supervisor.gettempdir") as p1,
+    ):
+        path = "/an/arbitrary/path"
+        p1.return_value = str(path)
+        cfg = SupervisorSSHAirflowConfiguration(
+            convenience=ConvenienceConfiguration(local_or_remote="remote"),
+            working_dir=path,
+            path=path,
+            program={
+                "test": ProgramConfiguration(
+                    command="bash -c 'sleep 60; exit 1'",
+                )
+            },
+        )
+        yield cfg
+
+
+@fixture
 def supervisor_operator(supervisor_cfg):
     yield SupervisorTask(task_id="test_supervisor", cfg=supervisor_cfg)
+
+
+@fixture
+def supervisor_ssh_operator(supervisor_ssh_cfg):
+    if not has_balancer:
+        pytest.skip("airflow_balancer is not installed, skipping supervisor ssh fixtures")
+
+    host = Host(name="test_host", username="test_user", password_variable="VAR", password_variable_key="password")
+    yield SupervisorSSHTask(
+        task_id="test_supervisor",
+        cfg=supervisor_ssh_cfg,
+        host=host,
+        port=Port(name="test_port", host=host, port=8080),
+    )
 
 
 @fixture
@@ -299,13 +343,24 @@ def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_o
 
 @fixture
 def dag_with_supervisor(dag_args, task_args, supervisor_operator):
-    ssh_operator.ssh_hook = hook
     return Dag(
         dag_id="a-dag",
         **dag_args.model_dump(exclude_unset=True),
         default_args=task_args,
         tasks={
             "task": supervisor_operator,
+        },
+    )
+
+
+@fixture
+def dag_with_supervisor_ssh(dag_args, task_args, supervisor_ssh_operator):
+    return Dag(
+        dag_id="a-dag",
+        **dag_args.model_dump(exclude_unset=True),
+        default_args=task_args,
+        tasks={
+            "task": supervisor_ssh_operator,
         },
     )
 

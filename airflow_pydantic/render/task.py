@@ -1,9 +1,14 @@
 import ast
+from importlib.util import find_spec
 from typing import Dict
 
 from pkn.pydantic import serialize_path_as_string
 
-from .utils import RenderedCode, _get_parts_from_value
+from .utils import RenderedCode, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
+
+have_balancer = False
+if find_spec("airflow_balancer"):
+    have_balancer = True
 
 __all__ = (
     "render_base_task_args",
@@ -18,7 +23,7 @@ def render_base_task_args(self, raw: bool = False, **kwargs: Dict[str, str]) -> 
 
     args = {**self.model_dump(exclude_unset=True, exclude=["type_"]), **kwargs}
     for k, v in args.items():
-        new_imports, value = _get_parts_from_value(k, v)
+        new_imports, value = _get_parts_from_value(k, v, self)
         if new_imports:
             imports.extend(new_imports)
         if isinstance(value, ast.AST):
@@ -64,22 +69,15 @@ class TaskRenderMixin:
                 and hasattr(self, "ssh_hook_foo")
                 and self.ssh_hook_foo
             ):
-                # If we have a callable, we want to import it
-                foo_import, foo_name = serialize_path_as_string(self.ssh_hook_foo).rsplit(".", 1)
-                imports.append(
-                    ast.ImportFrom(
-                        module=foo_import,
-                        names=[ast.alias(name=foo_name)],
-                        level=0,
-                    )
-                )
+                import_, value = _build_ssh_hook_callable(self.ssh_hook_foo)
+                imports.extend(import_)
                 # Replace the ssh_hook with the callable
-                args[k] = ast.Call(func=ast.Name(id=foo_name, ctx=ast.Load()), args=[], keywords=[])
+                args[k] = value
                 self.ssh_hook = None  # Clear the ssh_hook to avoid confusion
                 continue
 
             # Default case
-            import_, value = _get_parts_from_value(k, v)
+            import_, value = _get_parts_from_value(k, v, self)
             if import_:
                 imports.extend(import_)
             if isinstance(value, ast.AST):
@@ -93,31 +91,9 @@ class TaskRenderMixin:
             if k == "ssh_hook" and hasattr(self, "ssh_hook_host") and self.ssh_hook_host:
                 # If we have a host, and the host looks in a variable, lets
                 # use that instead of printing the password.
-                if self.ssh_hook_host.username and not self.ssh_hook_host.password and self.ssh_hook_host.password_variable:
-                    imports.append(
-                        ast.ImportFrom(
-                            module="airflow.models.variable",
-                            names=[ast.alias(name="Variable")],
-                            level=0,
-                        )
-                    )
-
-                    call: ast.Call = args[k]
-                    for k in call.keywords:
-                        if k.arg == "password":
-                            variable_get = ast.Call(
-                                func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
-                                args=[ast.Constant(value=self.ssh_hook_host.password_variable)],
-                                keywords=[],
-                            )
-                            if self.ssh_hook_host.password_variable_key:
-                                # Use bracket operator to get the key called password_variable_key
-                                k.value = ast.Subscript(
-                                    value=variable_get,
-                                    slice=ast.Constant(value=self.ssh_hook_host.password_variable_key),
-                                )
-                            else:
-                                k.value = variable_get
+                import_, call = _build_ssh_hook_with_variable(self.ssh_hook_host, args[k])
+                imports.extend(import_)
+                args[k] = call
 
         inside_dag = ast.Call(
             func=ast.Name(id=operator_name, ctx=ast.Load()),

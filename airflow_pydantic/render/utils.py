@@ -1,14 +1,21 @@
 import ast
 from datetime import datetime, time, timedelta
+from importlib.util import find_spec
 from pathlib import Path
 from types import FunctionType, MethodType
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from airflow.models.param import Param
 from airflow.utils.trigger_rule import TriggerRule
 from pkn.pydantic import serialize_path_as_string
+from pydantic import BaseModel
 
 from ..utils import SSHHook
+
+have_balancer = False
+if find_spec("airflow_balancer"):
+    have_balancer = True
+    from airflow_balancer import Host, Port
 
 __all__ = ("RenderedCode",)
 
@@ -25,9 +32,66 @@ def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
-def _get_parts_from_value(key, value):
+def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
+    imports = []
+    # If we have a callable, we want to import it
+    foo_import, foo_name = serialize_path_as_string(foo).rsplit(".", 1)
+    imports.append(
+        ast.ImportFrom(
+            module=foo_import,
+            names=[ast.alias(name=foo_name)],
+            level=0,
+        )
+    )
+    # Replace the ssh_hook with the callable
+    ret = ast.Call(func=ast.Name(id=foo_name, ctx=ast.Load()), args=[], keywords=[])
+    return imports, ret
+
+
+def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.ImportFrom], ast.Call]:
+    imports = []
+    if host.username and not host.password and host.password_variable:
+        imports.append(
+            ast.ImportFrom(
+                module="airflow.models.variable",
+                names=[ast.alias(name="Variable")],
+                level=0,
+            )
+        )
+
+        if isinstance(call, ast.Call):
+            for k in call.keywords:
+                if k.arg == "password":
+                    variable_get = ast.Call(
+                        func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
+                        args=[ast.Constant(value=host.password_variable)],
+                        keywords=[],
+                    )
+                    if host.password_variable_key:
+                        # Use bracket operator to get the key called password_variable_key
+                        k.value = ast.Subscript(
+                            value=variable_get,
+                            slice=ast.Constant(value=host.password_variable_key),
+                        )
+                    else:
+                        k.value = variable_get
+        else:
+            raise NotImplementedError(f"Got unexpected call type for `{ast.unparse(call)}`: {type(call)}")
+    return imports, call
+
+
+def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
     imports = []
 
+    # For certain types, we want to reset the recursive model_dump back
+    # to allow type-specific processing
+    # Reverted types:
+    #   - Host
+    #   - Port
+    if model_ref:
+        if have_balancer:
+            if isinstance(getattr(model_ref, key), (Host, Port)):
+                value = getattr(model_ref, key)
     if _islambda(value):
         raise NotImplementedError(
             f"Got lambda for {key}:Lambda functions are not supported in the configuration. Please use a regular function instead."
@@ -76,6 +140,44 @@ def _get_parts_from_value(key, value):
                 # For python_callable and output_processor, we need to use the name directly
                 return imports, ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=[], keywords=[])
             return imports, ast.Name(id=name, ctx=ast.Load())
+
+    if have_balancer:
+        if isinstance(value, Host):
+            imports.append(ast.ImportFrom(module="airflow_balancer", names=[ast.alias(name="Host")], level=0))
+
+            # Construct Call with host
+            keywords = []
+            for k, v in value.model_dump(exclude_unset=True).items():
+                keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+                if keyword_imports:
+                    imports.extend(keyword_imports)
+                keywords.append(ast.keyword(arg=k, value=keyword_value))
+            call = ast.Call(
+                func=ast.Name(id="Host", ctx=ast.Load()),
+                args=[],
+                keywords=keywords,
+            )
+
+            # Replace out variable
+            import_, call = _build_ssh_hook_with_variable(value, call)
+            if import_:
+                imports.extend(import_)
+            return imports, call
+
+        if isinstance(value, Port):
+            imports.append(ast.ImportFrom(module="airflow_balancer", names=[ast.alias(name="Port")], level=0))
+            keywords = []
+            for k, v in value.model_dump(exclude_unset=True).items():
+                keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+                if keyword_imports:
+                    imports.extend(keyword_imports)
+                keywords.append(ast.keyword(arg=k, value=keyword_value))
+            call = ast.Call(
+                func=ast.Name(id="Port", ctx=ast.Load()),
+                args=[],
+                keywords=keywords,
+            )
+            return imports, call
 
     if isinstance(value, TriggerRule):
         # NOTE: put before the basics types below

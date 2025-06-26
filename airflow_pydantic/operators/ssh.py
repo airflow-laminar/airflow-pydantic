@@ -10,7 +10,7 @@ from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
 have_balancer = False
 if find_spec("airflow_balancer"):
     have_balancer = True
-    from airflow_balancer.config import BalancerHostQueryConfiguration, Host
+    from airflow_balancer import BalancerHostQueryConfiguration, Host
 
 have_ssh_provider = False
 if find_spec("apache-airflow-providers-ssh"):
