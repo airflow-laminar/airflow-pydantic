@@ -200,6 +200,17 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
 
 
 @fixture
+def ssh_operator_balancer_template(ssh_operator_balancer):
+    if not has_balancer:
+        pytest.skip("airflow_balancer is not installed, skipping balancer fixtures")
+    with pools(), variables({"user": "test", "password": "password"}):
+        return SSHTask(
+            task_id="test_ssh_operator",
+            template=ssh_operator_balancer,
+        )
+
+
+@fixture
 def supervisor_cfg():
     if not has_supervisor:
         pytest.skip("airflow_supervisor is not installed, skipping supervisor fixtures")

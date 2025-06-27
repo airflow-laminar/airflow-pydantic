@@ -27,6 +27,19 @@ class TestRender:
             == "SSHOperator(pool='test_host', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR')['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
+    def test_render_operator_ssh_host_variable_from_template(self, ssh_operator_balancer_template):
+        imports, globals_, task = ssh_operator_balancer_template.render()
+        assert imports == [
+            "from airflow.providers.ssh.operators.ssh import SSHOperator",
+            "from airflow.providers.ssh.hooks.ssh import SSHHook",
+            "from airflow.models.variable import Variable",
+        ]
+        assert globals_ == []
+        assert (
+            task
+            == "SSHOperator(pool='test_host', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR')['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+        )
+
     def test_render_dag(self, dag):
         assert isinstance(dag, Dag)
         assert (
@@ -334,6 +347,8 @@ with DAG(
                     "stopwaitsecs": 30,
                     "stopasgroup": True,
                     "killasgroup": True,
+                    "stdout_logfile": Path("/an/arbitrary/path/test/output.log"),
+                    "stderr_logfile": Path("/an/arbitrary/path/test/error.log"),
                     "directory": Path("/an/arbitrary/path/test"),
                 }
             },
@@ -409,6 +424,8 @@ with DAG(
                     "stopwaitsecs": 30,
                     "stopasgroup": True,
                     "killasgroup": True,
+                    "stdout_logfile": Path("/an/arbitrary/path/test/output.log"),
+                    "stderr_logfile": Path("/an/arbitrary/path/test/error.log"),
                     "directory": Path("/an/arbitrary/path/test"),
                 }
             },

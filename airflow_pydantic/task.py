@@ -145,7 +145,13 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
         if "template" in values:
             template: TaskArgs = values.pop("template")
             # Do field-by-field for larger types
-            for key, value in template.model_dump(exclude_unset=True).items():
+            # NOTE: don't use model_dump here as some basemodel fields might be excluded
+            for key, value in template.__class__.model_fields.items():
+                if key not in template.model_fields_set:
+                    # see note above
+                    continue
+                # Get real value from template
+                value = getattr(template, key)
                 if key not in values:
                     values[key] = value
                 elif isinstance(value, dict):
