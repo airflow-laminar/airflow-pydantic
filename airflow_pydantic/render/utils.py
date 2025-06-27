@@ -69,6 +69,11 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.Import
                     )
                     if host.password_variable_key:
                         # Use bracket operator to get the key called password_variable_key
+                        variable_get = ast.Call(
+                            func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
+                            args=[ast.Constant(value=host.password_variable)],
+                            keywords=[ast.keyword(arg="deserialize_json", value=ast.Constant(value=True))],
+                        )
                         k.value = ast.Subscript(
                             value=variable_get,
                             slice=ast.Constant(value=host.password_variable_key),
