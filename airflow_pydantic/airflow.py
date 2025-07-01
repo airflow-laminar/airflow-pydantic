@@ -2,6 +2,8 @@ from getpass import getuser
 from typing import Set
 
 __all__ = (
+    "AirflowFailException",
+    "AirflowSkipException",
     "BashOperator",
     "BashSensor",
     "BranchPythonOperator",
@@ -16,6 +18,7 @@ __all__ = (
     "SSHHook",
     "SSHOperator",
     "TriggerRule",
+    "Variable",
     "_AirflowPydanticMarker",
 )
 
@@ -24,6 +27,7 @@ class _AirflowPydanticMarker: ...
 
 
 try:
+    from airflow.exceptions import AirflowFailException, AirflowSkipException
     from airflow.models.param import Param  # noqa: F401
     from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
     from airflow.models.variable import Variable  # noqa: F401
@@ -100,6 +104,16 @@ except ImportError:
             pass
 
     class PoolNotFound(Exception):
+        pass
+
+    class AirflowFailException(Exception):
+        """Exception raised when a task fails in Airflow."""
+
+        pass
+
+    class AirflowSkipException(Exception):
+        """Exception raised when a task is skipped in Airflow."""
+
         pass
 
     class Variable:
