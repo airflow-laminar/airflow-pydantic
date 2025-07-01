@@ -2,7 +2,7 @@ import os
 
 from pydantic import model_validator
 
-if os.environ.get("CCFLOW", "") != "":
+if os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW", "") != "":
     from ccflow import BaseModel as PydanticBaseModel
 else:
     from pydantic import BaseModel as PydanticBaseModel
