@@ -6,4 +6,4 @@ from .utils import *
 # NOTE: last to avoid circular imports
 from .operators import *  # isort: skip
 
-__version__ = "1.3.4"
+__version__ = "1.3.5"
