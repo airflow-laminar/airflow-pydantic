@@ -1,4 +1,5 @@
 from importlib.util import find_spec
+from logging import getLogger
 from types import FunctionType, MethodType
 from typing import Any, Dict, Optional, Type, Union
 
@@ -23,6 +24,8 @@ __all__ = (
     "SSHOperator",
     "SSHTask",
 )
+
+_log = getLogger(__name__)
 
 
 class SSHTaskArgs(TaskArgs):
@@ -136,15 +139,21 @@ class SSHTaskArgs(TaskArgs):
                     v = v()
                 except Exception:
                     # Skip, might only run in situ
+                    _log.info("Failed to call ssh_hook callable: %s", v)
                     v = None
 
             if have_balancer:
-                if isinstance(v, BalancerHostQueryConfiguration):
-                    if not v.kind == "select":
-                        raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
-                    v = v.execute().hook()
-                if isinstance(v, (Host,)):
-                    v = v.hook()
+                try:
+                    if isinstance(v, BalancerHostQueryConfiguration):
+                        if not v.kind == "select":
+                            raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
+                        v = v.execute().hook()
+                    if isinstance(v, (Host,)):
+                        v = v.hook()
+                except Exception:
+                    # Skip, might only run in situ
+                    _log.info("Failed to execute BalancerHostQueryConfiguration or Host: %s", v)
+                    v = None
 
             if isinstance(v, dict):
                 v = TypeAdapter(SSHHook).validate_python(v)
