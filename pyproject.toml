@@ -45,12 +45,11 @@ develop = [
     "wheel",
 ]
 laminar = [
-    # SSH Operator testing
-    "apache-airflow>=2.8,<3.1",
     "airflow-balancer",
     "airflow-common-operators",
     "airflow-ha",
     "airflow-supervisor>=1.7.4",
+    "apache-airflow>=2.8,<3.1",
     "apache-airflow-providers-ssh",
     "supervisor-pydantic",
 ]
