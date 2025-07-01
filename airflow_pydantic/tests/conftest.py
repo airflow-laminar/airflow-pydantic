@@ -2,7 +2,6 @@ from datetime import datetime, time, timedelta
 from unittest.mock import patch
 
 import pytest
-from airflow.exceptions import AirflowFailException
 from pytest import fixture
 
 from airflow_pydantic import (
@@ -381,6 +380,8 @@ def _null(**kwargs):
 
 
 def fail():
+    from airflow.exceptions import AirflowFailException
+
     raise AirflowFailException
 
 

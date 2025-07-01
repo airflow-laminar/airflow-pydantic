@@ -5,12 +5,11 @@ from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Optional, Tuple
 
-from airflow.models.param import Param
-from airflow.utils.trigger_rule import TriggerRule
 from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
-from ..utils import SSHHook
+from ..airflow import Param
+from ..utils import SSHHook, TriggerRule
 
 have_balancer = False
 if find_spec("airflow_balancer"):

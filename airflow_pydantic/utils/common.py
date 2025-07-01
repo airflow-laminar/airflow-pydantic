@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal, Tuple, Union
 
-from airflow.utils.trigger_rule import TriggerRule
 from pydantic import AfterValidator
 from pytz import timezone
+
+from ..airflow import TriggerRule
 
 __all__ = (
     "ScheduleArg",

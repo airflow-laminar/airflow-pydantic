@@ -1,7 +1,6 @@
 from importlib.util import find_spec
 from logging import getLogger
 
-from airflow.models import DAG as AirflowDAG
 from pydantic import BaseModel
 
 __all__ = ("DagInstantiateMixin",)
@@ -61,6 +60,9 @@ class DagInstantiateMixin:
 
         # NOTE: accept dag as an argument to allow for instantiation from airflow-config
         if not dag_instance:
+            # NOTE: defer import
+            from airflow.models import DAG as AirflowDAG
+
             dag_instance = AirflowDAG(
                 dag_id=self.dag_id, **self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"]), **kwargs
             )
