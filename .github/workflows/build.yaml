@@ -81,7 +81,7 @@ jobs:
       if: ${{ matrix.laminar == 'no-laminar' }}
 
     - name: Test (ccflow)
-      run: CCFLOW=1 make test
+      run: AIRFLOW_PYDANTIC_ENABLE_CCFLOW=1 make test
       if: ${{ matrix.ccflow == 'ccflow' }}
 
     - name: Test (coverage)
