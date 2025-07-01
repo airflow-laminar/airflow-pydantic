@@ -1,5 +1,2 @@
-from airflow_pydantic import *  # noqa
-
-
 def test_all():
-    assert True
+    from airflow_pydantic import BaseModel, Dag, Task  # noqa: F401
