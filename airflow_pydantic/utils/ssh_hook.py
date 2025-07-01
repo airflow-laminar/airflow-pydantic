@@ -6,6 +6,8 @@ from pydantic import (
 )
 from pydantic_core import core_schema
 
+from ..airflow import SSHHook as BaseSSHHook
+
 try:
     from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
 except ImportError:

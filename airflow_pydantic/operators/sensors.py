@@ -1,4 +1,5 @@
 from datetime import timedelta
+from logging import getLogger
 from typing import Any, Dict, List, Literal, Optional, Type, Union
 
 from pydantic import Field, field_validator
@@ -12,6 +13,8 @@ __all__ = (
     "PythonSensorArgs",
     "PythonSensor",
 )
+
+_log = getLogger(__name__)
 
 
 class BaseSensorArgs(TaskArgs):
@@ -47,9 +50,14 @@ class PythonSensor(Task, PythonSensorArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        from airflow.sensors.python import PythonSensor
+        from airflow_pydantic.airflow import PythonSensor, _AirflowPydanticMarker
 
-        if not isinstance(v, Type) and issubclass(v, PythonSensor):
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.sensors.python.PythonSensor', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("PythonSensor is a marker class, returning as is")
+            return v
+        if not issubclass(v, PythonSensor):
             raise ValueError(f"operator must be 'airflow.sensors.python.PythonSensor', got: {v}")
         return v
 
@@ -81,8 +89,13 @@ class BashSensor(Task, BashSensorArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        from airflow.sensors.bash import BashSensor
+        from airflow_pydantic.airflow import BashSensor, _AirflowPydanticMarker
 
-        if not isinstance(v, Type) and issubclass(v, BashSensor):
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.sensors.bash.BashSensor', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("BashOperator is a marker class, returning as is")
+            return v
+        if not issubclass(v, BashSensor):
             raise ValueError(f"operator must be 'airflow.sensors.bash.BashSensor', got: {v}")
         return v

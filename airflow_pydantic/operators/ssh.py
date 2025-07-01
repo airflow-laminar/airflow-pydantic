@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional, Type, Union
 
 from pydantic import Field, TypeAdapter, field_validator, model_validator
 
+from ..airflow import SSHHook as BaseSSHHook
 from ..task import Task, TaskArgs
 from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
 
@@ -12,11 +13,6 @@ have_balancer = False
 if find_spec("airflow_balancer"):
     have_balancer = True
     from airflow_balancer import BalancerHostQueryConfiguration, Host
-
-have_ssh_provider = False
-if find_spec("apache-airflow-providers-ssh"):
-    have_ssh_provider = True
-    from airflow.providers.ssh.operators.ssh import SSHOperator as BaseSSHOperator
 
 __all__ = (
     "SSHOperatorArgs",
@@ -128,8 +124,6 @@ class SSHTaskArgs(TaskArgs):
     @classmethod
     def _validate_ssh_hook(cls, v):
         if v:
-            from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
-
             if isinstance(v, str):
                 v = get_import_path(v)
 
@@ -170,14 +164,19 @@ class SSHTask(Task, SSHTaskArgs):
         default="airflow.providers.ssh.operators.ssh.SSHOperator", description="airflow operator path", validate_default=True
     )
 
-    if have_ssh_provider:
+    @field_validator("operator")
+    @classmethod
+    def validate_operator(cls, v: Type) -> Type:
+        from airflow_pydantic.airflow import SSHOperator, _AirflowPydanticMarker
 
-        @field_validator("operator")
-        @classmethod
-        def validate_operator(cls, v: Type) -> Type:
-            if not isinstance(v, Type) and issubclass(v, BaseSSHOperator):
-                raise ValueError(f"operator must be 'airflow.providers.ssh.operators.ssh.SSHOperator', got: {v}")
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.providers.ssh.operators.ssh.SSHOperator', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("SSHOperator is a marker class, returning as is")
             return v
+        if not issubclass(v, SSHOperator):
+            raise ValueError(f"operator must be 'airflow.providers.ssh.operators.ssh.SSHOperator', got: {v}")
+        return v
 
 
 # Alias

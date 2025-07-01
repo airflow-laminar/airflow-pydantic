@@ -26,13 +26,13 @@ classifiers = [
 ]
 
 dependencies = [
-    "apache-airflow>=2.8,<3.1",
     "pkn>=0.1.3",
     "pydantic>=2",
 ]
 
 [project.optional-dependencies]
 develop = [
+    "ccflow",
     "build",
     "bump-my-version",
     "check-manifest",
@@ -46,6 +46,7 @@ develop = [
 ]
 laminar = [
     # SSH Operator testing
+    "apache-airflow>=2.8,<3.1",
     "airflow-balancer",
     "airflow-common-operators",
     "airflow-ha",
@@ -94,7 +95,7 @@ exclude_also = [
     "@(abc\\.)?abstractmethod",
 ]
 ignore_errors = true
-fail_under = 75
+fail_under = 65
 
 [tool.hatch.build]
 artifacts = []

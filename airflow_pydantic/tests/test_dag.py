@@ -6,6 +6,7 @@ import pytest
 from pydantic import BaseModel
 
 from airflow_pydantic import Dag, DagArgs
+from airflow_pydantic.utils import _airflow_3
 
 
 class TestDag:
@@ -16,6 +17,9 @@ class TestDag:
         assert d == DagArgs.model_validate_json(d.model_dump_json(exclude_unset=True))
 
     def test_dag(self):
+        if _airflow_3() is None:
+            return pytest.skip("apache-airflow not installed")
+
         d = Dag(
             dag_id="a-dag",
             default_args=None,
@@ -27,6 +31,9 @@ class TestDag:
         assert d == Dag.model_validate_json(d.model_dump_json(exclude_unset=True))
 
     def test_dag_context(self, dag_args):
+        if _airflow_3() is None:
+            return pytest.skip("apache-airflow not installed")
+
         # Test direct context manager usage
         with Dag(dag_id="test-dag", **dag_args.model_dump(exclude_unset=True)) as dag:
             assert "owner" not in dag.default_args
@@ -38,6 +45,9 @@ class TestDag:
             assert "owner" not in dag.default_args
 
     def test_dag_selection(self, dag_args, airflow_config_instance):
+        if _airflow_3() is None:
+            return pytest.skip("apache-airflow not installed")
+
         from airflow.models import DAG as AirflowDAG
         from airflow_config import DAG as AirflowConfigDAG
 
@@ -75,6 +85,9 @@ class TestDag:
                 ...
 
     def test_dag_none_schedule(self, dag_none_schedule):
+        if _airflow_3() is None:
+            return pytest.skip("apache-airflow not installed")
+
         d = dag_none_schedule
         # Test roundtrips
         assert d == Dag.model_validate(d.model_dump(exclude_unset=True))

@@ -31,11 +31,19 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.11"]
-        airflow: ["<3", ">=3"]
-        with-laminar-dependencies: [true, false]
+        airflow: ["<3", ">=3", ""]
+        laminar: ["laminar", "no-laminar"]
+        ccflow: ["ccflow", "no-ccflow"]
         exclude:
+          # Skip laminar checks on airflow>=3
           - airflow: ">=3"
-            with-laminar-dependencies: true
+            laminar: "laminar"
+          # Skip laminar checks when no airflow
+          - airflow: ""
+            laminar: "laminar"
+          # Skip laminar checks with ccflow
+          - laminar: "laminar"
+            ccflow: "ccflow"
 
     steps:
     - uses: actions/checkout@v4
@@ -49,11 +57,15 @@ jobs:
 
     - name: Install Laminar dependencies
       run: uv pip install -e .[laminar]
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
 
     - name: Install Airflow
       run: uv pip install "apache-airflow${{ matrix.airflow }}"
-      if: ${{ !matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'no-laminar' && matrix.airflow != '' }}
+
+    - name: Uninstall Airflow
+      run: uv pip uninstall apache-airflow
+      if: ${{ matrix.airflow == '' }}
 
     - name: Lint
       run: make lint
@@ -66,37 +78,41 @@ jobs:
 
     - name: Test
       run: make test
-      if: ${{ !matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'no-laminar' }}
 
-    - name: Test
+    - name: Test (ccflow)
+      run: CCFLOW=1 make test
+      if: ${{ matrix.ccflow == 'ccflow' }}
+
+    - name: Test (coverage)
       run: make coverage
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
 
     - name: Upload test results (Python)
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
         path: junit.xml
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         files: '**/junit.xml'
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
 
     - name: Upload coverage
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
 
     - name: Make dist
       run: make dist
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
 
     - uses: actions/upload-artifact@v4
       with:
         name: dist-${{matrix.os}}
         path: dist
-      if: ${{ matrix.with-laminar-dependencies }}
+      if: ${{ matrix.laminar == 'laminar' }}
