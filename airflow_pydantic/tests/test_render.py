@@ -353,7 +353,7 @@ with DAG(
                 }
             },
             "rpcinterface": {"supervisor": {"rpcinterface_factory": "supervisor.rpcinterface:make_main_rpcinterface"}},
-            "config_path": Path("/an/arbitrary/path/supervisor.cfg"),
+            "config_path": Path("/an/arbitrary/path/supervisord.conf"),
             "working_dir": Path("/an/arbitrary/path"),
             "airflow": {"endtime": time(23, 59, 0, 0)},
         },
@@ -430,7 +430,7 @@ with DAG(
                 }
             },
             "rpcinterface": {"supervisor": {"rpcinterface_factory": "supervisor.rpcinterface:make_main_rpcinterface"}},
-            "config_path": Path("/an/arbitrary/path/supervisor.cfg"),
+            "config_path": Path("/an/arbitrary/path/supervisord.conf"),
             "working_dir": Path("/an/arbitrary/path"),
             "convenience": {"local_or_remote": "remote"},
         },
