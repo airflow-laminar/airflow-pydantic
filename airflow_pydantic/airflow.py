@@ -1,18 +1,21 @@
-from typing import Any, Set
+from getpass import getuser
+from typing import Set
 
 __all__ = (
-    "Param",
-    "TriggerRule",
     "BashOperator",
-    "EmptyOperator",
-    "PythonOperator",
-    "BranchPythonOperator",
-    "ShortCircuitOperator",
-    "PythonSensor",
     "BashSensor",
-    "SSHOperator",
+    "BranchPythonOperator",
     "EmptyOperator",
+    "get_parsing_context",
+    "Param",
+    "Pool",
+    "PoolNotFound",
+    "PythonOperator",
+    "PythonSensor",
+    "ShortCircuitOperator",
     "SSHHook",
+    "SSHOperator",
+    "TriggerRule",
     "_AirflowPydanticMarker",
 )
 
@@ -22,6 +25,9 @@ class _AirflowPydanticMarker: ...
 
 try:
     from airflow.models.param import Param  # noqa: F401
+    from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
+    from airflow.models.variable import Variable  # noqa: F401
+    from airflow.utils.dag_parsing_context import get_parsing_context  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 except ImportError:
     from enum import Enum
@@ -74,24 +80,39 @@ except ImportError:
                 },
             )
 
-        def __copy__(self) -> "Param":
-            return Param(self.value, title=self.title, description=self.description, type=self.type)
-
-        def dump(self) -> dict:
-            """Dump the Param as a dictionary."""
-            # TODO
-            return {}
-
-        @property
-        def has_value(self) -> bool:
-            return self.value is not None
-
         def serialize(self) -> dict:
             return {"value": self.value, "description": self.description, "schema": self.schema}
 
+    class Pool:
+        def __init__(self, name: str, slots: int, description: str):
+            self.name = name
+            self.slots = slots
+            self.description = description
+
+        @classmethod
+        def get_pool(cls, name: str) -> "Pool":
+            # Simulate getting a pool from Airflow
+            return cls(name=name, slots=5, description="Test pool")
+
+        @classmethod
+        def create_or_update_pool(cls, name: str, slots: int, description: str):
+            # Simulate creating or updating a pool in Airflow
+            pass
+
+    class PoolNotFound(Exception):
+        pass
+
+    class Variable:
         @staticmethod
-        def deserialize(data: dict[str, Any], version: int) -> "Param":
-            return Param(default=data["value"], description=data["description"], schema=data["schema"])
+        def get(name: str, deserialize_json: bool = False):
+            # Simulate getting a variable from Airflow
+            if deserialize_json:
+                return {"key": "value"}
+            return "value"
+
+    def get_parsing_context():
+        # Airflow not installed, so no parsing context
+        return None
 
 
 # Operators
@@ -128,6 +149,12 @@ try:
     from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401
 except ImportError:
 
-    class SSHHook(_AirflowPydanticMarker): ...
+    class SSHHook(_AirflowPydanticMarker):
+        def __init__(self, remote_host: str, username: str = None, password: str = None, key_file: str = None, **kwargs):
+            self.remote_host = remote_host
+            self.username = username or getuser()
+            self.password = password
+            self.key_file = key_file
+            self.keepalive_interval = kwargs.pop("keepalive_interval", 30)
 
     class SSHOperator(_AirflowPydanticMarker): ...
