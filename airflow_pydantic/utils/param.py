@@ -2,13 +2,14 @@ from datetime import datetime, timedelta
 from types import FunctionType, MethodType
 from typing import Annotated, Any, Literal, Optional, get_origin
 
-from airflow.models.param import Param as BaseParam
 from pydantic import (
     BaseModel,
     Field,
     GetCoreSchemaHandler,
 )
 from pydantic_core import core_schema
+
+from ..airflow import Param as BaseParam
 
 __all__ = ("Param", "ParamType")
 

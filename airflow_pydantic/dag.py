@@ -2,8 +2,9 @@ from importlib.metadata import version
 from logging import getLogger
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel as PydanticBaseModel, Field, field_validator, model_validator
 
+from .base import BaseModel
 from .instantiate import DagInstantiateMixin
 from .render import DagRenderMixin
 from .task import Task, TaskArgs
@@ -91,13 +92,13 @@ class DagArgs(BaseModel, validate_assignment=True):
     @field_validator("params", mode="before")
     @classmethod
     def _validate_params(cls, v):
-        # Automatically convert BaseModel to dict for params
-        if isinstance(v, BaseModel) or (isinstance(v, type) and issubclass(v, BaseModel)):
+        # Automatically convert PydanticBaseModel to dict for params
+        if isinstance(v, PydanticBaseModel) or (isinstance(v, type) and issubclass(v, PydanticBaseModel)):
             from .task import __all_task_fields__
 
             all_omit = __all_task_fields__ + __all_dag_fields__
-            # Naively convert to dict if it's a BaseModel
-            if isinstance(v, BaseModel):
+            # Naively convert to dict if it's a PydanticBaseModel
+            if isinstance(v, PydanticBaseModel):
                 new_v = {
                     key: value
                     for key, value in v.model_dump(exclude_unset=False, exclude=all_omit).items()

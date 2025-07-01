@@ -3,13 +3,6 @@ from typing import Literal, Optional, Union
 from unittest.mock import patch
 
 import pytest
-
-if version("apache-airflow") >= "3.0.0":
-    _AIRFLOW_3 = True
-else:
-    _AIRFLOW_3 = False
-
-from airflow.models import DAG as AirflowDAG
 from pydantic import BaseModel
 
 from airflow_pydantic import Dag, DagArgs
@@ -45,6 +38,7 @@ class TestDag:
             assert "owner" not in dag.default_args
 
     def test_dag_selection(self, dag_args, airflow_config_instance):
+        from airflow.models import DAG as AirflowDAG
         from airflow_config import DAG as AirflowConfigDAG
 
         # NOTE: we will use the log as a sentinel to check that things
@@ -89,7 +83,7 @@ class TestDag:
         inst = d.instantiate()
         assert inst.dag_id == "a-dag"
 
-        if _AIRFLOW_3:
+        if version("apache-airflow") >= "3.0.0":
             assert inst.schedule is None
         else:
             assert inst.schedule_interval is None

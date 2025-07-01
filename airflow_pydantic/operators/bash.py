@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional, Type, Union
 
-from airflow.operators.bash import BashOperator as BaseBashOperator
 from pydantic import Field, field_validator
 
 from ..task import Task, TaskArgs
@@ -49,6 +48,8 @@ class BashTask(Task, BashTaskArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
+        from airflow.operators.bash import BashOperator as BaseBashOperator
+
         if not isinstance(v, Type) and issubclass(v, BaseBashOperator):
             raise ValueError(f"operator must be 'airflow.operators.bash.BashOperator', got: {v}")
         return v

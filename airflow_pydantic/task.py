@@ -1,8 +1,9 @@
 from datetime import timedelta
 from typing import List, Optional, Tuple, Union
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
+from .base import BaseModel
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
 from .utils import DatetimeArg, ImportPath, TriggerRule

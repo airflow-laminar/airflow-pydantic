@@ -1,8 +1,6 @@
 from datetime import timedelta
 from typing import Any, Dict, List, Literal, Optional, Type, Union
 
-from airflow.sensors.bash import BashSensor as BaseBashSensor
-from airflow.sensors.python import PythonSensor as BasePythonSensor
 from pydantic import Field, field_validator
 
 from ..task import Task, TaskArgs
@@ -49,7 +47,9 @@ class PythonSensor(Task, PythonSensorArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        if not isinstance(v, Type) and issubclass(v, BasePythonSensor):
+        from airflow.sensors.python import PythonSensor
+
+        if not isinstance(v, Type) and issubclass(v, PythonSensor):
             raise ValueError(f"operator must be 'airflow.sensors.python.PythonSensor', got: {v}")
         return v
 
@@ -81,6 +81,8 @@ class BashSensor(Task, BashSensorArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        if not isinstance(v, Type) and issubclass(v, BaseBashSensor):
+        from airflow.sensors.bash import BashSensor
+
+        if not isinstance(v, Type) and issubclass(v, BashSensor):
             raise ValueError(f"operator must be 'airflow.sensors.bash.BashSensor', got: {v}")
         return v

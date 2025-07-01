@@ -1,10 +1,5 @@
 from typing import Dict, List, Optional, Type
 
-from airflow.operators.python import (
-    BranchPythonOperator as BaseBranchPythonOperator,
-    PythonOperator as BasePythonOperator,
-    ShortCircuitOperator as BaseShortCircuitOperator,
-)
 from pydantic import Field, field_validator
 
 from ..task import Task, TaskArgs
@@ -76,7 +71,9 @@ class PythonTask(Task, PythonTaskArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> ImportPath:
-        if not isinstance(v, Type) and issubclass(v, BasePythonOperator):
+        from airflow.operators.python import PythonOperator
+
+        if not isinstance(v, Type) and issubclass(v, PythonOperator):
             raise ValueError(f"operator must be 'airflow.operators.python.PythonOperator', got: {v}")
         return v
 
@@ -91,7 +88,9 @@ class BranchPythonTask(Task, BranchPythonTaskArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        if not isinstance(v, Type) and issubclass(v, BaseBranchPythonOperator):
+        from airflow.operators.python import BranchPythonOperator
+
+        if not isinstance(v, Type) and issubclass(v, BranchPythonOperator):
             raise ValueError(f"operator must be 'airflow.operators.python.BranchPythonOperator', got: {v}")
         return v
 
@@ -106,7 +105,9 @@ class ShortCircuitTask(Task, ShortCircuitTaskArgs):
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        if not isinstance(v, Type) and issubclass(v, BaseShortCircuitOperator):
+        from airflow.operators.python import ShortCircuitOperator
+
+        if not isinstance(v, Type) and issubclass(v, ShortCircuitOperator):
             raise ValueError(f"operator must be 'airflow.operators.python.ShortCircuitOperator', got: {v}")
         return v
 
