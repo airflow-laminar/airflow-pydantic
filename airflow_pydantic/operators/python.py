@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import Dict, List, Optional, Type
 
 from pydantic import Field, field_validator
@@ -19,6 +20,8 @@ __all__ = (
     "ShortCircuitOperator",
     "ShortCircuitTask",
 )
+
+_log = getLogger(__name__)
 
 
 class PythonTaskArgs(TaskArgs):
@@ -66,14 +69,19 @@ ShortCircuitOperatorArgs = ShortCircuitTaskArgs
 
 
 class PythonTask(Task, PythonTaskArgs):
-    operator: ImportPath = Field(default="airflow.operators.python.PythonOperator", description="airflow operator path", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.PythonOperator", description="airflow operator path", validate_default=True)
 
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> ImportPath:
-        from airflow.operators.python import PythonOperator
+        from airflow_pydantic.airflow import PythonOperator, _AirflowPydanticMarker
 
-        if not isinstance(v, Type) and issubclass(v, PythonOperator):
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.operators.python.PythonOperator', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("PythonOperator is a marker class, returning as is")
+            return v
+        if not issubclass(v, PythonOperator):
             raise ValueError(f"operator must be 'airflow.operators.python.PythonOperator', got: {v}")
         return v
 
@@ -83,14 +91,19 @@ PythonOperator = PythonTask
 
 
 class BranchPythonTask(Task, BranchPythonTaskArgs):
-    operator: ImportPath = Field(default="airflow.operators.python.BranchPythonOperator", description="airflow operator path", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.BranchPythonOperator", description="airflow operator path", validate_default=True)
 
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        from airflow.operators.python import BranchPythonOperator
+        from airflow_pydantic.airflow import BranchPythonOperator, _AirflowPydanticMarker
 
-        if not isinstance(v, Type) and issubclass(v, BranchPythonOperator):
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.operators.python.BranchPythonOperator', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("BranchPythonOperator is a marker class, returning as is")
+            return v
+        if not issubclass(v, BranchPythonOperator):
             raise ValueError(f"operator must be 'airflow.operators.python.BranchPythonOperator', got: {v}")
         return v
 
@@ -100,14 +113,19 @@ BranchPythonOperator = BranchPythonTask
 
 
 class ShortCircuitTask(Task, ShortCircuitTaskArgs):
-    operator: ImportPath = Field(default="airflow.operators.python.ShortCircuitOperator", description="airflow operator path", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.ShortCircuitOperator", description="airflow operator path", validate_default=True)
 
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        from airflow.operators.python import ShortCircuitOperator
+        from airflow_pydantic.airflow import ShortCircuitOperator, _AirflowPydanticMarker
 
-        if not isinstance(v, Type) and issubclass(v, ShortCircuitOperator):
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.operators.python.ShortCircuitOperator', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("ShortCircuitOperator is a marker class, returning as is")
+            return v
+        if not issubclass(v, ShortCircuitOperator):
             raise ValueError(f"operator must be 'airflow.operators.python.ShortCircuitOperator', got: {v}")
         return v
 

@@ -1,4 +1,11 @@
-from pydantic import BaseModel as PydanticBaseModel, model_validator
+import os
+
+from pydantic import model_validator
+
+if os.environ.get("CCFLOW", "") != "":
+    from ccflow import BaseModel as PydanticBaseModel
+else:
+    from pydantic import BaseModel as PydanticBaseModel
 
 __all__ = ("BaseModel",)
 
@@ -28,3 +35,15 @@ class BaseModel(PydanticBaseModel, validate_assignment=True):
                         if subkey not in values[key]:
                             values[key][subkey] = subvalue
         return values
+
+    def model_dump(self, **kwargs):
+        exclude = set(kwargs.pop("exclude", set()))
+        if "type_" not in exclude:
+            exclude.add("type_")
+        return super().model_dump(exclude=exclude, **kwargs)
+
+    def model_dump_json(self, **kwargs):
+        exclude = set(kwargs.pop("exclude", set()))
+        if "type_" not in exclude:
+            exclude.add("type_")
+        return super().model_dump_json(exclude=exclude, **kwargs)

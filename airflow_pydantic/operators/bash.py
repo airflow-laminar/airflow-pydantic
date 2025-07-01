@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import Any, Dict, List, Optional, Type, Union
 
 from pydantic import Field, field_validator
@@ -11,6 +12,8 @@ __all__ = (
     "BashOperator",
     "BashTask",
 )
+
+_log = getLogger(__name__)
 
 
 class BashTaskArgs(TaskArgs):
@@ -43,14 +46,19 @@ BashOperatorArgs = BashTaskArgs
 
 
 class BashTask(Task, BashTaskArgs):
-    operator: ImportPath = Field(default="airflow.operators.bash.BashOperator", description="airflow operator path", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.BashOperator", description="airflow operator path", validate_default=True)
 
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        from airflow.operators.bash import BashOperator as BaseBashOperator
+        from airflow_pydantic.airflow import BashOperator, _AirflowPydanticMarker
 
-        if not isinstance(v, Type) and issubclass(v, BaseBashOperator):
+        if not isinstance(v, Type):
+            raise ValueError(f"operator must be 'airflow.operators.bash.BashOperator', got: {v}")
+        if issubclass(v, _AirflowPydanticMarker):
+            _log.info("BashOperator is a marker class, returning as is")
+            return v
+        if not issubclass(v, BashOperator):
             raise ValueError(f"operator must be 'airflow.operators.bash.BashOperator', got: {v}")
         return v
 

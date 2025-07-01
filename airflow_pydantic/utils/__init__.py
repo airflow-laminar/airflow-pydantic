@@ -5,6 +5,7 @@ from pkn.pydantic import (
     serialize_path_as_string,
 )
 
+from .airflow import _airflow_3
 from .bash import *
 from .common import *
 from .param import *

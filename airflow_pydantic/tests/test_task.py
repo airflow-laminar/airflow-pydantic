@@ -12,9 +12,8 @@ class TestTask:
     def test_task(self):
         t = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=[],
-            args=None,
         )
 
         # Test roundtrips
@@ -24,19 +23,19 @@ class TestTask:
     def test_operators(self):
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
         t2 = Task(
             task_id="b-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
         t3 = Task(
             task_id="c-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
         t4 = Task(
             task_id="d-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
 
         # T1 -> T2
@@ -58,19 +57,19 @@ class TestTask:
     def test_setters(self):
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
         t2 = Task(
             task_id="b-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
         t3 = Task(
             task_id="c-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
         t4 = Task(
             task_id="d-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
         )
 
         # T1 -> T2
@@ -92,56 +91,56 @@ class TestTask:
     def test_task_dependency_normalization(self):
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies="a",
         )
         assert t1.dependencies == ["a"]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=["a"],
         )
         assert t1.dependencies == ["a"]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies="a.b",
         )
         assert t1.dependencies == [("a", "b")]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=["a.b", "a.b.c"],
         )
         assert t1.dependencies == [("a", "b"), ("a.b", "c")]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=t1,
         )
         assert t1.dependencies == ["a-task"]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=[t1],
         )
         assert t1.dependencies == ["a-task"]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=[(t1, "c")],
         )
         assert t1.dependencies == [("a-task", "c")]
 
         t1 = Task(
             task_id="a-task",
-            operator="airflow.operators.empty.EmptyOperator",
+            operator="airflow_pydantic.airflow.EmptyOperator",
             dependencies=["a", "a.b.c", t1, ("a.b", "c"), (t1, "c")],
         )
         assert t1.dependencies == ["a", ("a.b", "c"), "a-task", ("a.b", "c"), ("a-task", "c")]
