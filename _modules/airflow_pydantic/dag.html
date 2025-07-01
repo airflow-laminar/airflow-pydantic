@@ -253,8 +253,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for airflow_pydantic.dag</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span> <span class="k">as</span> <span class="n">PydanticBaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span><span class="p">,</span> <span class="n">model_validator</span>
@@ -263,12 +262,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.instantiate</span><span class="w"> </span><span class="kn">import</span> <span class="n">DagInstantiateMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.render</span><span class="w"> </span><span class="kn">import</span> <span class="n">DagRenderMixin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.task</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskArgs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatetimeArg</span><span class="p">,</span> <span class="n">Param</span><span class="p">,</span> <span class="n">ParamType</span><span class="p">,</span> <span class="n">ScheduleArg</span>
-
-<span class="k">if</span> <span class="n">version</span><span class="p">(</span><span class="s2">&quot;apache-airflow&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="s2">&quot;3.0.0&quot;</span><span class="p">:</span>
-    <span class="n">_AIRFLOW_3</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">_AIRFLOW_3</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatetimeArg</span><span class="p">,</span> <span class="n">Param</span><span class="p">,</span> <span class="n">ParamType</span><span class="p">,</span> <span class="n">ScheduleArg</span><span class="p">,</span> <span class="n">_airflow_3</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;DagArgs&quot;</span><span class="p">,</span>
@@ -402,7 +396,7 @@
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;default_view&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_default_view</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">_AIRFLOW_3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_airflow_3</span><span class="p">():</span>
             <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;default_view is deprecated in Airflow 3&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">v</span>
@@ -410,7 +404,7 @@
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;orientation&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_orientation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">_AIRFLOW_3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_airflow_3</span><span class="p">():</span>
             <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;orientation is deprecated in Airflow 3&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">v</span></div>
