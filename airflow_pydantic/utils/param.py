@@ -55,7 +55,7 @@ class ParamType:
     def _serialize(cls, info, value: BaseParam) -> dict:
         ret = {}
         for key in ParamType.__annotations__:
-            val = getattr(value, key)
+            val = getattr(value, key, getattr(value.schema, key, None))
             if val is not None:
                 ret[key] = val
         return ret
