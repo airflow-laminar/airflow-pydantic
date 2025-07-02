@@ -102,12 +102,12 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         )
     if key in ("ssh_hook", "python_callable", "output_processor"):
         try:
-            from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
+            from airflow_pydantic.airflow import SSHHook as BaseSSHHook
 
             if isinstance(value, BaseSSHHook):
                 # Add SSHHook to imports
                 import_module, name = serialize_path_as_string(value).rsplit(".", 1)
-                imports.append(ast.ImportFrom(module=import_module, names=[ast.alias(name=name)], level=0))
+                imports.append(ast.ImportFrom(module="airflow.providers.ssh.hooks.ssh", names=[ast.alias(name="SSHHook")], level=0))
 
                 # Add SSHHook builder to args
                 call = ast.Call(

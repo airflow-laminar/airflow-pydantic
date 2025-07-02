@@ -160,9 +160,7 @@ SSHOperatorArgs = SSHTaskArgs
 
 
 class SSHTask(Task, SSHTaskArgs):
-    operator: ImportPath = Field(
-        default="airflow.providers.ssh.operators.ssh.SSHOperator", description="airflow operator path", validate_default=True
-    )
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.SSHOperator", description="airflow operator path", validate_default=True)
 
     @field_validator("operator")
     @classmethod

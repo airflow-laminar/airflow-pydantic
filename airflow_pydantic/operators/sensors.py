@@ -45,7 +45,7 @@ class PythonSensorArgs(BaseSensorArgs):
 
 
 class PythonSensor(Task, PythonSensorArgs):
-    operator: ImportPath = Field(default="airflow.sensors.python.PythonSensor", description="airflow sensor path", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.PythonSensor", description="airflow sensor path", validate_default=True)
 
     @field_validator("operator")
     @classmethod
@@ -84,7 +84,7 @@ class BashSensorArgs(TaskArgs):
 
 
 class BashSensor(Task, BashSensorArgs):
-    operator: ImportPath = Field(default="airflow.sensors.bash.BashSensor", description="airflow sensor path", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.airflow.BashSensor", description="airflow sensor path", validate_default=True)
 
     @field_validator("operator")
     @classmethod

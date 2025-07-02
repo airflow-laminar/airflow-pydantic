@@ -8,12 +8,6 @@ from pydantic_core import core_schema
 
 from ..airflow import SSHHook as BaseSSHHook
 
-try:
-    from airflow.providers.ssh.hooks.ssh import SSHHook as BaseSSHHook
-except ImportError:
-    BaseSSHHook = object
-
-
 __all__ = ("SSHHook",)
 
 
@@ -70,7 +64,7 @@ class SSHHookType:
     def _serialize(cls, info, value: BaseSSHHook) -> dict:
         ret = {}
         for key in SSHHookType.__annotations__:
-            val = getattr(value, key)
+            val = getattr(value, key, None)
             if val is not None:
                 ret[key] = val
         return ret
