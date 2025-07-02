@@ -50,7 +50,7 @@ class PoolType:
     def _serialize(cls, info, value: BasePool) -> dict:
         ret = {}
         for key in PoolType.__annotations__:
-            val = getattr(value, key, getattr(value.schema, key, None))
+            val = getattr(value, key, None)
             if val is not None:
                 ret[key] = val
         return ret
