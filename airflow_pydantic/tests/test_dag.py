@@ -6,7 +6,7 @@ import pytest
 from pydantic import BaseModel
 
 from airflow_pydantic import Dag, DagArgs
-from airflow_pydantic.utils import _airflow_3
+from airflow_pydantic.migration import _airflow_3
 
 
 class TestDag:

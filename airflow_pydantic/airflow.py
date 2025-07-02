@@ -1,5 +1,9 @@
+from enum import Enum
 from getpass import getuser
+from logging import getLogger
 from typing import Set
+
+from .migration import _airflow_3
 
 __all__ = (
     "AirflowFailException",
@@ -22,19 +26,62 @@ __all__ = (
     "_AirflowPydanticMarker",
 )
 
+_log = getLogger(__name__)
+
 
 class _AirflowPydanticMarker: ...
 
 
-try:
+if _airflow_3():
+    _log.info("Using Airflow 3.x imports")
     from airflow.exceptions import AirflowFailException, AirflowSkipException
     from airflow.models.param import Param  # noqa: F401
     from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
     from airflow.models.variable import Variable  # noqa: F401
+    from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401
+    from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401
+    from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
+    from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
+    from airflow.providers.standard.operators.python import (
+        BranchPythonOperator,  # noqa: F401
+        PythonOperator,  # noqa: F401
+        ShortCircuitOperator,  # noqa: F401
+    )
+    from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
+    from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
     from airflow.sdk import get_parsing_context  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
-except ImportError:
-    from enum import Enum
+elif _airflow_3() is False:
+    _log.info("Using Airflow 2.x imports")
+
+    from airflow.exceptions import AirflowFailException, AirflowSkipException
+    from airflow.models.param import Param  # noqa: F401
+    from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
+    from airflow.models.variable import Variable  # noqa: F401
+    from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401  # noqa: F401
+    from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401  # noqa: F401
+    from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
+    from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
+    from airflow.providers.standard.operators.python import (
+        BranchPythonOperator,  # noqa: F401
+        PythonOperator,  # noqa: F401
+        ShortCircuitOperator,  # noqa: F401
+    )
+    from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
+    from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
+    from airflow.utils.dag_parsing_context import get_parsing_context  # noqa: F401
+    from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
+else:
+
+    class AirflowFailException(Exception):
+        """Exception raised when a task fails in Airflow."""
+
+        pass
+
+    class AirflowSkipException(Exception):
+        """Exception raised when a task is skipped in Airflow."""
+
+        pass
 
     class TriggerRule(str, Enum):
         """Class with task's trigger rules."""
@@ -94,32 +141,23 @@ except ImportError:
             return {"value": self.default, "description": self.description, "schema": self.schema}
 
     class Pool:
-        def __init__(self, name: str, slots: int, description: str):
-            self.name = name
+        def __init__(self, pool: str, slots: int = 0, description: str = "", include_deferred: bool = False):
+            self.pool = pool
             self.slots = slots
             self.description = description
+            self.include_deferred = include_deferred
 
         @classmethod
-        def get_pool(cls, name: str) -> "Pool":
+        def get_pool(cls, pool: str) -> "Pool":
             # Simulate getting a pool from Airflow
-            return cls(name=name, slots=5, description="Test pool")
+            return cls(pool=pool, slots=5, description="Test pool")
 
         @classmethod
-        def create_or_update_pool(cls, name: str, slots: int, description: str):
+        def create_or_update_pool(cls, pool: str, slots: int = 0, description: str = "", include_deferred: bool = False):
             # Simulate creating or updating a pool in Airflow
             pass
 
     class PoolNotFound(Exception):
-        pass
-
-    class AirflowFailException(Exception):
-        """Exception raised when a task fails in Airflow."""
-
-        pass
-
-    class AirflowSkipException(Exception):
-        """Exception raised when a task is skipped in Airflow."""
-
         pass
 
     class Variable:
@@ -136,20 +174,6 @@ except ImportError:
     def get_parsing_context():
         # Airflow not installed, so no parsing context
         return _ParsingContext()
-
-
-# Operators
-try:
-    from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
-    from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
-    from airflow.providers.standard.operators.python import (
-        BranchPythonOperator,  # noqa: F401
-        PythonOperator,  # noqa: F401
-        ShortCircuitOperator,  # noqa: F401
-    )
-    from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
-    from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
-except ImportError:
 
     class PythonOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.python.PythonOperator"
@@ -171,13 +195,6 @@ except ImportError:
 
     class EmptyOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.empty.EmptyOperator"
-
-
-# Providers
-try:
-    from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401
-    from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401
-except ImportError:
 
     class SSHHook(_AirflowPydanticMarker):
         def __init__(self, remote_host: str, username: str = None, password: str = None, key_file: str = None, **kwargs):

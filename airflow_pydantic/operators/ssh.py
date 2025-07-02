@@ -96,7 +96,7 @@ class SSHTaskArgs(TaskArgs):
                         data["ssh_hook_host"] = ssh_hook
 
                     # Override pool from host if not otherwise set
-                    if data["ssh_hook"].pool and not data.get("pool"):
+                    if data["ssh_hook_host"].pool and not data.get("pool"):
                         data["pool"] = data["ssh_hook"].pool
 
                 if isinstance(ssh_hook, str):

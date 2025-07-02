@@ -5,7 +5,7 @@ from typing import Dict
 from pkn.pydantic import serialize_path_as_string
 
 from ..airflow import _AirflowPydanticMarker
-from .utils import RenderedCode, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
+from .utils import RenderedCode, _build_pool_callable, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
 
 have_balancer = False
 if find_spec("airflow_balancer"):
@@ -79,6 +79,12 @@ class TaskRenderMixin:
                 # Replace the ssh_hook with the callable
                 args[k] = value
                 self.ssh_hook = None  # Clear the ssh_hook to avoid confusion
+                continue
+
+            if k == "pool":
+                import_, value = _build_pool_callable(v)
+                imports.extend(import_)
+                args[k] = value
                 continue
 
             # Default case

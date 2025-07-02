@@ -181,6 +181,7 @@ class DagRenderMixin:
                 _log.debug("Using 'ruff' to format the code.")
                 # Call ruff to format the file
                 call(["ruff", "format", temp_filename])
+                call(["ruff", "check", "--fix", "--select", "I", temp_filename])
             elif which("black") is not None:
                 _log.debug("Using 'black' to format the code.")
                 # Call black to format the file
