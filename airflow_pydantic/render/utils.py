@@ -45,8 +45,8 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
         return imports, ast.Attribute(
             value=ast.Call(
                 func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
-                args=[ast.Constant(value=pool)],
-                keywords=[],
+                args=[],
+                keywords=[ast.keyword(arg="pool", value=ast.Constant(value=pool))],
             ),
             attr="pool",
             ctx=ast.Load(),
@@ -63,8 +63,9 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
         return imports, ast.Attribute(
             value=ast.Call(
                 func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
-                args=[ast.Constant(value=pool.pool)],
+                args=[],
                 keywords=[
+                    ast.keyword(arg="pool", value=ast.Constant(value=pool.pool)),
                     ast.keyword(arg="slots", value=ast.Constant(value=pool.slots)),
                     ast.keyword(arg="description", value=ast.Constant(value=pool.description)),
                     ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.include_deferred)),

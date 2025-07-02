@@ -39,7 +39,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool('test_host').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(pool='test_host').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
     def test_render_operator_ssh_host_variable_from_template(self, ssh_operator_balancer_template):
@@ -53,7 +53,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool('test_host').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(pool='test_host').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
     def test_render_dag(self, dag):
