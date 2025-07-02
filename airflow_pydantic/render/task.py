@@ -4,6 +4,7 @@ from typing import Dict
 
 from pkn.pydantic import serialize_path_as_string
 
+from ..airflow import _AirflowPydanticMarker
 from .utils import RenderedCode, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
 
 have_balancer = False
@@ -56,7 +57,11 @@ class TaskRenderMixin:
             raise ValueError("task_id must be set to render a task")
 
         # Extract the importable from the operator path
-        operator_import, operator_name = serialize_path_as_string(self.operator).rsplit(".", 1)
+        if isinstance(self.operator, type) and issubclass(self.operator, _AirflowPydanticMarker):
+            # Airflow is not present locally! Use the original
+            operator_import, operator_name = self.operator._original.rsplit(".", 1)
+        else:
+            operator_import, operator_name = serialize_path_as_string(self.operator).rsplit(".", 1)
         imports = [ast.ImportFrom(module=operator_import, names=[ast.alias(name=operator_name)], level=0)]
         globals_ = []
 

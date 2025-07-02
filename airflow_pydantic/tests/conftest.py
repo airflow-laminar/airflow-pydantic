@@ -19,6 +19,7 @@ from airflow_pydantic import (
     SSHTaskArgs,
     TaskArgs,
 )
+from airflow_pydantic.airflow import SSHHook
 
 has_balancer = False
 try:
@@ -29,19 +30,9 @@ try:
 except ImportError:
     ...
 
-has_ssh_hook = False
-try:
-    from airflow.providers.ssh.hooks.ssh import SSHHook
-
-    has_ssh_hook = True
-except ImportError:
-    ...
-
 has_supervisor = False
 try:
     from airflow_supervisor import (
-        AirflowConfiguration,
-        ConvenienceConfiguration,
         ProgramConfiguration,
         SupervisorAirflowConfiguration,
         SupervisorSSHAirflowConfiguration,
@@ -58,9 +49,6 @@ def foo(**kwargs): ...
 
 
 def hook(**kwargs):
-    if not has_ssh_hook:
-        pytest.skip("SSHHook is not installed, skipping SSHHook fixtures")
-        return
     return SSHHook(remote_host="test", username="test")
 
 
@@ -139,9 +127,6 @@ def bash_sensor(bash_sensor_args):
 
 @fixture
 def ssh_operator_args():
-    if not has_ssh_hook:
-        pytest.skip("SSHHook is not installed, skipping SSHHook fixtures")
-        return
     return SSHTaskArgs(
         ssh_conn_id="test",
         ssh_hook="airflow_pydantic.tests.conftest.hook",
@@ -155,9 +140,6 @@ def ssh_operator_args():
 
 @fixture
 def ssh_operator(ssh_operator_args):
-    if not has_ssh_hook:
-        pytest.skip("SSHHook is not installed, skipping SSHHook fixtures")
-        return
     return SSHTask(
         task_id="test_ssh_operator",
         **ssh_operator_args.model_dump(exclude_unset=True),
@@ -219,7 +201,8 @@ def supervisor_cfg():
         path = "/an/arbitrary/path"
         p1.return_value = str(path)
         cfg = SupervisorAirflowConfiguration(
-            airflow=AirflowConfiguration(port="*:9090", endtime=time(23, 59)),
+            port="*:1234",
+            endtime=time(23, 59),
             working_dir=path,
             path=path,
             program={
@@ -241,7 +224,6 @@ def supervisor_ssh_cfg():
         path = "/an/arbitrary/path"
         p1.return_value = str(path)
         cfg = SupervisorSSHAirflowConfiguration(
-            convenience=ConvenienceConfiguration(local_or_remote="remote"),
             working_dir=path,
             path=path,
             program={
