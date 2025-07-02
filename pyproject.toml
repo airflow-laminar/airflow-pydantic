@@ -44,15 +44,22 @@ develop = [
     "uv",
     "wheel",
 ]
+airflow = [
+    "apache-airflow>=2.8,<3.1",
+    "apache-airflow-providers-ssh",
+    "apache-airflow-providers-standard",
+]
 laminar = [
+    # Laminar
     "airflow-balancer",
     "airflow-common-operators",
     "airflow-ha",
     "airflow-supervisor>=1.7.4",
+    "supervisor-pydantic",
+    # Airflow
     "apache-airflow>=2.8,<3.1",
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
-    "supervisor-pydantic",
 ]
 
 [project.scripts]

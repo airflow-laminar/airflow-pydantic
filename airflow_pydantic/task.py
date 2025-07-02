@@ -6,7 +6,7 @@ from pydantic import Field, field_validator, model_validator
 from .base import BaseModel
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
-from .utils import DatetimeArg, ImportPath, TriggerRule
+from .utils import DatetimeArg, ImportPath, Pool, TriggerRule
 
 __all__ = (
     "TaskArgs",
@@ -64,7 +64,7 @@ class TaskArgs(BaseModel, validate_assignment=True):
         default=None,
         description="which queue to target when running this job. Not all executors implement queue management, the CeleryExecutor does support targeting specific queues.",
     )
-    pool: Optional[str] = Field(
+    pool: Optional[Union[str, Pool]] = Field(
         default=None,
         description="the slot pool this task should run in, slot pools are a way to limit concurrency for certain tasks",
     )
@@ -143,24 +143,6 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
     @model_validator(mode="before")
     @classmethod
     def _validate_model(cls, values):
-        if "template" in values:
-            template: TaskArgs = values.pop("template")
-            # Do field-by-field for larger types
-            # NOTE: don't use model_dump here as some basemodel fields might be excluded
-            for key, value in template.__class__.model_fields.items():
-                if key not in template.model_fields_set:
-                    # see note above
-                    continue
-                # Get real value from template
-                value = getattr(template, key)
-                if key not in values:
-                    values[key] = value
-                elif isinstance(value, dict):
-                    # If the field is a BaseModel, we need to update it
-                    # with the new values from the template
-                    for subkey, subvalue in value.items():
-                        if subkey not in values[key]:
-                            values[key][subkey] = subvalue
         return values
 
     @field_validator("dependencies", mode="before")

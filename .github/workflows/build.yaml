@@ -60,7 +60,7 @@ jobs:
       if: ${{ matrix.laminar == 'laminar' }}
 
     - name: Install Airflow
-      run: uv pip install "apache-airflow${{ matrix.airflow }}"
+      run: uv pip install "apache-airflow${{ matrix.airflow }}" apache-airflow-providers-ssh apache-airflow-providers-standard
       if: ${{ matrix.laminar == 'no-laminar' && matrix.airflow != '' }}
 
     - name: Uninstall Airflow

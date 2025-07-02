@@ -8,7 +8,7 @@ from typing import List, Optional, Tuple
 from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
-from ..airflow import Param
+from ..airflow import Param, Pool
 from ..utils import SSHHook, TriggerRule
 
 have_balancer = False
@@ -31,6 +31,52 @@ def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
+def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
+    imports = []
+    if isinstance(pool, str):
+        imports.append(
+            ast.ImportFrom(
+                module="airflow.models.pool",
+                names=[ast.alias(name="Pool")],
+                level=0,
+            )
+        )
+        # Replace the pool with the Pool class
+        return imports, ast.Attribute(
+            value=ast.Call(
+                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
+                args=[ast.Constant(value=pool)],
+                keywords=[],
+            ),
+            attr="pool",
+            ctx=ast.Load(),
+        )
+    elif isinstance(pool, Pool):
+        imports.append(
+            ast.ImportFrom(
+                module="airflow.models.pool",
+                names=[ast.alias(name="Pool")],
+                level=0,
+            )
+        )
+        # Replace the pool with the Pool class
+        return imports, ast.Attribute(
+            value=ast.Call(
+                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
+                args=[ast.Constant(value=pool.pool)],
+                keywords=[
+                    ast.keyword(arg="slots", value=ast.Constant(value=pool.slots)),
+                    ast.keyword(arg="description", value=ast.Constant(value=pool.description)),
+                    ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.include_deferred)),
+                ],
+            ),
+            attr="pool",
+            ctx=ast.Load(),
+        )
+    else:
+        raise TypeError(f"Unsupported type for pool: {type(pool)}. Expected str or Pool instance.")
+
+
 def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
     imports = []
     # If we have a callable, we want to import it
@@ -50,13 +96,7 @@ def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
 def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.ImportFrom], ast.Call]:
     imports = []
     if host.username and not host.password and host.password_variable:
-        imports.append(
-            ast.ImportFrom(
-                module="airflow.models.variable",
-                names=[ast.alias(name="Variable")],
-                level=0,
-            )
-        )
+        has_any_variable = False
 
         if isinstance(call, ast.Call):
             for k in call.keywords:
@@ -79,8 +119,17 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.Import
                         )
                     else:
                         k.value = variable_get
+                    has_any_variable = True
         else:
             raise NotImplementedError(f"Got unexpected call type for `{ast.unparse(call)}`: {type(call)}")
+        if has_any_variable:
+            imports.append(
+                ast.ImportFrom(
+                    module="airflow.models.variable",
+                    names=[ast.alias(name="Variable")],
+                    level=0,
+                )
+            )
     return imports, call
 
 
