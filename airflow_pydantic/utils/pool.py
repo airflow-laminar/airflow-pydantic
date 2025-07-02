@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
 from pydantic import (
     Field,
@@ -19,8 +19,8 @@ class PoolType:
         default=None,
         description="Number of slots in the pool",
     )
-    description: Optional[str] = Field(default=None, description="Pool description")
-    include_deferred: Optional[bool] = Field(default=None, description="Whether to include deferred tasks in the pool")
+    description: str = Field(default="", description="Pool description")
+    include_deferred: bool = Field(default=False, description="Whether to include deferred tasks in the pool")
 
     @classmethod
     def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> core_schema.CoreSchema:
@@ -28,8 +28,8 @@ class PoolType:
             {
                 "pool": core_schema.model_field(core_schema.str_schema()),
                 "slots": core_schema.model_field(core_schema.int_schema()),
-                "description": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "include_deferred": core_schema.model_field(core_schema.union_schema([core_schema.bool_schema(), core_schema.none_schema()])),
+                "description": core_schema.model_field(core_schema.str_schema()),
+                "include_deferred": core_schema.model_field(core_schema.bool_schema()),
             },
             model_name="Pool",
         )
