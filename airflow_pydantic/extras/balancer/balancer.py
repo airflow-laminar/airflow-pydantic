@@ -86,7 +86,12 @@ class BalancerConfiguration(BaseModel):
             if get_parsing_context().dag_id is not None:
                 # check airflow first
                 try:
-                    res = Pool.get_pool(host.pool)
+                    if isinstance(host.pool, Pool):
+                        pool_name = host.pool.pool
+                    elif isinstance(host.pool, str):
+                        pool_name = host.pool
+
+                    res = Pool.get_pool(pool_name)
 
                     # airflow return value differs version-to-version
                     if res is None:
@@ -94,8 +99,8 @@ class BalancerConfiguration(BaseModel):
                     elif res.slots != host.size:
                         if self.override_pool_size:
                             Pool.create_or_update_pool(
-                                pool=host.pool.pool,
-                                slots=host.pool.size,
+                                pool=pool_name,
+                                slots=host.size,
                                 description=host.pool.description,
                                 include_deferred=False,
                             )
