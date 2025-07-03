@@ -1,15 +1,10 @@
 import ast
-from importlib.util import find_spec
 from typing import Dict
 
 from pkn.pydantic import serialize_path_as_string
 
-from ..airflow import _AirflowPydanticMarker
+from ...airflow import _AirflowPydanticMarker
 from .utils import RenderedCode, _build_pool_callable, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
-
-have_balancer = False
-if find_spec("airflow_balancer"):
-    have_balancer = True
 
 __all__ = (
     "render_base_task_args",

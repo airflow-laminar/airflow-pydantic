@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 from pydantic import Field, field_validator
 
-from ..task import Task, TaskArgs
+from ..core import Task, TaskArgs
 from ..utils import BashCommands, CallablePath, ImportPath
 
 __all__ = (

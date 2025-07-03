@@ -5,12 +5,16 @@ import pytest
 from pytest import fixture
 
 from airflow_pydantic import (
+    BalancerConfiguration,
+    BalancerHostQueryConfiguration,
     BashSensor,
     BashSensorArgs,
     BashTask,
     BashTaskArgs,
     Dag,
     DagArgs,
+    Host,
+    Port,
     PythonSensor,
     PythonSensorArgs,
     PythonTask,
@@ -20,15 +24,7 @@ from airflow_pydantic import (
     TaskArgs,
 )
 from airflow_pydantic.airflow import SSHHook
-
-has_balancer = False
-try:
-    from airflow_balancer import BalancerConfiguration, BalancerHostQueryConfiguration, Host, Port
-    from airflow_balancer.testing import pools, variables
-
-    has_balancer = True
-except ImportError:
-    ...
+from airflow_pydantic.testing import pools, variables
 
 has_supervisor = False
 try:
@@ -50,6 +46,15 @@ def foo(**kwargs): ...
 
 def hook(**kwargs):
     return SSHHook(remote_host="test", username="test")
+
+
+@fixture
+def load_config():
+    try:
+        from airflow_config import load_config
+    except ImportError:
+        pytest.skip("airflow_config is not installed, skipping load_config fixture")
+    return load_config
 
 
 @fixture
@@ -148,9 +153,6 @@ def ssh_operator(ssh_operator_args):
 
 @fixture
 def balancer():
-    if not has_balancer:
-        pytest.skip("airflow_balancer is not installed, skipping balancer fixtures")
-        return
     with pools():
         return BalancerConfiguration(
             hosts=[
@@ -166,8 +168,6 @@ def balancer():
 
 @fixture
 def ssh_operator_balancer(ssh_operator_args, balancer):
-    if not has_balancer:
-        pytest.skip("airflow_balancer is not installed, skipping balancer fixtures")
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHTask(
             task_id="test_ssh_operator",
@@ -182,8 +182,6 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
 
 @fixture
 def ssh_operator_balancer_template(ssh_operator_balancer):
-    if not has_balancer:
-        pytest.skip("airflow_balancer is not installed, skipping balancer fixtures")
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHTask(
             task_id="test_ssh_operator",
@@ -242,9 +240,6 @@ def supervisor_operator(supervisor_cfg):
 
 @fixture
 def supervisor_ssh_operator(supervisor_ssh_cfg):
-    if not has_balancer:
-        pytest.skip("airflow_balancer is not installed, skipping supervisor ssh fixtures")
-
     host = Host(name="test_host", username="test_user", password_variable="VAR", password_variable_key="password")
     yield SupervisorSSHTask(
         task_id="test_supervisor",

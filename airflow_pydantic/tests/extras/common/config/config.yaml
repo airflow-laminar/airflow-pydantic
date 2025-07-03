@@ -1,0 +1,17 @@
+# @package _global_
+_target_: airflow_config.Configuration
+default_dag_args:
+  _target_: airflow_config.DagArgs
+  start_date: ["2025-01-01", "America/New_York"]
+  catchup: false
+  max_active_runs: 1
+
+dags:
+  test_cleanup:
+    schedule: "0 0 * * *"
+    max_active_tasks: 1
+    params: ${.tasks.cleanup_task}
+    tasks:
+      cleanup_task:
+        _target_: airflow_pydantic.DagCleanupTask
+        task_id: "cleanup_task"

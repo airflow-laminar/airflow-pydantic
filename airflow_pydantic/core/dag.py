@@ -3,12 +3,12 @@ from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel as PydanticBaseModel, Field, field_validator, model_validator
 
+from ..migration import _airflow_3
+from ..utils import DatetimeArg, Param, ParamType, ScheduleArg
 from .base import BaseModel
 from .instantiate import DagInstantiateMixin
-from .migration import _airflow_3
 from .render import DagRenderMixin
 from .task import Task, TaskArgs
-from .utils import DatetimeArg, Param, ParamType, ScheduleArg
 
 __all__ = (
     "DagArgs",

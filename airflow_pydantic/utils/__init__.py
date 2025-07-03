@@ -7,6 +7,9 @@ from pkn.pydantic import (
 
 from .bash import *
 from .common import *
+from .env import *
+from .host import *
 from .param import *
+from .path import *
 from .pool import *
 from .ssh_hook import *
