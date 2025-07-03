@@ -49,6 +49,15 @@ def hook(**kwargs):
 
 
 @fixture
+def load_config():
+    try:
+        from airflow_config import load_config
+    except ImportError:
+        pytest.skip("airflow_config is not installed, skipping load_config fixture")
+    return load_config
+
+
+@fixture
 def python_operator_args():
     return PythonTaskArgs(
         python_callable="airflow_pydantic.tests.conftest.foo",

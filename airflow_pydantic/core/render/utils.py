@@ -8,7 +8,6 @@ from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
 from ...airflow import Param, Pool
-from ...extras import Host, Port
 from ...utils import SSHHook, TriggerRule
 
 __all__ = ("RenderedCode",)
@@ -63,7 +62,9 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
                     ast.keyword(arg="pool", value=ast.Constant(value=pool.pool)),
                     ast.keyword(arg="slots", value=ast.Constant(value=pool.slots)),
                     ast.keyword(arg="description", value=ast.Constant(value=pool.description)),
-                    ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.include_deferred)),
+                    ast.keyword(
+                        arg="include_deferred", value=ast.Constant(value=pool.include_deferred if pool.include_deferred is not None else False)
+                    ),
                 ],
             ),
             attr="pool",
@@ -130,6 +131,8 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.Import
 
 
 def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
+    from airflow_pydantic import Host, Port
+
     imports = []
 
     # For certain types, we want to reset the recursive model_dump back
