@@ -3,10 +3,10 @@ from typing import List, Optional, Tuple, Union
 
 from pydantic import Field, field_validator, model_validator
 
+from ..utils import DatetimeArg, ImportPath, Pool, TriggerRule
 from .base import BaseModel
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
-from .utils import DatetimeArg, ImportPath, Pool, TriggerRule
 
 __all__ = (
     "TaskArgs",

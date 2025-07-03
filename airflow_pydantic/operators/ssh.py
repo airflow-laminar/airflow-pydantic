@@ -1,4 +1,3 @@
-from importlib.util import find_spec
 from logging import getLogger
 from types import FunctionType, MethodType
 from typing import Any, Dict, Optional, Type, Union
@@ -6,13 +5,9 @@ from typing import Any, Dict, Optional, Type, Union
 from pydantic import Field, TypeAdapter, field_validator, model_validator
 
 from ..airflow import SSHHook as BaseSSHHook
-from ..task import Task, TaskArgs
+from ..core import Task, TaskArgs
+from ..extras import BalancerHostQueryConfiguration, Host
 from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
-
-have_balancer = False
-if find_spec("airflow_balancer"):
-    have_balancer = True
-    from airflow_balancer import BalancerHostQueryConfiguration, Host
 
 __all__ = (
     "SSHOperatorArgs",
@@ -27,15 +22,10 @@ _log = getLogger(__name__)
 class SSHTaskArgs(TaskArgs):
     # ssh operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/operators/ssh/index.html
-    if have_balancer:
-        ssh_hook: Optional[Union[SSHHook, CallablePath, BalancerHostQueryConfiguration, Host]] = Field(
-            default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
-        )
-        ssh_hook_host: Optional[Host] = Field(default=None, exclude=True)
-    else:
-        ssh_hook: Optional[Union[SSHHook, CallablePath]] = Field(
-            default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
-        )
+    ssh_hook: Optional[Union[SSHHook, CallablePath, BalancerHostQueryConfiguration, Host]] = Field(
+        default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
+    )
+    ssh_hook_host: Optional[Host] = Field(default=None, exclude=True)
 
     # Track source of hook in order to defer
     ssh_hook_foo: Optional[CallablePath] = Field(default=None, exclude=True)
@@ -79,7 +69,7 @@ class SSHTaskArgs(TaskArgs):
         if isinstance(data, dict):
             if "ssh_hook" in data:
                 ssh_hook = data["ssh_hook"]
-                if have_balancer and isinstance(ssh_hook, (BalancerHostQueryConfiguration, Host)):
+                if isinstance(ssh_hook, (BalancerHostQueryConfiguration, Host)):
                     if isinstance(ssh_hook, BalancerHostQueryConfiguration):
                         # Ensure that the BalancerHostQueryConfiguration is of kind 'select'
                         if not ssh_hook.kind == "select":
@@ -136,18 +126,17 @@ class SSHTaskArgs(TaskArgs):
                     _log.info("Failed to call ssh_hook callable: %s", v)
                     v = None
 
-            if have_balancer:
-                try:
-                    if isinstance(v, BalancerHostQueryConfiguration):
-                        if not v.kind == "select":
-                            raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
-                        v = v.execute().hook()
-                    if isinstance(v, (Host,)):
-                        v = v.hook()
-                except Exception:
-                    # Skip, might only run in situ
-                    _log.info("Failed to execute BalancerHostQueryConfiguration or Host: %s", v)
-                    v = None
+            try:
+                if isinstance(v, BalancerHostQueryConfiguration):
+                    if not v.kind == "select":
+                        raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
+                    v = v.execute().hook()
+                if isinstance(v, (Host,)):
+                    v = v.hook()
+            except Exception:
+                # Skip, might only run in situ
+                _log.info("Failed to execute BalancerHostQueryConfiguration or Host: %s", v)
+                v = None
 
             if isinstance(v, dict):
                 v = TypeAdapter(SSHHook).validate_python(v)

@@ -1,6 +1,5 @@
 import ast
 from datetime import datetime, time, timedelta
-from importlib.util import find_spec
 from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Optional, Tuple
@@ -8,13 +7,9 @@ from typing import List, Optional, Tuple
 from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
-from ..airflow import Param, Pool
-from ..utils import SSHHook, TriggerRule
-
-have_balancer = False
-if find_spec("airflow_balancer"):
-    have_balancer = True
-    from airflow_balancer import Host, Port
+from ...airflow import Param, Pool
+from ...extras import Host, Port
+from ...utils import SSHHook, TriggerRule
 
 __all__ = ("RenderedCode",)
 
@@ -143,9 +138,8 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
     #   - Host
     #   - Port
     if model_ref:
-        if have_balancer:
-            if isinstance(getattr(model_ref, key), (Host, Port)):
-                value = getattr(model_ref, key)
+        if isinstance(getattr(model_ref, key), (Host, Port)):
+            value = getattr(model_ref, key)
     if _islambda(value):
         raise NotImplementedError(
             f"Got lambda for {key}:Lambda functions are not supported in the configuration. Please use a regular function instead."
@@ -195,43 +189,42 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
                 return imports, ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=[], keywords=[])
             return imports, ast.Name(id=name, ctx=ast.Load())
 
-    if have_balancer:
-        if isinstance(value, Host):
-            imports.append(ast.ImportFrom(module="airflow_balancer", names=[ast.alias(name="Host")], level=0))
+    if isinstance(value, Host):
+        imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Host")], level=0))
 
-            # Construct Call with host
-            keywords = []
-            for k, v in value.model_dump(exclude_unset=True).items():
-                keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
-                if keyword_imports:
-                    imports.extend(keyword_imports)
-                keywords.append(ast.keyword(arg=k, value=keyword_value))
-            call = ast.Call(
-                func=ast.Name(id="Host", ctx=ast.Load()),
-                args=[],
-                keywords=keywords,
-            )
+        # Construct Call with host
+        keywords = []
+        for k, v in value.model_dump(exclude_unset=True).items():
+            keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+            if keyword_imports:
+                imports.extend(keyword_imports)
+            keywords.append(ast.keyword(arg=k, value=keyword_value))
+        call = ast.Call(
+            func=ast.Name(id="Host", ctx=ast.Load()),
+            args=[],
+            keywords=keywords,
+        )
 
-            # Replace out variable
-            import_, call = _build_ssh_hook_with_variable(value, call)
-            if import_:
-                imports.extend(import_)
-            return imports, call
+        # Replace out variable
+        import_, call = _build_ssh_hook_with_variable(value, call)
+        if import_:
+            imports.extend(import_)
+        return imports, call
 
-        if isinstance(value, Port):
-            imports.append(ast.ImportFrom(module="airflow_balancer", names=[ast.alias(name="Port")], level=0))
-            keywords = []
-            for k, v in value.model_dump(exclude_unset=True).items():
-                keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
-                if keyword_imports:
-                    imports.extend(keyword_imports)
-                keywords.append(ast.keyword(arg=k, value=keyword_value))
-            call = ast.Call(
-                func=ast.Name(id="Port", ctx=ast.Load()),
-                args=[],
-                keywords=keywords,
-            )
-            return imports, call
+    if isinstance(value, Port):
+        imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Port")], level=0))
+        keywords = []
+        for k, v in value.model_dump(exclude_unset=True).items():
+            keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+            if keyword_imports:
+                imports.extend(keyword_imports)
+            keywords.append(ast.keyword(arg=k, value=keyword_value))
+        call = ast.Call(
+            func=ast.Name(id="Port", ctx=ast.Load()),
+            args=[],
+            keywords=keywords,
+        )
+        return imports, call
 
     if isinstance(value, TriggerRule):
         # NOTE: put before the basics types below

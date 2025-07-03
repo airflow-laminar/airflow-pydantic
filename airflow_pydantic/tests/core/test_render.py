@@ -39,7 +39,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(pool='test_host').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(pool='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=None).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
     def test_render_operator_ssh_host_variable_from_template(self, ssh_operator_balancer_template):
@@ -53,7 +53,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(pool='test_host').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(pool='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=None).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test_ssh_operator')"
         )
 
     def test_render_dag(self, dag):
@@ -387,7 +387,7 @@ with DAG(
             exec(dag_with_supervisor.render())
 
     def test_render_with_external_supervisor_ssh_config(self, dag_with_supervisor_ssh):
-        from airflow_balancer.testing import variables
+        from airflow_pydantic.testing import variables
 
         assert isinstance(dag_with_supervisor_ssh, Dag)
         assert (
@@ -397,8 +397,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from airflow.models import DAG
-from airflow_balancer import Host, Port
 from airflow_supervisor.airflow.ssh import SupervisorSSH
+
+from airflow_pydantic import Host, Port
 
 with DAG(
     description="",
