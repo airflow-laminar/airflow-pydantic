@@ -9,6 +9,7 @@ from .bash import *
 from .common import *
 from .env import *
 from .host import *
+from .names import *
 from .param import *
 from .path import *
 from .pool import *

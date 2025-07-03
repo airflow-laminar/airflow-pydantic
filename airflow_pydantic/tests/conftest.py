@@ -83,7 +83,7 @@ def python_sensor_args():
 @fixture
 def python_operator(python_operator_args):
     return PythonTask(
-        task_id="test_python_operator",
+        task_id="test-python-operator",
         **python_operator_args.model_dump(exclude_unset=True),
     )
 
@@ -91,7 +91,7 @@ def python_operator(python_operator_args):
 @fixture
 def python_sensor(python_sensor_args):
     return PythonSensor(
-        task_id="test_python_sensor",
+        task_id="test-python-sensor",
         **python_sensor_args.model_dump(exclude_unset=True),
     )
 
@@ -120,7 +120,7 @@ def bash_sensor_args():
 @fixture
 def bash_operator(bash_operator_args):
     return BashTask(
-        task_id="test_bash_operator",
+        task_id="test-bash-operator",
         **bash_operator_args.model_dump(exclude_unset=True),
     )
 
@@ -128,7 +128,7 @@ def bash_operator(bash_operator_args):
 @fixture
 def bash_sensor(bash_sensor_args):
     return BashSensor(
-        task_id="test_bash_sensor",
+        task_id="test-bash-sensor",
         **bash_sensor_args.model_dump(exclude_unset=True),
     )
 
@@ -150,7 +150,7 @@ def ssh_operator_args():
 @fixture
 def ssh_operator(ssh_operator_args):
     return SSHTask(
-        task_id="test_ssh_operator",
+        task_id="test-ssh-operator",
         **ssh_operator_args.model_dump(exclude_unset=True),
     )
 
@@ -174,7 +174,7 @@ def balancer():
 def ssh_operator_balancer(ssh_operator_args, balancer):
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHTask(
-            task_id="test_ssh_operator",
+            task_id="test-ssh-operator",
             **ssh_operator_args.model_dump(exclude_unset=True, exclude=["ssh_hook", "pool"]),
             ssh_hook=BalancerHostQueryConfiguration(
                 kind="select",
@@ -188,7 +188,7 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
 def ssh_operator_balancer_template(ssh_operator_balancer):
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHTask(
-            task_id="test_ssh_operator",
+            task_id="test-ssh-operator",
             template=ssh_operator_balancer,
         )
 
@@ -239,14 +239,14 @@ def supervisor_ssh_cfg():
 
 @fixture
 def supervisor_operator(supervisor_cfg):
-    yield SupervisorTask(task_id="test_supervisor", cfg=supervisor_cfg)
+    yield SupervisorTask(task_id="test-supervisor", cfg=supervisor_cfg)
 
 
 @fixture
 def supervisor_ssh_operator(supervisor_ssh_cfg):
     host = Host(name="test_host", username="test_user", password_variable="VAR", password_variable_key="password")
     yield SupervisorSSHTask(
-        task_id="test_supervisor",
+        task_id="test-supervisor",
         cfg=supervisor_ssh_cfg,
         host=host,
         port=Port(name="test_port", host=host, port=8080),
@@ -393,10 +393,10 @@ def dag_with_attribute_dependencies(dag_args, task_args, supervisor_operator):
         tasks={
             "pre": pre,
             "ha": ha,
-            "retrigger_fail": retrigger_fail,
-            "stop_fail": stop_fail,
-            "retrigger_pass": retrigger_pass,
-            "stop_pass": stop_pass,
+            "retrigger-fail": retrigger_fail,
+            "stop-fail": stop_fail,
+            "retrigger-pass": retrigger_pass,
+            "stop-pass": stop_pass,
         },
     )
 

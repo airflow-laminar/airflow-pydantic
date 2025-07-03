@@ -7,16 +7,13 @@ from subprocess import call
 from tempfile import NamedTemporaryFile
 from typing import Dict, List
 
+from ...utils import _task_id_to_python_name
 from .task import render_base_task_args
 from .utils import _get_parts_from_value
 
 __all__ = ("DagRenderMixin",)
 
 _log = getLogger(__name__)
-
-
-def _task_id_to_better_name(task_id):
-    return task_id.replace("-", "_").replace(" ", "_").replace(".", " ")
 
 
 class DagRenderMixin:
@@ -62,10 +59,7 @@ class DagRenderMixin:
             globals_.extend(task_globals)
 
             # Ensure task_id is a valid Python identifier
-            task_id = _task_id_to_better_name(task_id)
-
-            if not task_id.isidentifier():
-                raise ValueError(f"Task ID '{task_id}' is not a valid Python identifier")
+            task_id = _task_id_to_python_name(task_id)
 
             # Add task code to dict
             tasks[task_id] = task_code
@@ -76,7 +70,7 @@ class DagRenderMixin:
                 for dependency in task.dependencies:
                     if isinstance(dependency, tuple):
                         # Normalize first element of tuple to task_id
-                        dependency = (_task_id_to_better_name(dependency[0]), dependency[1])
+                        dependency = (_task_id_to_python_name(dependency[0]), dependency[1])
                     to_set.append(dependency)
                 task_dependencies[task_id] = to_set
 
