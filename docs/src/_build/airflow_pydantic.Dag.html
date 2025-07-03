@@ -263,8 +263,8 @@
 <h1>airflow_pydantic.Dag<a class="headerlink" href="#airflow-pydantic-dag" title="Link to this heading">¶</a></h1>
 <dl class="py class pydantic_model">
 <dt class="sig sig-object py" id="airflow_pydantic.Dag">
-<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.</span></span><span class="sig-name descname"><span class="pre">Dag</span></span><a class="reference internal" href="../../../_modules/airflow_pydantic/dag.html#Dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.Dag" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs" title="airflow_pydantic.dag.DagArgs"><code class="xref py py-class docutils literal notranslate"><span class="pre">DagArgs</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DagRenderMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DagInstantiateMixin</span></code></p>
+<em class="property"><span class="pre">pydantic</span> <span class="pre">model</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.</span></span><span class="sig-name descname"><span class="pre">Dag</span></span><a class="reference internal" href="../../../_modules/airflow_pydantic/core/dag.html#Dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.Dag" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="airflow_pydantic.DagArgs.html#airflow_pydantic.DagArgs" title="airflow_pydantic.core.dag.DagArgs"><code class="xref py py-class docutils literal notranslate"><span class="pre">DagArgs</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DagRenderMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DagInstantiateMixin</span></code></p>
 <p><details  class="autodoc_pydantic_collapsable_json">
 <summary>Show JSON schema</summary><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">   </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Dag&quot;</span><span class="p">,</span>
@@ -1040,7 +1040,7 @@
 <dt class="field-odd">Fields<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dag_id</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tasks</span> <span class="pre">(Dict[str,</span> <span class="pre">airflow_pydantic.task.Task]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tasks</span> <span class="pre">(Dict[str,</span> <span class="pre">airflow_pydantic.core.task.Task]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -1052,7 +1052,7 @@
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.Dag.tasks">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tasks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="airflow_pydantic.Task.html#airflow_pydantic.Task" title="airflow_pydantic.task.Task"><span class="pre">Task</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#airflow_pydantic.Dag.tasks" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tasks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="airflow_pydantic.Task.html#airflow_pydantic.Task" title="airflow_pydantic.core.task.Task"><span class="pre">Task</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#airflow_pydantic.Dag.tasks" title="Link to this definition">¶</a></dt>
 <dd><p>List of tasks in the DAG</p>
 </dd></dl>
 
