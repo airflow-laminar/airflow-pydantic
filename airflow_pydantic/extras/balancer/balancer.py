@@ -3,9 +3,6 @@ from pathlib import Path
 from random import choice
 from typing import Callable, List, Optional, Union
 
-from hydra import compose, initialize_config_dir
-from hydra.errors import HydraException
-from hydra.utils import instantiate
 from pydantic import Field, model_validator
 
 try:
@@ -250,6 +247,9 @@ class BalancerConfiguration(BaseModel):
     @staticmethod
     def load_path(yaml_file: str | Path, _config_dir: str | Path = None) -> Self:
         """Load configuration from yaml file"""
+        from hydra import compose, initialize_config_dir
+        from hydra.utils import instantiate
+
         if not isinstance(yaml_file, Path):
             yaml_file = Path(yaml_file).resolve()
         if not yaml_file.suffix == ".yaml":
@@ -294,6 +294,7 @@ class BalancerConfiguration(BaseModel):
         _offset: int = 4,
     ) -> "BalancerConfiguration":
         from airflow_config import load_config as load_airflow_config
+        from hydra.errors import HydraException
 
         try:
             _log.info(f"Loading balancer configuration from {config_dir} with name {config_name}")
