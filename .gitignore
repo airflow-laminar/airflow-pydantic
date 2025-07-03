@@ -145,5 +145,4 @@ target
 
 docs/html
 
-airflow_pydantic/tests/rendered
-
+airflow_pydantic/tests/core/rendered
