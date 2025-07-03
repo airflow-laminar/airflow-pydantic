@@ -135,6 +135,7 @@ def ssh_operator_args():
     return SSHTaskArgs(
         ssh_conn_id="test",
         ssh_hook="airflow_pydantic.tests.conftest.hook",
+        pool="blerg",
         command="test",
         do_xcom_push=True,
         cmd_timeout=10,
@@ -171,7 +172,7 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHTask(
             task_id="test_ssh_operator",
-            **ssh_operator_args.model_dump(exclude_unset=True, exclude=["ssh_hook"]),
+            **ssh_operator_args.model_dump(exclude_unset=True, exclude=["ssh_hook", "pool"]),
             ssh_hook=BalancerHostQueryConfiguration(
                 kind="select",
                 balancer=balancer,
