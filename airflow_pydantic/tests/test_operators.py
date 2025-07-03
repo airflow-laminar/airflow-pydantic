@@ -1,6 +1,7 @@
-from airflow_pydantic import BashCommands, BashOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
+import pytest
 
-from .conftest import hook
+from airflow_pydantic import BashCommands, BashOperatorArgs, BashSensorArgs, PythonOperatorArgs, SSHOperatorArgs
+from airflow_pydantic.migration import _airflow_3
 
 
 class TestOperators:
@@ -11,23 +12,30 @@ class TestOperators:
         assert o == PythonOperatorArgs.model_validate(o.model_dump(exclude_unset=True))
         assert o == PythonOperatorArgs.model_validate_json(o.model_dump_json(exclude_unset=True))
 
+    def test_python_operator(self, python_operator):
+        if _airflow_3() is None:
+            return pytest.skip("Airflow not installed")
+        python_operator.instantiate()
+
     def test_bash_operator_args(self, bash_operator_args):
         o = bash_operator_args
 
         # Test roundtrips
         assert o == BashOperatorArgs.model_validate(o.model_dump(exclude_unset=True))
-        assert o == BashOperatorArgs.model_validate_json(o.model_dump_json(exclude_unset=True))
+
+        jsn = o.model_dump_json(exclude_unset=True)
+        obj = BashOperatorArgs.model_validate_json(jsn)
+
+        # pool has no __eq__
+        obj.pool = o.pool
+        assert o == obj
+
+    def test_bash_operator(self, bash_operator):
+        if _airflow_3() is None:
+            return pytest.skip("Airflow not installed")
+        bash_operator.instantiate()
 
     def test_ssh_operator_args(self, ssh_operator_args):
-        o = SSHOperatorArgs(
-            ssh_hook=hook(),
-            ssh_conn_id="test",
-            command="test",
-            do_xcom_push=True,
-            cmd_timeout=10,
-            get_pty=True,
-        )
-
         o = ssh_operator_args
 
         # Test roundtrips
@@ -37,6 +45,23 @@ class TestOperators:
         assert o.model_dump_json(exclude_unset=True) == SSHOperatorArgs.model_validate_json(o.model_dump_json(exclude_unset=True)).model_dump_json(
             exclude_unset=True
         )
+
+    def test_ssh_operator(self, ssh_operator):
+        if _airflow_3() is None:
+            return pytest.skip("Airflow not installed")
+        ssh_operator.instantiate()
+
+    def test_bash_sensor_args(self, bash_sensor_args):
+        o = bash_sensor_args
+
+        # Test roundtrips
+        assert o == BashSensorArgs.model_validate(o.model_dump(exclude_unset=True))
+        assert o == BashSensorArgs.model_validate_json(o.model_dump_json(exclude_unset=True))
+
+    def test_bash_sensor(self, bash_sensor):
+        if _airflow_3() is None:
+            return pytest.skip("Airflow not installed")
+        bash_sensor.instantiate()
 
     def test_bash(self):
         cmds = BashCommands(

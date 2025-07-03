@@ -61,7 +61,7 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
                 keywords=[
                     ast.keyword(arg="name", value=ast.Constant(value=pool.pool)),
                     ast.keyword(arg="slots", value=ast.Constant(value=pool.slots)),
-                    ast.keyword(arg="description", value=ast.Constant(value=pool.description)),
+                    ast.keyword(arg="description", value=ast.Constant(value=pool.description if pool.description is not None else "")),
                     ast.keyword(
                         arg="include_deferred", value=ast.Constant(value=pool.include_deferred if pool.include_deferred is not None else False)
                     ),

@@ -2,6 +2,7 @@ from datetime import datetime, time, timedelta
 from unittest.mock import patch
 
 import pytest
+from pydantic import TypeAdapter
 from pytest import fixture
 
 from airflow_pydantic import (
@@ -14,6 +15,7 @@ from airflow_pydantic import (
     Dag,
     DagArgs,
     Host,
+    Pool,
     Port,
     PythonSensor,
     PythonSensorArgs,
@@ -100,6 +102,7 @@ def bash_operator_args():
         bash_command="test",
         env={"test": "test"},
         append_env=True,
+        pool=TypeAdapter(Pool).validate_python({"pool": "test", "slots": 5}),
         output_encoding="utf-8",
         skip_on_exit_code=99,
         cwd="test",

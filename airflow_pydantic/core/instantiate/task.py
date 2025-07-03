@@ -1,3 +1,5 @@
+from ...airflow import Pool
+
 __all__ = ("TaskInstantiateMixin",)
 
 
@@ -6,4 +8,10 @@ class TaskInstantiateMixin:
         if not self.task_id:
             raise ValueError("task_id must be set to instantiate a task")
         args = {**self.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
+
+        # Handle Conversions
+        if "pool" in args:
+            if isinstance(args["pool"], Pool):
+                # Convert
+                args["pool"] = args["pool"].pool
         return self.operator(**args)

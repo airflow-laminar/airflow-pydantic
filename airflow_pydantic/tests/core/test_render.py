@@ -1,6 +1,8 @@
 from unittest.mock import patch
 
 from airflow_pydantic import Dag
+from airflow_pydantic.airflow import Pool
+from airflow_pydantic.testing import pools
 
 try:
     from airflow import DAG  # noqa: F401
@@ -118,6 +120,7 @@ with DAG(
         dag=dag,
     )
     task2 = BashOperator(
+        pool=Pool.create_or_update_pool(name="test", slots=5, description="", include_deferred=False).pool,
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -145,8 +148,9 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW_SSH:
-            with patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
+            with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
                 mock_get_pool.return_value = Pool()
+                dag.instantiate()
                 exec(dag.render())
 
     def test_render_with_dependencies(self, dag):
@@ -210,6 +214,7 @@ with DAG(
         dag=dag,
     )
     task2 = BashOperator(
+        pool=Pool.create_or_update_pool(name="test", slots=5, description="", include_deferred=False).pool,
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -240,8 +245,9 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW_SSH:
-            with patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
+            with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
                 mock_get_pool.return_value = Pool()
+                dag.instantiate()
                 exec(dag.render())
 
     def test_render_with_externals(self, dag_with_external):
@@ -299,6 +305,7 @@ with DAG(
         dag=dag,
     )
     task2 = BashOperator(
+        pool=Pool.create_or_update_pool(name="test", slots=5, description="", include_deferred=False).pool,
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -324,8 +331,9 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW_SSH:
-            with patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
+            with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
                 mock_get_pool.return_value = Pool()
+                dag_with_external.instantiate()
                 exec(dag_with_external.render())
 
     def test_render_with_external_supervisor_config(self, dag_with_supervisor):
@@ -400,6 +408,7 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW:
+            dag_with_supervisor.instantiate()
             exec(dag_with_supervisor.render())
 
     def test_render_with_external_supervisor_ssh_config(self, dag_with_supervisor_ssh):
@@ -481,6 +490,7 @@ with DAG(
         )
         if _HAVE_AIRFLOW:
             with variables({"user": "test", "password": "password"}):
+                dag_with_supervisor_ssh.instantiate()
                 exec(dag_with_supervisor_ssh.render())
 
     def test_render_single_task_python_sensor_and_params(self, dag, python_sensor):
