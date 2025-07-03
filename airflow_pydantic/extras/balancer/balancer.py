@@ -99,7 +99,7 @@ class BalancerConfiguration(BaseModel):
                     elif res.slots != host.size:
                         if self.override_pool_size:
                             Pool.create_or_update_pool(
-                                pool=pool_name,
+                                name=pool_name,
                                 slots=host.size,
                                 description=host.pool.description,
                                 include_deferred=False,
@@ -110,7 +110,7 @@ class BalancerConfiguration(BaseModel):
                     try:
                         # else set to default
                         Pool.create_or_update_pool(
-                            pool=host.name,
+                            name=host.name,
                             slots=host.size,
                             description=f"Balancer pool for host({host.name})",
                             include_deferred=False,
