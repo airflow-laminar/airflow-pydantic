@@ -148,12 +148,12 @@ else:
             self.include_deferred = include_deferred
 
         @classmethod
-        def get_pool(cls, pool: str) -> "Pool":
+        def get_pool(cls, pool_name: str, *args, **kwargs) -> "Pool":
             # Simulate getting a pool from Airflow
-            return cls(pool=pool, slots=5, description="Test pool")
+            return cls(pool=pool_name, slots=5, description="Test pool")
 
         @classmethod
-        def create_or_update_pool(cls, pool: str, slots: int = 0, description: str = "", include_deferred: bool = False):
+        def create_or_update_pool(cls, name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
             # Simulate creating or updating a pool in Airflow
             pass
 

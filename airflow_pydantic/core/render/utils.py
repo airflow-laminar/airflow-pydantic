@@ -38,9 +38,9 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
         # Replace the pool with the Pool class
         return imports, ast.Attribute(
             value=ast.Call(
-                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
-                args=[],
-                keywords=[ast.keyword(arg="pool", value=ast.Constant(value=pool))],
+                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="get_pool", ctx=ast.Load()),
+                args=[ast.Constant(value=pool)],
+                keywords=[],
             ),
             attr="pool",
             ctx=ast.Load(),
@@ -59,7 +59,7 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
                 func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
                 args=[],
                 keywords=[
-                    ast.keyword(arg="pool", value=ast.Constant(value=pool.pool)),
+                    ast.keyword(arg="name", value=ast.Constant(value=pool.pool)),
                     ast.keyword(arg="slots", value=ast.Constant(value=pool.slots)),
                     ast.keyword(arg="description", value=ast.Constant(value=pool.description)),
                     ast.keyword(
@@ -72,6 +72,53 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
         )
     else:
         raise TypeError(f"Unsupported type for pool: {type(pool)}. Expected str or Pool instance.")
+
+
+def _build_param_callable(param, key) -> Tuple[List[ast.ImportFrom], ast.Call]:
+    imports = []
+    # If the value is a Param, we can use a dict with the properties
+    imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
+
+    # pull out the description
+    param = param.serialize()
+    keywords = [
+        ast.keyword(arg="description", value=ast.Constant(value=param["description"])),
+    ]
+
+    # Grab the default value from the schema if it exists
+    default_value = param["schema"].pop("value", None)
+
+    # Process title
+    if "title" in param["schema"]:
+        keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=param["schema"]["title"])))
+
+    # Process type
+    if default_value is not None:
+        # We can remove the "null" from the type if it exists
+        if "null" in param["schema"]["type"]:
+            param["schema"]["type"].remove("null")
+    if isinstance(param["schema"]["type"], list) and len(param["schema"]["type"]) == 1:
+        # If the type is a single item list, we can use it directly
+        param["schema"]["type"] = param["schema"]["type"][0]
+    new_imports, new_type = _get_parts_from_value(key, param["schema"]["type"])
+    keywords.append(ast.keyword(arg="type", value=new_type))
+    if new_imports:
+        # If we have imports, we need to add them to the imports list
+        imports.extend(new_imports)
+
+    new_imports, new_value = _get_parts_from_value(key, param["value"])
+    if new_imports:
+        # If we have imports, we need to add them to the imports list
+        imports.extend(new_imports)
+
+    if new_value.value is None:
+        new_value = _get_parts_from_value(key, default_value)[1]
+
+    return imports, ast.Call(
+        func=ast.Name(id="Param", ctx=ast.Load()),
+        args=[new_value],
+        keywords=keywords,
+    )
 
 
 def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
@@ -308,48 +355,13 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             keywords=[],
         )
     if isinstance(value, Param):
-        # If the value is a Param, we can use a dict with the properties
-        imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
+        new_imports, new_value = _build_param_callable(value, key)
+        imports.extend(new_imports)
+        return imports, new_value
 
-        # pull out the description
-        value = value.serialize()
-        keywords = [
-            ast.keyword(arg="description", value=ast.Constant(value=value["description"])),
-        ]
-
-        # Grab the default value from the schema if it exists
-        default_value = value["schema"].pop("value", None)
-
-        # Process title
-        if "title" in value["schema"]:
-            keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=value["schema"]["title"])))
-
-        # Process type
-        if default_value is not None:
-            # We can remove the "null" from the type if it exists
-            if "null" in value["schema"]["type"]:
-                value["schema"]["type"].remove("null")
-        if isinstance(value["schema"]["type"], list) and len(value["schema"]["type"]) == 1:
-            # If the type is a single item list, we can use it directly
-            value["schema"]["type"] = value["schema"]["type"][0]
-        new_imports, new_type = _get_parts_from_value(key, value["schema"]["type"])
-        keywords.append(ast.keyword(arg="type", value=new_type))
-        if new_imports:
-            # If we have imports, we need to add them to the imports list
-            imports.extend(new_imports)
-
-        new_imports, new_value = _get_parts_from_value(key, value["value"])
-        if new_imports:
-            # If we have imports, we need to add them to the imports list
-            imports.extend(new_imports)
-
-        if new_value.value is None:
-            new_value = _get_parts_from_value(key, default_value)[1]
-
-        return imports, ast.Call(
-            func=ast.Name(id="Param", ctx=ast.Load()),
-            args=[new_value],
-            keywords=keywords,
-        )
+    if isinstance(value, Pool):
+        new_import, new_value = _build_pool_callable(value)
+        imports.append(new_import)
+        return imports, new_value
 
     raise TypeError(f"Unsupported type for key: {key}, value: {type(value)}")
