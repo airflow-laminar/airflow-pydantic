@@ -25,8 +25,10 @@ class DagRenderMixin:
             raise ValueError("DAG must have a dag_id")
         imports: List[str] = []
         globals_: List[str] = []
-        tasks: Dict[str, str] = {}
-        task_dependencies: Dict[str, List[str]] = {}
+        task_id_to_task_code: Dict[str, str] = {}
+        task_key_to_task_id: Dict[str, str] = {}
+        task_id_to_task_python_name: Dict[str, str] = {}
+        task_id_to_task_dependencies: Dict[str, List[str]] = {}
 
         new_dag = ast.Module(body=[], type_ignores=[])
         # First, Prepare DAG kwargs
@@ -53,26 +55,29 @@ class DagRenderMixin:
         # reformat to keywords instance
         dag_args = [ast.keyword(arg=k, value=v) for k, v in dag_args.items()]
 
-        for task_id, task in self.tasks.items():
+        for task_key, task in self.tasks.items():
             task_imports, task_globals, task_code = task.render(raw=True, dag_from_context=True)
             imports.extend(task_imports)
             globals_.extend(task_globals)
 
             # Ensure task_id is a valid Python identifier
-            task_id = _task_id_to_python_name(task_id)
+            task_python_name = _task_id_to_python_name(task_key)
 
             # Add task code to dict
-            tasks[task_id] = task_code
+            task_id_to_task_code[task.task_id] = task_code
+            task_key_to_task_id[task_key] = task.task_id
+            task_id_to_task_python_name[task.task_id] = task_python_name
 
             # Grab dependencies and add them
             if task.dependencies:
                 to_set = []
                 for dependency in task.dependencies:
                     if isinstance(dependency, tuple):
-                        # Normalize first element of tuple to task_id
-                        dependency = (_task_id_to_python_name(dependency[0]), dependency[1])
+                        dependency = (dependency[0], dependency[1])
+                    else:
+                        dependency = (dependency, None)
                     to_set.append(dependency)
-                task_dependencies[task_id] = to_set
+                task_id_to_task_dependencies[task.task_id] = to_set
 
         # Imports
         imports.append(ast.ImportFrom(module="airflow.models", names=[ast.alias(name="DAG")], level=0))
@@ -109,47 +114,57 @@ class DagRenderMixin:
 
         # Tasks
         # dag_block.body.append(ast.Assign(targets=[ast.Name(id="dag", ctx=ast.Store())], value=dag_block.context_expr))
-        for task_id, task in tasks.items():
+        for task_id, task in task_id_to_task_code.items():
             dag_block.body.append(
                 ast.Assign(
-                    targets=[ast.Name(id=task_id, ctx=ast.Store())],
+                    targets=[ast.Name(id=task_id_to_task_python_name[task_id], ctx=ast.Store())],
                     value=task,
                 )
             )
-        if not tasks:
+        if not task_id_to_task_code:
             _log.warning("No tasks found in the DAG. Ensure that tasks are defined correctly.")
             # Add an ellipsis to indicate no tasks
             dag_block.body.append(ast.Expr(value=ast.Constant(value=...)))
 
         # Handle task dependencies
-        for task_id, dependencies in task_dependencies.items():
+        for task_id, dependencies in task_id_to_task_dependencies.items():
             for dependency in dependencies:
                 # Extract attribute accessor if it exists
-                if isinstance(dependency, tuple):
-                    dependency, accessor = dependency
-                else:
-                    accessor = None
+                dependency_unknown_id, accessor = dependency
 
-                # NOTE: this should have already been validated in the DAG,
-                # but do again here for safety
-                if dependency not in tasks:
-                    raise ValueError(f"Task Dependency for {task_id} not found: {dependency}")
+                # NOTE: this should have already been validated in the DAG, but do again here for safety
+                if dependency_unknown_id not in task_id_to_task_python_name:
+                    # It is not a task id, maybe its a task key
+                    if dependency_unknown_id not in task_key_to_task_id:
+                        # It is not a task id and not a task key, raise
+                        raise ValueError(f"Task Dependency not found for task {task_id}: {dependency_unknown_id}")
+                    else:
+                        dependency_task_id = task_key_to_task_id[dependency_unknown_id]
+                else:
+                    dependency_task_id = dependency_unknown_id
+
+                # Get python name from task id
+                dependency_python_name = task_id_to_task_python_name[dependency_task_id]
+                assert dependency_python_name.isidentifier()
+
+                if dependency_task_id not in task_id_to_task_code:
+                    raise ValueError(f"Task Dependency not found for task {task_id}: {dependency_task_id}")
 
                 if accessor:
                     # Access attribute `accessor` of the dependency task
                     dependency_ast = ast.Attribute(
-                        value=ast.Name(id=dependency, ctx=ast.Load()),
+                        value=ast.Name(id=dependency_python_name, ctx=ast.Load()),
                         attr=accessor,
                         ctx=ast.Load(),
                     )
                 else:
-                    dependency_ast = ast.Name(id=dependency)
+                    dependency_ast = ast.Name(id=dependency_python_name)
                 dag_block.body.append(
                     ast.Expr(
                         value=ast.BinOp(
                             left=dependency_ast,
                             op=ast.RShift(),
-                            right=ast.Name(id=task_id),
+                            right=ast.Name(id=task_id_to_task_python_name[task_id], ctx=ast.Load()),
                         )
                     )
                 )
