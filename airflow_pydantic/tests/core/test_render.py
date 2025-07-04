@@ -40,12 +40,12 @@ class TestRender:
             "from airflow.providers.ssh.operators.ssh import SSHOperator",
             "from airflow.models.pool import Pool",
             "from airflow.providers.ssh.hooks.ssh import SSHHook",
-            "from airflow.models.variable import Variable",
+            "from airflow.models.variable import Variable as AirflowVariable",
         ]
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_host_variable_from_template(self, ssh_operator_balancer_template):
@@ -54,12 +54,12 @@ class TestRender:
             "from airflow.providers.ssh.operators.ssh import SSHOperator",
             "from airflow.models.pool import Pool",
             "from airflow.providers.ssh.hooks.ssh import SSHHook",
-            "from airflow.models.variable import Variable",
+            "from airflow.models.variable import Variable as AirflowVariable",
         ]
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=Variable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_dag(self, dag):
@@ -110,6 +110,7 @@ with DAG(
     },
 ) as dag:
     task1 = PythonOperator(
+        pool=Pool.get_pool("test-pool-model").pool,
         python_callable=foo,
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -204,6 +205,7 @@ with DAG(
     },
 ) as dag:
     task1 = PythonOperator(
+        pool=Pool.get_pool("test-pool-model").pool,
         python_callable=foo,
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -295,6 +297,7 @@ with DAG(
     },
 ) as dag:
     task1 = PythonOperator(
+        pool=Pool.get_pool("test-pool-model").pool,
         python_callable=foo,
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -424,7 +427,7 @@ from pathlib import Path
 from airflow.models import DAG
 from airflow_supervisor.airflow.ssh import SupervisorSSH
 
-from airflow_pydantic import Host, Port
+from airflow_pydantic import Host, Port, Variable
 
 with DAG(
     description="",
@@ -479,9 +482,9 @@ with DAG(
             "config_path": Path("/an/arbitrary/path/supervisord.conf"),
             "working_dir": Path("/an/arbitrary/path"),
         },
-        host=Host(name="test_host", username="test_user", password_variable="VAR", password_variable_key="password"),
+        host=Host(name="test_host", username="test_user", password=Variable(key="VAR", deserialize_json=True)),
         port=Port(
-            name="test_port", host=Host(name="test_host", username="test_user", password_variable="VAR", password_variable_key="password"), port=8080
+            name="test_port", host=Host(name="test_host", username="test_user", password=Variable(key="VAR", deserialize_json=True)), port=8080
         ),
         task_id="test-supervisor",
         dag=dag,

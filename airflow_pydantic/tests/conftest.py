@@ -24,6 +24,7 @@ from airflow_pydantic import (
     SSHTask,
     SSHTaskArgs,
     TaskArgs,
+    Variable,
 )
 from airflow_pydantic.airflow import SSHHook
 from airflow_pydantic.testing import pools, variables
@@ -68,6 +69,7 @@ def python_operator_args():
         templates_dict={"test": "test"},
         templates_exts=[".sql", ".hql"],
         show_return_value_in_logs=True,
+        pool=Pool(pool="test-pool-model"),
     )
 
 
@@ -163,8 +165,7 @@ def balancer():
                 Host(
                     name="test_host",
                     username="test_user",
-                    password_variable="VAR",
-                    password_variable_key="password",
+                    password=Variable(key="VAR", deserialize_json=True),
                 ),
             ]
         )
@@ -244,7 +245,7 @@ def supervisor_operator(supervisor_cfg):
 
 @fixture
 def supervisor_ssh_operator(supervisor_ssh_cfg):
-    host = Host(name="test_host", username="test_user", password_variable="VAR", password_variable_key="password")
+    host = Host(name="test_host", username="test_user", password=Variable(key="VAR", deserialize_json=True))
     yield SupervisorSSHTask(
         task_id="test-supervisor",
         cfg=supervisor_ssh_cfg,

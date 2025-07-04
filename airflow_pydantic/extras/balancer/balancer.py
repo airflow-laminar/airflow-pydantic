@@ -13,6 +13,7 @@ except ImportError:
 from typing_extensions import Self
 
 from ...core import BaseModel
+from ...utils import Pool, Variable
 from .host import Host
 from .port import Port
 
@@ -26,12 +27,10 @@ class BalancerConfiguration(BaseModel):
     ports: List[Port] = Field(default_factory=list)
 
     default_username: str = "airflow"
+
     # Password
-    default_password: Optional[str] = None
-    # If password is stored in a variable
-    default_password_variable: Optional[str] = None
-    # if stored in structured container, access by key
-    default_password_variable_key: Optional[str] = None
+    default_password: Optional[Union[str, Variable]] = None
+
     # Or get key file
     default_key_file: Optional[str] = None
 
@@ -63,7 +62,7 @@ class BalancerConfiguration(BaseModel):
 
     @model_validator(mode="after")
     def _validate(self) -> Self:
-        from airflow_pydantic.airflow import Pool, PoolNotFound, get_parsing_context
+        from airflow_pydantic.airflow import Pool as AirflowPool, PoolNotFound, get_parsing_context
 
         # Validate no duplicate hosts
         seen_hostnames = set()
@@ -88,17 +87,21 @@ class BalancerConfiguration(BaseModel):
                 try:
                     if isinstance(host.pool, Pool):
                         pool_name = host.pool.pool
+                    elif isinstance(host.pool, AirflowPool):
+                        pool_name = host.pool.pool
+                    elif isinstance(host.pool, dict):
+                        pool_name = host.pool.get("pool")
                     elif isinstance(host.pool, str):
                         pool_name = host.pool
 
-                    res = Pool.get_pool(pool_name)
+                    res = AirflowPool.get_pool(pool_name)
 
                     # airflow return value differs version-to-version
                     if res is None:
                         raise PoolNotFound
                     elif res.slots != host.size:
                         if self.override_pool_size:
-                            Pool.create_or_update_pool(
+                            AirflowPool.create_or_update_pool(
                                 name=pool_name,
                                 slots=host.size,
                                 description=host.pool.description,
@@ -109,7 +112,7 @@ class BalancerConfiguration(BaseModel):
                 except PoolNotFound:
                     try:
                         # else set to default
-                        Pool.create_or_update_pool(
+                        AirflowPool.create_or_update_pool(
                             name=host.name,
                             slots=host.size,
                             description=f"Balancer pool for host({host.name})",
@@ -123,10 +126,6 @@ class BalancerConfiguration(BaseModel):
                 host.username = self.default_username
             if not host.password and self.default_password:
                 host.password = self.default_password
-            if not host.password_variable and self.default_password_variable:
-                host.password_variable = self.default_password_variable
-            if not host.password_variable_key and self.default_password_variable_key:
-                host.password_variable_key = self.default_password_variable_key
             if not host.key_file and self.default_key_file:
                 host.key_file = self.default_key_file
             if not host.size:
