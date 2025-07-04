@@ -14,3 +14,4 @@ from .param import *
 from .path import *
 from .pool import *
 from .ssh_hook import *
+from .variable import *

@@ -7,8 +7,8 @@ from typing import List, Optional, Tuple
 from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
-from ...airflow import Param, Pool
-from ...utils import SSHHook, TriggerRule
+from ...airflow import Param as AirflowParam, Pool as AirflowPool
+from ...utils import Pool, SSHHook, TriggerRule, Variable
 
 __all__ = ("RenderedCode",)
 
@@ -21,13 +21,37 @@ RenderedCode = Tuple[Imports, Globals, TaskCode]
 _LAMBDA_TYPE = type(lambda: 0)
 
 
+class RenderError(TypeError): ...
+
+
 def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
 def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
     imports = []
-    if isinstance(pool, str):
+    if isinstance(pool, Pool):
+        # Swap
+        pool = pool.model_dump(exclude_unset=True)
+    elif isinstance(pool, AirflowPool):
+        pool = {
+            "pool": pool.pool,
+            "slots": pool.slots,
+            "description": pool.description if pool.description is not None else "",
+            "include_deferred": pool.include_deferred if pool.include_deferred is not None else False,
+        }
+    elif isinstance(pool, str):
+        if pool == "default":
+            # If default, leave alone
+            return [], ast.Constant(value=pool)
+        pool = {"pool": pool}
+    elif isinstance(pool, dict):
+        # Leave it
+        pass
+    else:
+        raise TypeError(f"Unsupported type for pool: {type(pool)}. Expected Pool, AirflowPool, or str.")
+
+    if len(pool.keys()) == 1:
         imports.append(
             ast.ImportFrom(
                 module="airflow.models.pool",
@@ -39,39 +63,34 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
         return imports, ast.Attribute(
             value=ast.Call(
                 func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="get_pool", ctx=ast.Load()),
-                args=[ast.Constant(value=pool)],
+                args=[ast.Constant(value=pool["pool"])],
                 keywords=[],
             ),
             attr="pool",
             ctx=ast.Load(),
         )
-    elif isinstance(pool, Pool):
-        imports.append(
-            ast.ImportFrom(
-                module="airflow.models.pool",
-                names=[ast.alias(name="Pool")],
-                level=0,
-            )
+    imports.append(
+        ast.ImportFrom(
+            module="airflow.models.pool",
+            names=[ast.alias(name="Pool")],
+            level=0,
         )
-        # Replace the pool with the Pool class
-        return imports, ast.Attribute(
-            value=ast.Call(
-                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
-                args=[],
-                keywords=[
-                    ast.keyword(arg="name", value=ast.Constant(value=pool.pool)),
-                    ast.keyword(arg="slots", value=ast.Constant(value=pool.slots)),
-                    ast.keyword(arg="description", value=ast.Constant(value=pool.description if pool.description is not None else "")),
-                    ast.keyword(
-                        arg="include_deferred", value=ast.Constant(value=pool.include_deferred if pool.include_deferred is not None else False)
-                    ),
-                ],
-            ),
-            attr="pool",
-            ctx=ast.Load(),
-        )
-    else:
-        raise TypeError(f"Unsupported type for pool: {type(pool)}. Expected str or Pool instance.")
+    )
+    # Replace the pool with the Pool class
+    return imports, ast.Attribute(
+        value=ast.Call(
+            func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
+            args=[],
+            keywords=[
+                ast.keyword(arg="name", value=ast.Constant(value=pool["pool"])),
+                ast.keyword(arg="slots", value=ast.Constant(value=pool.get("slots", 128))),
+                ast.keyword(arg="description", value=ast.Constant(value=pool.get("description", ""))),
+                ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.get("include_deferred", False))),
+            ],
+        ),
+        attr="pool",
+        ctx=ast.Load(),
+    )
 
 
 def _build_param_callable(param, key) -> Tuple[List[ast.ImportFrom], ast.Call]:
@@ -139,38 +158,40 @@ def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
 
 def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.ImportFrom], ast.Call]:
     imports = []
-    if host.username and not host.password and host.password_variable:
+    if isinstance(host.password, Variable):
         has_any_variable = False
 
         if isinstance(call, ast.Call):
             for k in call.keywords:
                 if k.arg == "password":
                     variable_get = ast.Call(
-                        func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
-                        args=[ast.Constant(value=host.password_variable)],
+                        func=ast.Attribute(value=ast.Name(id="AirflowVariable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
+                        args=[ast.Constant(value=host.password.key)],
                         keywords=[],
                     )
-                    if host.password_variable_key:
-                        # Use bracket operator to get the key called password_variable_key
+                    if host.password.deserialize_json:
+                        # Use bracket operator to get the key called "password"
                         variable_get = ast.Call(
-                            func=ast.Attribute(value=ast.Name(id="Variable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
-                            args=[ast.Constant(value=host.password_variable)],
+                            func=ast.Attribute(value=ast.Name(id="AirflowVariable", ctx=ast.Load()), attr="get", ctx=ast.Load()),
+                            args=[ast.Constant(value=host.password.key)],
                             keywords=[ast.keyword(arg="deserialize_json", value=ast.Constant(value=True))],
                         )
+                        # TODO maybe not "password"
                         k.value = ast.Subscript(
                             value=variable_get,
-                            slice=ast.Constant(value=host.password_variable_key),
+                            slice=ast.Constant(value="password"),
                         )
                     else:
                         k.value = variable_get
                     has_any_variable = True
         else:
             raise NotImplementedError(f"Got unexpected call type for `{ast.unparse(call)}`: {type(call)}")
+
         if has_any_variable:
             imports.append(
                 ast.ImportFrom(
                     module="airflow.models.variable",
-                    names=[ast.alias(name="Variable")],
+                    names=[ast.alias(name="Variable", asname="AirflowVariable")],
                     level=0,
                 )
             )
@@ -187,8 +208,10 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
     # Reverted types:
     #   - Host
     #   - Port
+    #   - Pool
+    # NOTE: See below for backup
     if model_ref:
-        if isinstance(getattr(model_ref, key), (Host, Port)):
+        if isinstance(getattr(model_ref, key), (Host, Port, Pool, Variable)):
             value = getattr(model_ref, key)
     if _islambda(value):
         raise NotImplementedError(
@@ -239,6 +262,9 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
                 return imports, ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=[], keywords=[])
             return imports, ast.Name(id=name, ctx=ast.Load())
 
+    if key in ("pool",):
+        return _build_pool_callable(value)
+
     if isinstance(value, Host):
         imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Host")], level=0))
 
@@ -254,11 +280,6 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             args=[],
             keywords=keywords,
         )
-
-        # Replace out variable
-        import_, call = _build_ssh_hook_with_variable(value, call)
-        if import_:
-            imports.extend(import_)
         return imports, call
 
     if isinstance(value, Port):
@@ -271,6 +292,26 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             keywords.append(ast.keyword(arg=k, value=keyword_value))
         call = ast.Call(
             func=ast.Name(id="Port", ctx=ast.Load()),
+            args=[],
+            keywords=keywords,
+        )
+        return imports, call
+
+    if isinstance(value, Pool):
+        new_import, new_value = _build_pool_callable(value)
+        imports.append(new_import)
+        return imports, new_value
+
+    if isinstance(value, Variable):
+        imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Variable")], level=0))
+        keywords = []
+        for k, v in value.model_dump(exclude_unset=True).items():
+            keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+            if keyword_imports:
+                imports.extend(keyword_imports)
+            keywords.append(ast.keyword(arg=k, value=keyword_value))
+        call = ast.Call(
+            func=ast.Name(id="Variable", ctx=ast.Load()),
             args=[],
             keywords=keywords,
         )
@@ -296,7 +337,18 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
                 imports.extend(new_imports)
             new_values.append(new_value)
         return imports, ast.List(elts=new_values, ctx=ast.Load())
+
     if isinstance(value, dict):
+        # Check if its actually a model!
+        # NOTE: See abvoe for primary
+        if model_ref and isinstance(getattr(model_ref, key, None), BaseModel):
+            try:
+                return _get_parts_from_value(key, getattr(model_ref, key), model_ref)
+            except RenderError:
+                # Just parse as a dict, some types we don't handle specifically:
+                # - SueprvisorAirflowConfiguration
+                # - SupervisorSSHAirflowConfiguration
+                pass
         new_keys = []
         new_values = []
         for k, v in value.items():
@@ -354,14 +406,14 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             ],
             keywords=[],
         )
-    if isinstance(value, Param):
+    if isinstance(value, AirflowParam):
         new_imports, new_value = _build_param_callable(value, key)
         imports.extend(new_imports)
         return imports, new_value
 
-    if isinstance(value, Pool):
+    if isinstance(value, AirflowPool):
         new_import, new_value = _build_pool_callable(value)
         imports.append(new_import)
         return imports, new_value
 
-    raise TypeError(f"Unsupported type for key: {key}, value: {type(value)}")
+    raise RenderError(f"Unsupported type for key: {key}, value: {type(value)}")
