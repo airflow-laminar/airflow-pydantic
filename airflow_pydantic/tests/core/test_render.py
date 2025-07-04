@@ -31,7 +31,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.get_pool('blerg').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool=Pool.get_pool('blerg').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command=\"bash -lc 'set -ex\\ntest1\\ntest2'\", cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_host_variable(self, ssh_operator_balancer):
@@ -45,7 +45,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_host_variable_from_template(self, ssh_operator_balancer_template):
@@ -59,7 +59,7 @@ class TestRender:
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='test', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_dag(self, dag):
@@ -137,7 +137,7 @@ with DAG(
         do_xcom_push=True,
         ssh_hook=SSHHook(remote_host="test", username="test"),
         ssh_conn_id="test",
-        command="test",
+        command="bash -lc 'set -ex\\ntest1\\ntest2'",
         cmd_timeout=10,
         environment={"test": "test"},
         get_pty=True,
@@ -232,7 +232,7 @@ with DAG(
         do_xcom_push=True,
         ssh_hook=SSHHook(remote_host="test", username="test"),
         ssh_conn_id="test",
-        command="test",
+        command="bash -lc 'set -ex\\ntest1\\ntest2'",
         cmd_timeout=10,
         environment={"test": "test"},
         get_pty=True,
@@ -324,7 +324,7 @@ with DAG(
         do_xcom_push=True,
         ssh_hook=hook(),
         ssh_conn_id="test",
-        command="test",
+        command="bash -lc 'set -ex\\ntest1\\ntest2'",
         cmd_timeout=10,
         environment={"test": "test"},
         get_pty=True,

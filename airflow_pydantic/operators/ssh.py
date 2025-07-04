@@ -1,13 +1,13 @@
 from logging import getLogger
 from types import FunctionType, MethodType
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
 from pydantic import Field, TypeAdapter, field_validator, model_validator
 
 from ..airflow import SSHHook as BaseSSHHook
 from ..core import Task, TaskArgs
 from ..extras import BalancerHostQueryConfiguration, Host
-from ..utils import CallablePath, ImportPath, SSHHook, get_import_path
+from ..utils import BashCommands, CallablePath, ImportPath, SSHHook, get_import_path
 
 __all__ = (
     "SSHOperatorArgs",
@@ -40,7 +40,7 @@ class SSHTaskArgs(TaskArgs):
         default=None,
         description="remote host to connect (templated) Nullable. If provided, it will replace the remote_host which was defined in ssh_hook or predefined in the connection of ssh_conn_id.",
     )
-    command: str = Field(default=None, description="command to execute on remote host. (templated)")
+    command: Union[str, List[str], BashCommands] = Field(default=None, description="command to execute on remote host. (templated)")
     conn_timeout: Optional[int] = Field(
         default=None,
         description="timeout (in seconds) for maintaining the connection. The default is 10 seconds. Nullable. If provided, it will replace the conn_timeout which was predefined in the connection of ssh_conn_id.",
@@ -62,6 +62,18 @@ class SSHTaskArgs(TaskArgs):
         default=None,
         description="If command exits with this exit code, leave the task in skipped state (default: None). If set to None, any non-zero exit code will be treated as a failure.",
     )
+
+    @field_validator("command")
+    @classmethod
+    def validate_command(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            return v
+        elif isinstance(v, list) and all(isinstance(item, str) for item in v):
+            return BashCommands(commands=v)
+        elif isinstance(v, BashCommands):
+            return v
+        else:
+            raise ValueError("command must be a string, list of strings, or a BashCommands model")
 
     @model_validator(mode="before")
     @classmethod

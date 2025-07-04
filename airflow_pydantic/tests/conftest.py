@@ -8,6 +8,7 @@ from pytest import fixture
 from airflow_pydantic import (
     BalancerConfiguration,
     BalancerHostQueryConfiguration,
+    BashCommands,
     BashSensor,
     BashSensorArgs,
     BashTask,
@@ -141,7 +142,7 @@ def ssh_operator_args():
         ssh_conn_id="test",
         ssh_hook="airflow_pydantic.tests.conftest.hook",
         pool="blerg",
-        command="test",
+        command=["test1", "test2"],
         do_xcom_push=True,
         cmd_timeout=10,
         get_pty=True,
@@ -173,6 +174,7 @@ def balancer():
 
 @fixture
 def ssh_operator_balancer(ssh_operator_args, balancer):
+    ssh_operator_args.command = BashCommands(commands=["test1", "test2"], login=True, cwd="/tmp", env={"var": "{{ ti.blerg }}"})
     with pools(), variables({"user": "test", "password": "password"}):
         return SSHTask(
             task_id="test-ssh-operator",
