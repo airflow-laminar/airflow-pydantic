@@ -1,38 +1,38 @@
-from typing import TYPE_CHECKING, Optional, Type
+from typing import Optional, Type
 
 from pydantic import Field, field_validator
 
-from ...core import BaseModel, Task, TaskArgs
+from ...airflow import PythonOperator
+from ...core import Task, TaskArgs
 from ...utils import CallablePath
-from .airflow_functions import cleanup_dag_runs
-
-if TYPE_CHECKING:
-    from airflow.providers.standard.operators.python import PythonOperator
+from .airflow_functions import clean_dag_runs, clean_dags
 
 __all__ = (
-    "DagCleanup",
-    "DagCleanupOperatorArgs",
-    "DagCleanupTaskArgs",
-    "DagCleanupOperator",
-    "DagCleanupTask",
+    "DagClean",
+    "DagRunClean",
+    "DagCleanOperatorArgs",
+    "DagCleanTaskArgs",
+    "DagCleanOperator",
+    "DagCleanTask",
 )
 
 
-def create_cleanup_dag_runs():
+def create_clean_dag_runs():
+    # Wrapped to avoid airflow imports
     from airflow.utils.session import provide_session
 
     @provide_session
-    def _cleanup_dag_runs(session=None, **context):
+    def _clean_dag_runs(session=None, **context):
         params = context["params"]
 
         # Get the configurable parameters
-        delete_successful = params.get("delete_successful", DagCleanupTaskArgs.model_fields["delete_successful"].default)
-        delete_failed = params.get("delete_failed", DagCleanupTaskArgs.model_fields["delete_failed"].default)
-        mark_failed_as_successful = params.get("mark_failed_as_successful", DagCleanupTaskArgs.model_fields["mark_failed_as_successful"].default)
-        max_dagruns = params.get("max_dagruns", DagCleanupTaskArgs.model_fields["max_dagruns"].default)
-        days_to_keep = params.get("days_to_keep", DagCleanupTaskArgs.model_fields["days_to_keep"].default)
+        delete_successful = params.get("delete_successful", DagCleanTaskArgs.model_fields["delete_successful"].default)
+        delete_failed = params.get("delete_failed", DagCleanTaskArgs.model_fields["delete_failed"].default)
+        mark_failed_as_successful = params.get("mark_failed_as_successful", DagCleanTaskArgs.model_fields["mark_failed_as_successful"].default)
+        max_dagruns = params.get("max_dagruns", DagCleanTaskArgs.model_fields["max_dagruns"].default)
+        days_to_keep = params.get("days_to_keep", DagCleanTaskArgs.model_fields["days_to_keep"].default)
 
-        cleanup_dag_runs(
+        clean_dag_runs(
             session=session,
             delete_successful=delete_successful,
             delete_failed=delete_failed,
@@ -41,48 +41,70 @@ def create_cleanup_dag_runs():
             days_to_keep=days_to_keep,
         )
 
-    return _cleanup_dag_runs
+    return _clean_dag_runs
 
 
-def create_cleanup_dag_runs_operator(**kwargs) -> "PythonOperator":
-    from airflow.providers.standard.operators.python import PythonOperator
+def create_clean_dags():
+    # Wrapped to avoid airflow imports
+    from airflow.utils.session import provide_session
 
-    operator = PythonOperator(
-        python_callable=create_cleanup_dag_runs(),
-        **kwargs,
-    )
-    return operator
+    @provide_session
+    def _clean_dags(session=None, **context):
+        clean_dags(session=session)
+
+    return _clean_dags
 
 
-class DagCleanup(BaseModel):
+def create_clean_dags_and_dag_runs():
+    # Wrapped to avoid airflow imports
+    from airflow.utils.session import provide_session
+
+    @provide_session
+    def _clean_dags_and_dag_runs(session=None, **context):
+        clean_dag_runs = create_clean_dag_runs()
+        clean_dags = create_clean_dags()
+        clean_dag_runs(session=session, **context)
+        clean_dags(session=session, **context)
+
+    return _clean_dags_and_dag_runs
+
+
+class DagRunClean(PythonOperator):
+    def __init__(self, **kwargs):
+        if "python_callable" in kwargs:
+            raise ValueError("DagRunClean does not accept 'python_callable' as an argument.")
+        super().__init__(python_callable=create_clean_dag_runs(), **kwargs)
+
+
+class DagClean(PythonOperator):
+    def __init__(self, **kwargs):
+        if "python_callable" in kwargs:
+            raise ValueError("DagClean does not accept 'python_callable' as an argument.")
+        super().__init__(python_callable=create_clean_dags_and_dag_runs(), **kwargs)
+
+
+class DagCleanTaskArgs(TaskArgs):
     delete_successful: Optional[bool] = Field(default=True)
     delete_failed: Optional[bool] = Field(default=True)
     mark_failed_as_successful: Optional[bool] = Field(default=False)
     max_dagruns: Optional[int] = Field(default=10)
     days_to_keep: Optional[int] = Field(default=10)
 
-    @property
-    def cleanup_dag_runs(self):
-        return create_cleanup_dag_runs()
-
-
-class DagCleanupTaskArgs(DagCleanup, TaskArgs, extra="allow"): ...
-
 
 # Alias
-DagCleanupOperatorArgs = DagCleanupTaskArgs
+DagCleanOperatorArgs = DagCleanTaskArgs
 
 
-class DagCleanupTask(Task, DagCleanupTaskArgs):
-    operator: CallablePath = Field(default="airflow_pydantic.extras.common.clean.create_cleanup_dag_runs_operator", validate_default=True)
+class DagCleanTask(Task, DagCleanTaskArgs):
+    operator: CallablePath = Field(default="airflow_pydantic.extras.common.clean.DagClean", validate_default=True)
 
     @field_validator("operator")
     @classmethod
     def validate_operator(cls, v: Type) -> Type:
-        if v.__qualname__ != create_cleanup_dag_runs_operator.__qualname__:
-            raise ValueError(f"operator must be 'airflow_pydantic.extras.common.clean.create_cleanup_dag_runs_operator', got: {v}")
+        if v is not DagClean:
+            raise ValueError(f"operator must be 'airflow_pydantic.extras.common.clean.DagClean', got: {v}")
         return v
 
 
 # Alias
-DagCleanupOperator = DagCleanupTask
+DagCleanOperator = DagCleanTask
