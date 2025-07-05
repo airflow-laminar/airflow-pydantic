@@ -1,16 +1,14 @@
-from unittest.mock import MagicMock
-
 import pytest
 
-from airflow_pydantic import DagCleanup
+from airflow_pydantic import DagClean
 
 
 class TestModels:
-    def test_dag_cleanup(self):
+    def test_dag_clean(self):
         try:
-            from airflow.models import DagModel  # noqa: F401
+            from airflow import DAG  # noqa: F401
         except ImportError:
-            return pytest.skip("Airflow DagModel not available in this environment")
+            return pytest.skip("Airflow not installed")
 
-        d = DagCleanup()
-        d.cleanup_dag_runs(session=MagicMock(), params={})
+        d = DAG(dag_id="test_dag_clean")
+        DagClean(task_id="test_clean_dags", dag=d)

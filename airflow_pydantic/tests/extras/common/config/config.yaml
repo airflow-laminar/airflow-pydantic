@@ -7,11 +7,11 @@ default_dag_args:
   max_active_runs: 1
 
 dags:
-  test_cleanup:
+  test_clean:
     schedule: "0 0 * * *"
     max_active_tasks: 1
-    params: ${.tasks.cleanup_task}
+    params: ${.tasks.clean_task}
     tasks:
-      cleanup_task:
-        _target_: airflow_pydantic.DagCleanupTask
-        task_id: "cleanup_task"
+      clean_task:
+        _target_: airflow_pydantic.DagCleanTask
+        task_id: clean_task
