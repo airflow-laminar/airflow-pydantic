@@ -3,4 +3,4 @@ from .extras import *
 from .operators import *
 from .utils import *
 
-__version__ = "1.4.6"
+__version__ = "1.4.7"
