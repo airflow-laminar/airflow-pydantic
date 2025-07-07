@@ -387,8 +387,8 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
 
         return imports, ast.Call(
             func=ast.Name(id="timedelta", ctx=ast.Load()),
-            args=[ast.Constant(value=value.total_seconds())],
-            keywords=[],
+            args=[],
+            keywords=[ast.keyword(arg="seconds", value=ast.Constant(value=value.total_seconds()))],
         )
     if isinstance(value, time):
         value: time
