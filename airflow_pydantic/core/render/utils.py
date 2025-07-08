@@ -4,6 +4,7 @@ from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Optional, Tuple
 
+from pendulum import DateTime, Timezone
 from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
@@ -371,6 +372,19 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             args=[ast.Constant(value=str(value))],
             keywords=[],
         )
+    if isinstance(value, DateTime):
+        # NOTE: Handle pendulum datetime
+        imports.append(ast.ImportFrom(module="pendulum", names=[ast.alias(name="datetime", asname="pdatetime")], level=0))
+        kwargs = []
+        for attr in ("year", "month", "day", "tz"):
+            new_imports, new_value = _get_parts_from_value(attr, getattr(value, attr))
+            imports.extend(new_imports)
+            kwargs.append(ast.keyword(arg=attr, value=new_value))
+        return imports, ast.Call(
+            func=ast.Name(id="pdatetime", ctx=ast.Load()),
+            args=[],
+            keywords=kwargs,
+        )
     if isinstance(value, datetime):
         # If the value is a datetime, we can use datetime.fromisoformat
         # and convert it to a string representation
@@ -379,6 +393,13 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         return imports, ast.Call(
             func=ast.Attribute(value=ast.Name(id="datetime", ctx=ast.Load()), attr="fromisoformat", ctx=ast.Load()),
             args=[ast.Constant(value=value.isoformat())],
+            keywords=[],
+        )
+    if isinstance(value, Timezone):
+        imports.append(ast.ImportFrom(module="pendulum", names=[ast.alias(name="Timezone")], level=0))
+        return imports, ast.Call(
+            func=ast.Name(id="Timezone", ctx=ast.Load()),
+            args=[ast.Constant(value=value.name)],
             keywords=[],
         )
     if isinstance(value, timedelta):

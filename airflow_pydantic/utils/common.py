@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal, Tuple, Union
 
+from pendulum import datetime as pendulum_datetime
 from pydantic import AfterValidator
-from pytz import timezone
 
 from ..airflow import TriggerRule
 
@@ -25,8 +25,7 @@ def _datetime_or_datetime_and_timezone(val: Any):
         return val
     elif isinstance(val, (tuple,)):
         dt = val[0]
-        tz = timezone(val[1])
-        dt = dt.replace(tzinfo=tz)
+        dt = pendulum_datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond, tz=val[1])
         return dt
     raise ValueError(f"Expected datetime or Dict[str, datetime|str], got {val!r}")
 
