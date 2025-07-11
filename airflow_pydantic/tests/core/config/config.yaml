@@ -1,0 +1,93 @@
+# @package _global_
+_target_: airflow_config.Configuration
+default_dag_args:
+  _target_: airflow_config.DagArgs
+  start_date: ["2025-01-01", "America/New_York"]
+  catchup: false
+  max_active_runs: 1
+
+dags:
+  test_one:
+    schedule: "0 0 * * *"
+    tasks:
+      one:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'one'
+  test_two:
+    schedule:
+      _target_: airflow_pydantic.CronDataIntervalTimetable
+      cron: 0 0 * * *
+      timezone: America/New_York
+    tasks:
+      two:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'two'
+  test_three:
+    schedule:
+      _target_: airflow_pydantic.CronTriggerTimetable
+      cron: "0 0 * * *"
+      timezone: America/New_York
+      interval:
+        _target_: airflow_pydantic.RelativeDelta
+        hours: 5
+        minutes: 10
+    tasks:
+      three:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'three'
+  test_four:
+    schedule:
+      _target_: airflow_pydantic.MultipleCronTriggerTimetable
+      crons:
+        - "0 0 * * *"
+        - "0 1 * * *"
+      timezone: America/New_York
+      interval:
+        _target_: airflow_pydantic.RelativeDelta
+        hours: 5
+        minutes: 10
+    tasks:
+      four:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'four'
+  test_five:
+    schedule:
+      _target_: airflow_pydantic.DeltaDataIntervalTimetable
+      delta:
+        _target_: airflow_pydantic.RelativeDelta
+        days: 1
+        hours: 2
+        minutes: 3
+    tasks:
+      five:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'five'
+  test_six:
+    schedule:
+      _target_: airflow_pydantic.DeltaTriggerTimetable
+      delta:
+        _target_: airflow_pydantic.RelativeDelta
+        days: 1
+        hours: 2
+        minutes: 3
+      interval:
+        _target_: airflow_pydantic.RelativeDelta
+        hours: 5
+        minutes: 10
+    tasks:
+      six:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'six'
+  test_seven:
+    schedule:
+      _target_: airflow_pydantic.EventsTimetable
+      event_dates:
+        - 2025-01-01T00:00:00
+        - [2025-01-02T00:00:00, "America/New_York"]
+      restrict_to_events: true
+      presorted: true
+      description: whatever
+    tasks:
+      seven:
+        _target_: airflow_pydantic.BashTask
+        bash_command: echo 'seven'

@@ -4,12 +4,24 @@ from pathlib import Path
 from types import FunctionType, MethodType
 from typing import List, Optional, Tuple
 
+from dateutil.relativedelta import relativedelta
 from pendulum import DateTime, Timezone
 from pkn.pydantic import serialize_path_as_string
 from pydantic import BaseModel
 
 from ...airflow import Param as AirflowParam, Pool as AirflowPool
-from ...utils import Pool, SSHHook, TriggerRule, Variable
+from ...utils import (
+    CronDataIntervalTimetable,
+    CronTriggerTimetable,
+    DeltaDataIntervalTimetable,
+    DeltaTriggerTimetable,
+    EventsTimetable,
+    MultipleCronTriggerTimetable,
+    Pool,
+    SSHHook,
+    TriggerRule,
+    Variable,
+)
 
 __all__ = ("RenderedCode",)
 
@@ -212,7 +224,21 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
     #   - Pool
     # NOTE: See below for backup
     if model_ref:
-        if isinstance(getattr(model_ref, key), (Host, Port, Pool, Variable)):
+        if isinstance(
+            getattr(model_ref, key),
+            (
+                Host,
+                Port,
+                Pool,
+                Variable,
+                CronDataIntervalTimetable,
+                CronTriggerTimetable,
+                MultipleCronTriggerTimetable,
+                DeltaDataIntervalTimetable,
+                DeltaTriggerTimetable,
+                EventsTimetable,
+            ),
+        ):
             value = getattr(model_ref, key)
     if _islambda(value):
         raise NotImplementedError(
@@ -317,6 +343,45 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             keywords=keywords,
         )
         return imports, call
+
+    if isinstance(
+        value,
+        (
+            CronDataIntervalTimetable,
+            CronTriggerTimetable,
+            MultipleCronTriggerTimetable,
+            DeltaDataIntervalTimetable,
+            DeltaTriggerTimetable,
+            EventsTimetable,
+        ),
+    ):
+        if isinstance(value, (CronDataIntervalTimetable, DeltaDataIntervalTimetable)):
+            import_module = "airflow.timetables.interval"
+        elif isinstance(value, (CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable)):
+            import_module = "airflow.timetables.trigger"
+        elif isinstance(value, EventsTimetable):
+            import_module = "airflow.timetables.events"
+        else:
+            # Hope for the best
+            import_module = "airflow.timetables"
+        imports.append(ast.ImportFrom(module=import_module, names=[ast.alias(name=value.__class__.__name__)], level=0))
+        args = []
+        keywords = []
+        for k, v in value.model_dump(exclude_unset=True).items():
+            if k == "crons":
+                # vararg of strs
+                for arg in v:
+                    args.append(ast.Constant(value=arg))
+            else:
+                keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+                if keyword_imports:
+                    imports.extend(keyword_imports)
+                keywords.append(ast.keyword(arg=k, value=keyword_value))
+        return imports, ast.Call(
+            func=ast.Name(id=value.__class__.__name__, ctx=ast.Load()),
+            args=args,
+            keywords=keywords,
+        )
 
     if isinstance(value, TriggerRule):
         # NOTE: put before the basics types below
@@ -426,6 +491,35 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
                 # TODO tzinfo
             ],
             keywords=[],
+        )
+    if isinstance(value, relativedelta):
+        imports.append(ast.ImportFrom(module="dateutil.relativedelta", names=[ast.alias(name="relativedelta")], level=0))
+        kwargs = []
+        for attr in (
+            "years",
+            "months",
+            "days",
+            "leapdays",
+            "hours",
+            "minutes",
+            "seconds",
+            "microseconds",
+            "year",
+            "month",
+            "day",
+            "weekday",
+            "hour",
+            "minute",
+            "second",
+            "microsecond",
+        ):
+            val = getattr(value, attr)
+            if val is not None:
+                kwargs.append(ast.keyword(arg=attr, value=ast.Constant(value=val)))
+        return imports, ast.Call(
+            func=ast.Name(id="relativedelta", ctx=ast.Load()),
+            args=[],
+            keywords=kwargs,
         )
     if isinstance(value, AirflowParam):
         new_imports, new_value = _build_param_callable(value, key)

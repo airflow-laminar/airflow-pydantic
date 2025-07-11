@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from typing import Annotated, Any, Literal, Tuple, Union
+from datetime import datetime
+from typing import Annotated, Any, Tuple, Union
 
 from pendulum import datetime as pendulum_datetime
 from pydantic import AfterValidator
@@ -7,17 +7,9 @@ from pydantic import AfterValidator
 from ..airflow import TriggerRule
 
 __all__ = (
-    "ScheduleArg",
     "DatetimeArg",
     "TriggerRule",
 )
-
-# TODO
-# from airflow.models.dag import ScheduleArg
-# ScheduleArg = Union[ArgNotSet, ScheduleInterval, Timetable, BaseDatasetEventInput, Collection["Dataset"]]
-# ScheduleInterval = Union[None, str, timedelta, relativedelta]
-# ScheduleArg = Union[timedelta, RelativeDelta, Literal["NOTSET"], str, None]
-ScheduleArg = Union[timedelta, Literal["NOTSET"], str, None]
 
 
 def _datetime_or_datetime_and_timezone(val: Any):
