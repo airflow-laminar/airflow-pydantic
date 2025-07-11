@@ -7,7 +7,19 @@ from pydantic import (
     Field,
     GetCoreSchemaHandler,
 )
-from pydantic_core import core_schema
+from pydantic_core.core_schema import (
+    CoreSchema,
+    any_schema,
+    is_instance_schema,
+    json_or_python_schema,
+    model_field,
+    model_fields_schema,
+    no_info_plain_validator_function,
+    none_schema,
+    plain_serializer_function_ser_schema,
+    str_schema,
+    union_schema,
+)
 
 from ..airflow import Param as BaseParam
 
@@ -29,23 +41,21 @@ class ParamType:
     )
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> core_schema.CoreSchema:
-        types_schema = core_schema.model_fields_schema(
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> CoreSchema:
+        types_schema = model_fields_schema(
             {
-                "value": core_schema.model_field(core_schema.union_schema([core_schema.any_schema(), core_schema.none_schema()])),
-                "title": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "description": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "type": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
+                "value": model_field(union_schema([any_schema(), none_schema()])),
+                "title": model_field(union_schema([str_schema(), none_schema()])),
+                "description": model_field(union_schema([str_schema(), none_schema()])),
+                "type": model_field(union_schema([str_schema(), none_schema()])),
             },
             model_name="Param",
         )
-        union_schema = core_schema.union_schema(
-            [core_schema.is_instance_schema(BaseParam), types_schema, core_schema.no_info_plain_validator_function(cls._validate, ref=cls.__name__)]
-        )
-        return core_schema.json_or_python_schema(
-            json_schema=union_schema,
-            python_schema=union_schema,
-            serialization=core_schema.plain_serializer_function_ser_schema(cls._serialize, is_field_serializer=True, when_used="json"),
+        schema = union_schema([is_instance_schema(BaseParam), types_schema, no_info_plain_validator_function(cls._validate, ref=cls.__name__)])
+        return json_or_python_schema(
+            json_schema=schema,
+            python_schema=schema,
+            serialization=plain_serializer_function_ser_schema(cls._serialize, is_field_serializer=True, when_used="json"),
         )
 
     @classmethod

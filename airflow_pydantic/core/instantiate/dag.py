@@ -63,8 +63,16 @@ class DagInstantiateMixin:
             # NOTE: defer import
             from airflow.models import DAG as AirflowDAG
 
+            # Handle Schedule
+            if isinstance(self.schedule, BaseModel):
+                schedule = self.schedule.instance()
+            else:
+                schedule = self.schedule
             dag_instance = AirflowDAG(
-                dag_id=self.dag_id, **self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "dag_id", "enabled"]), **kwargs
+                dag_id=self.dag_id,
+                schedule=schedule,
+                **self.model_dump(exclude_unset=True, exclude=["type_", "schedule", "tasks", "dag_id", "enabled"]),
+                **kwargs,
             )
 
         task_instances = {}

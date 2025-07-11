@@ -4,7 +4,20 @@ from pydantic import (
     Field,
     GetCoreSchemaHandler,
 )
-from pydantic_core import core_schema
+from pydantic_core.core_schema import (
+    CoreSchema,
+    float_schema,
+    int_schema,
+    is_instance_schema,
+    json_or_python_schema,
+    model_field,
+    model_fields_schema,
+    no_info_plain_validator_function,
+    none_schema,
+    plain_serializer_function_ser_schema,
+    str_schema,
+    union_schema,
+)
 
 from ..airflow import SSHHook as BaseSSHHook
 
@@ -30,30 +43,28 @@ class SSHHookType:
     # host_proxy_cmd: Optional[str] = Field(description="")
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> core_schema.CoreSchema:
-        types_schema = core_schema.model_fields_schema(
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> CoreSchema:
+        types_schema = model_fields_schema(
             {
-                "ssh_conn_id": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "remote_host": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "username": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "password": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "key_file": core_schema.model_field(core_schema.union_schema([core_schema.str_schema(), core_schema.none_schema()])),
-                "port": core_schema.model_field(core_schema.union_schema([core_schema.int_schema(), core_schema.none_schema()])),
-                "conn_timeout": core_schema.model_field(core_schema.union_schema([core_schema.int_schema(), core_schema.none_schema()])),
-                "cmd_timeout": core_schema.model_field(core_schema.union_schema([core_schema.float_schema(), core_schema.none_schema()])),
-                "keepalive_interval": core_schema.model_field(core_schema.union_schema([core_schema.int_schema(), core_schema.none_schema()])),
-                "banner_timeout": core_schema.model_field(core_schema.union_schema([core_schema.float_schema(), core_schema.none_schema()])),
-                "auth_timeout": core_schema.model_field(core_schema.union_schema([core_schema.int_schema(), core_schema.none_schema()])),
+                "ssh_conn_id": model_field(union_schema([str_schema(), none_schema()])),
+                "remote_host": model_field(union_schema([str_schema(), none_schema()])),
+                "username": model_field(union_schema([str_schema(), none_schema()])),
+                "password": model_field(union_schema([str_schema(), none_schema()])),
+                "key_file": model_field(union_schema([str_schema(), none_schema()])),
+                "port": model_field(union_schema([int_schema(), none_schema()])),
+                "conn_timeout": model_field(union_schema([int_schema(), none_schema()])),
+                "cmd_timeout": model_field(union_schema([float_schema(), none_schema()])),
+                "keepalive_interval": model_field(union_schema([int_schema(), none_schema()])),
+                "banner_timeout": model_field(union_schema([float_schema(), none_schema()])),
+                "auth_timeout": model_field(union_schema([int_schema(), none_schema()])),
             },
             model_name="SSHHook",
         )
-        union_schema = core_schema.union_schema(
-            [core_schema.is_instance_schema(BaseSSHHook), types_schema, core_schema.no_info_plain_validator_function(cls._validate, ref=cls.__name__)]
-        )
-        return core_schema.json_or_python_schema(
-            json_schema=union_schema,
-            python_schema=union_schema,
-            serialization=core_schema.plain_serializer_function_ser_schema(cls._serialize, is_field_serializer=True, when_used="json"),
+        schema = union_schema([is_instance_schema(BaseSSHHook), types_schema, no_info_plain_validator_function(cls._validate, ref=cls.__name__)])
+        return json_or_python_schema(
+            json_schema=schema,
+            python_schema=schema,
+            serialization=plain_serializer_function_ser_schema(cls._serialize, is_field_serializer=True, when_used="json"),
         )
 
     @classmethod

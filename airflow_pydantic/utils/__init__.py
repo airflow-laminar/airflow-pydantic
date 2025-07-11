@@ -13,5 +13,8 @@ from .names import *
 from .param import *
 from .path import *
 from .pool import *
+from .relativedelta import *
+from .schedule import *
 from .ssh_hook import *
+from .timetables import *
 from .variable import *

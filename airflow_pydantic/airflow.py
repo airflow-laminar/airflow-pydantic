@@ -1,3 +1,4 @@
+from datetime import timedelta
 from enum import Enum
 from getpass import getuser
 from logging import getLogger
@@ -11,7 +12,12 @@ __all__ = (
     "BashOperator",
     "BashSensor",
     "BranchPythonOperator",
+    "CronDataIntervalTimetable",
+    "CronTriggerTimetable",
+    "DeltaDataIntervalTimetable",
     "EmptyOperator",
+    "EventsTimetable",
+    "MultipleCronTriggerTimetable",
     "get_parsing_context",
     "Param",
     "Pool",
@@ -50,6 +56,9 @@ if _airflow_3():
     from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
     from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
     from airflow.sdk import get_parsing_context  # noqa: F401
+    from airflow.timetables.events import EventsTimetable  # noqa: F401
+    from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
+    from airflow.timetables.trigger import CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 elif _airflow_3() is False:
     _log.info("Using Airflow 2.x imports")
@@ -69,6 +78,11 @@ elif _airflow_3() is False:
     )
     from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
     from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
+    from airflow.timetables.events import EventsTimetable  # noqa: F401
+    from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
+    from airflow.timetables.trigger import CronTriggerTimetable  # noqa: F401
+
+    # NOTE: No MultipleCronTriggerTimetable, DeltaTriggerTimetable
     from airflow.utils.dag_parsing_context import get_parsing_context  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 else:
@@ -212,3 +226,51 @@ else:
 
     class SSHOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.ssh.operators.ssh.SSHOperator"
+
+    class EventsTimetable(_AirflowPydanticMarker):
+        _original = "airflow.timetables.events.EventsTimetable"
+
+        def __init__(self, event_dates, restrict_to_events: bool = False, presorted: bool = False, description: str = None):
+            self.event_dates = event_dates
+            self.restrict_to_events = restrict_to_events
+            self.presorted = presorted
+            self.description = description
+
+    class CronDataIntervalTimetable(_AirflowPydanticMarker):
+        _original = "airflow.timetables.interval.CronDataIntervalTimetable"
+
+        def __init__(self, cron, timezone) -> None:
+            self.cron = cron
+            self.timezone = timezone
+
+    class DeltaDataIntervalTimetable(_AirflowPydanticMarker):
+        _original = "airflow.timetables.interval.DeltaDataIntervalTimetable"
+
+        def __init__(self, delta) -> None:
+            self._delta = delta
+
+    class CronTriggerTimetable(_AirflowPydanticMarker):
+        _original = "airflow.timetables.trigger.CronTriggerTimetable"
+
+        def __init__(self, cron, timezone) -> None:
+            self.cron = cron
+            self.timezone = timezone
+
+
+if _airflow_3() in (False, None):
+
+    class DeltaTriggerTimetable(_AirflowPydanticMarker):
+        _original = "airflow.timetables.trigger.DeltaTriggerTimetable"
+
+        def __init__(self, delta, *, interval=timedelta()) -> None:
+            self.delta = delta
+            self.interval = interval
+
+    class MultipleCronTriggerTimetable(_AirflowPydanticMarker):
+        _original = "airflow.timetables.trigger.MultipleCronTriggerTimetable"
+
+        def __init__(self, *crons, timezone, interval=timedelta(), run_immediately=False) -> None:
+            self.crons = crons
+            self.timezone = timezone
+            self.interval = interval
+            self.run_immediately = run_immediately
