@@ -53,6 +53,7 @@ if _airflow_3():
         PythonOperator,  # noqa: F401
         ShortCircuitOperator,  # noqa: F401
     )
+    from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator  # noqa: F401
     from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
     from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
     from airflow.sdk import get_parsing_context  # noqa: F401
@@ -76,6 +77,7 @@ elif _airflow_3() is False:
         PythonOperator,  # noqa: F401
         ShortCircuitOperator,  # noqa: F401
     )
+    from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator  # noqa: F401
     from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
     from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
     from airflow.timetables.events import EventsTimetable  # noqa: F401
@@ -209,6 +211,9 @@ else:
 
     class EmptyOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.empty.EmptyOperator"
+
+    class TriggerDagRunOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.trigger_dagrun.TriggerDagRunOperator"
 
     class SSHHook(_AirflowPydanticMarker):
         def __init__(self, remote_host: str, username: str = None, password: str = None, key_file: str = None, **kwargs):

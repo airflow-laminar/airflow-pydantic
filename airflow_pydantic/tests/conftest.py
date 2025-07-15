@@ -25,6 +25,8 @@ from airflow_pydantic import (
     SSHTask,
     SSHTaskArgs,
     TaskArgs,
+    TriggerDagRunTask,
+    TriggerDagRunTaskArgs,
     Variable,
 )
 from airflow_pydantic.airflow import SSHHook
@@ -133,6 +135,19 @@ def bash_sensor(bash_sensor_args):
     return BashSensor(
         task_id="test-bash-sensor",
         **bash_sensor_args.model_dump(exclude_unset=True),
+    )
+
+
+@fixture
+def trigger_dagrun_args():
+    return TriggerDagRunTaskArgs(trigger_dag_id="test_dag")
+
+
+@fixture
+def trigger_dagrun(trigger_dagrun_args):
+    return TriggerDagRunTask(
+        task_id="test-trigger-dagrun",
+        **trigger_dagrun_args.model_dump(exclude_unset=True),
     )
 
 
@@ -320,7 +335,7 @@ def dag_none_schedule(dag_args):
 
 
 @fixture
-def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator):
+def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_operator, trigger_dagrun):
     ssh_operator.ssh_hook = hook
     ssh_operator.ssh_hook_external = True
     return Dag(
@@ -331,6 +346,7 @@ def dag_with_external(dag_args, task_args, python_operator, bash_operator, ssh_o
             "task1": python_operator,
             "task2": bash_operator,
             "task3": ssh_operator,
+            "task4": trigger_dagrun,
         },
     )
 
