@@ -264,6 +264,7 @@ from airflow.models.pool import Pool
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.providers.standard.operators.python import PythonOperator
+from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
 
 from airflow_pydantic.tests.conftest import foo, hook
 
@@ -331,6 +332,7 @@ with DAG(
         task_id="test-ssh-operator",
         dag=dag,
     )
+    task4 = TriggerDagRunOperator(trigger_dag_id="test_dag", task_id="test-trigger-dagrun", dag=dag)
 """
         )
         if _HAVE_AIRFLOW_SSH:
