@@ -158,11 +158,5 @@ airflow_pydantic/labextension
 
 # Rust
 target
-<<<<<<< before updating
-
-
-docs/html
 
 airflow_pydantic/tests/core/rendered
-=======
->>>>>>> after updating
