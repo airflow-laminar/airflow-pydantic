@@ -29,6 +29,7 @@ Pydantic models for Apache Airflow
 - EmptyOperator
 
 ### Other
+
 - [Param](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html)
 - [Pool](https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/pools.html)
 - [SSHHook](https://airflow.apache.org/docs/apache-airflow-providers-ssh/stable/_api/airflow/providers/ssh/hooks/ssh/index.html#airflow.providers.ssh.hooks.ssh.SSHHook)
@@ -39,7 +40,6 @@ Pydantic models for Apache Airflow
 - [DeltaTriggerTimetable](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/timetables/trigger/index.html#airflow.timetables.trigger.DeltaTriggerTimetable)
 - [EventsTimetable](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/timetables/events/index.html#airflow.timetables.events.EventsTimetable)
 - [MultipleCronTriggerTimetable](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/timetables/trigger/index.html#airflow.timetables.trigger.MultipleCronTriggerTimetable)
-
 
 > [!NOTE]
 > This library was generated using [copier](https://copier.readthedocs.io/en/stable/) from the [Base Python Project Template repository](https://github.com/python-project-templates/base).
