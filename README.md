@@ -9,7 +9,6 @@ Pydantic models for Apache Airflow
 
 ## Overview
 
-<<<<<<< before updating
 [Pydantic](https://docs.pydantic.dev/latest/) models of Apache Airflow data structures:
 
 ## Core
@@ -41,8 +40,5 @@ Pydantic models for Apache Airflow
 - [EventsTimetable](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/timetables/events/index.html#airflow.timetables.events.EventsTimetable)
 - [MultipleCronTriggerTimetable](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/timetables/trigger/index.html#airflow.timetables.trigger.MultipleCronTriggerTimetable)
 
-
-=======
->>>>>>> after updating
 > [!NOTE]
 > This library was generated using [copier](https://copier.readthedocs.io/en/stable/) from the [Base Python Project Template repository](https://github.com/python-project-templates/base).
