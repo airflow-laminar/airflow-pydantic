@@ -53,6 +53,7 @@ airflow = [
     "apache-airflow>=2.8,<3.1",
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
+    "paramiko<4",
 ]
 laminar = [
     # Laminar
@@ -66,6 +67,7 @@ laminar = [
     "apache-airflow>=2.8,<3.1",
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
+    "paramiko<4",
 ]
 
 [project.scripts]
