@@ -26,6 +26,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "paramiko<4",
     "pendulum",
     "pkn>=0.1.3",
     "pydantic>=2",
