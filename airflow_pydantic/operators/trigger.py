@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type, Union
 
 from pydantic import Field, field_validator
 
@@ -24,7 +24,7 @@ class TriggerDagRunTaskArgs(TaskArgs):
         default=None,
         description="A dictionary of configuration parameters to pass to the triggered DAG run",
     )
-    logical_date: Optional[datetime] = Field(default=None, description="The logical date of the DAG run to trigger")
+    logical_date: Optional[Union[datetime, str]] = Field(default=None, description="The logical date of the DAG run to trigger")
     reset_dag_run: Optional[bool] = Field(
         default=None,
         description="Whether clear existing DAG run if already exists. This is useful when backfill or rerun an existing DAG run. This only resets (not recreates) the DAG run. DAG run conf is immutable and will not be reset on rerun of an existing DAG run. When reset_dag_run=False and dag run exists, DagRunAlreadyExists will be raised. When reset_dag_run=True and dag run exists, existing DAG run will be cleared to rerun.",
