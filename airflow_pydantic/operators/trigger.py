@@ -1,5 +1,6 @@
+from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 from pydantic import Field, field_validator
 
@@ -18,9 +19,38 @@ _log = getLogger(__name__)
 
 class TriggerDagRunTaskArgs(TaskArgs):
     trigger_dag_id: str = Field(description="The DAG ID of the DAG to trigger")
+    trigger_run_id: Optional[str] = Field(default=None, description="The run ID of the DAG run to trigger")
     conf: Optional[Dict[str, Any]] = Field(
         default=None,
         description="A dictionary of configuration parameters to pass to the triggered DAG run",
+    )
+    logical_date: Optional[datetime] = Field(default=None, description="The logical date of the DAG run to trigger")
+    reset_dag_run: Optional[bool] = Field(
+        default=None,
+        description="Whether clear existing DAG run if already exists. This is useful when backfill or rerun an existing DAG run. This only resets (not recreates) the DAG run. DAG run conf is immutable and will not be reset on rerun of an existing DAG run. When reset_dag_run=False and dag run exists, DagRunAlreadyExists will be raised. When reset_dag_run=True and dag run exists, existing DAG run will be cleared to rerun.",
+    )
+    wait_for_completion: Optional[bool] = Field(
+        default=None,
+        description="Whether or not wait for DAG run completion.",
+    )
+    poke_interval: Optional[int] = Field(
+        default=None,
+        description="Poke interval to check DAG run status when wait_for_completion=True)",
+    )
+    allowed_states: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of allowed DAG run states of the triggered DAG. This is useful when setting wait_for_completion to True. Must be a valid DagRunState",
+    )
+    failed_states: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of failed or disallowed DAG run states of the triggered DAG. This is useful when setting wait_for_completion to True. Must be a valid DagRunState",
+    )
+    skip_when_already_exists: Optional[bool] = Field(
+        default=None,
+        description="Set to true to mark the task as SKIPPED if a DAG run of the triggered DAG for the same logical date already exists.",
+    )
+    deferrable: Optional[bool] = Field(
+        default=None, description="If waiting for completion, whether or not to defer the task until done, default is False."
     )
 
 
