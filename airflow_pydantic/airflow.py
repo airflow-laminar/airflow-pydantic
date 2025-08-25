@@ -2,7 +2,7 @@ from datetime import timedelta
 from enum import Enum
 from getpass import getuser
 from logging import getLogger
-from typing import Set
+from typing import Any, Set
 
 from .migration import _airflow_3
 
@@ -14,16 +14,19 @@ __all__ = (
     "BranchPythonOperator",
     "CronDataIntervalTimetable",
     "CronTriggerTimetable",
+    "DAG",
     "DeltaDataIntervalTimetable",
     "EmptyOperator",
     "EventsTimetable",
     "MultipleCronTriggerTimetable",
+    "NEW_SESSION",
     "get_parsing_context",
     "Param",
     "Pool",
     "PoolNotFound",
     "PythonOperator",
     "PythonSensor",
+    "provide_session",
     "ShortCircuitOperator",
     "SSHHook",
     "SSHOperator",
@@ -41,6 +44,7 @@ class _AirflowPydanticMarker: ...
 if _airflow_3():
     _log.info("Using Airflow 3.x imports")
     from airflow.exceptions import AirflowFailException, AirflowSkipException
+    from airflow.models.dag import DAG  # noqa: F401
     from airflow.models.param import Param  # noqa: F401
     from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
     from airflow.models.variable import Variable  # noqa: F401
@@ -60,11 +64,13 @@ if _airflow_3():
     from airflow.timetables.events import EventsTimetable  # noqa: F401
     from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
     from airflow.timetables.trigger import CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable  # noqa: F401
+    from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 elif _airflow_3() is False:
     _log.info("Using Airflow 2.x imports")
 
     from airflow.exceptions import AirflowFailException, AirflowSkipException
+    from airflow.models.dag import DAG  # noqa: F401
     from airflow.models.param import Param  # noqa: F401
     from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
     from airflow.models.variable import Variable  # noqa: F401
@@ -86,8 +92,20 @@ elif _airflow_3() is False:
 
     # NOTE: No MultipleCronTriggerTimetable, DeltaTriggerTimetable
     from airflow.utils.dag_parsing_context import get_parsing_context  # noqa: F401
+    from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 else:
+
+    class DAG(_AirflowPydanticMarker):
+        def __init__(self, **kwargs):
+            self.dag_id = kwargs.get("dag_id", "default_dag_id")
+            self.default_args = kwargs.get("default_args", {})
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
 
     class AirflowFailException(Exception):
         """Exception raised when a task fails in Airflow."""
@@ -260,6 +278,9 @@ else:
         def __init__(self, cron, timezone) -> None:
             self.cron = cron
             self.timezone = timezone
+
+    NEW_SESSION = Any
+    provide_session = lambda f: f  # noqa: E731
 
 
 if _airflow_3() in (False, None):
