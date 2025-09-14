@@ -146,6 +146,7 @@ airflow_pydantic/extension
 # Jupyter
 .ipynb_checkpoints
 .autoversion
+Untitled*.ipynb
 !airflow_pydantic/extension/airflow_pydantic.json
 !airflow_pydantic/extension/install.json
 airflow_pydantic/nbextension
