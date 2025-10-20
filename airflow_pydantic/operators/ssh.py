@@ -155,6 +155,13 @@ class SSHTaskArgs(TaskArgs):
             assert v is None or isinstance(v, BaseSSHHook), f"ssh_hook must be an instance of SSHHook, got: {type(v)}"
         return v
 
+    # @field_serializer("ssh_hook", when_used="json")
+    # def _serialize_ssh_hook(self, v: Optional[BaseSSHHook]) -> Optional[Dict[str, Any]]:
+    #     import pdb; pdb.set_trace()
+    #     if v is None:
+    #         return None
+    #     return SSHHook.__get_pydantic_core_schema__().serialization.serialize_json(SSHHook, v)
+
 
 # Alias
 SSHOperatorArgs = SSHTaskArgs

@@ -130,7 +130,7 @@ class RelativeDeltaType:
                 "dt1": model_field(union_schema([int_schema(), none_schema()])),
                 "dt2": model_field(union_schema([int_schema(), none_schema()])),
             },
-            model_name="SSHHook",
+            model_name="RelativeDelta",
         )
         schema = union_schema([is_instance_schema(relativedelta), types_schema, no_info_plain_validator_function(cls._validate, ref=cls.__name__)])
         return json_or_python_schema(
