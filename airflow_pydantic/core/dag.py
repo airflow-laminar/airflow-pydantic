@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel as PydanticBaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel as PydanticBaseModel, Field, SerializeAsAny, field_validator, model_validator
 
 from ..migration import _airflow_3
 from ..utils import DatetimeArg, Param, ParamType, ScheduleArg
@@ -158,7 +158,7 @@ class Dag(DagArgs, DagRenderMixin, DagInstantiateMixin, validate_assignment=True
     dag_id: Optional[str] = Field(
         default=None, description="The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)"
     )
-    tasks: Optional[Dict[str, Task]] = Field(default_factory=dict, description="List of tasks in the DAG")
+    tasks: Optional[Dict[str, SerializeAsAny[Task]]] = Field(default_factory=dict, description="List of tasks in the DAG")
 
     # TODO: Validate all task dependencies exist
 
