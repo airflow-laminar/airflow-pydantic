@@ -31,13 +31,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.11"]
-        airflow: ["<3", ">=3", ""]
+        airflow: ["2", "3", ""]
         laminar: ["laminar", "no-laminar"]
         ccflow: ["ccflow", "no-ccflow"]
         exclude:
-          # Skip laminar checks on airflow>=3
-          - airflow: ">=3"
-            laminar: "laminar"
           # Skip laminar checks when no airflow
           - airflow: ""
             laminar: "laminar"
@@ -59,13 +56,13 @@ jobs:
       run: uv pip install -e .[laminar]
       if: ${{ matrix.laminar == 'laminar' }}
 
-    - name: Install Airflow
-      run: uv pip install "apache-airflow${{ matrix.airflow }}" apache-airflow-providers-ssh apache-airflow-providers-standard
-      if: ${{ matrix.laminar == 'no-laminar' && matrix.airflow != '' }}
+    - name: Install Airflow 2.x
+      run: uv pip install -e .[airflow]
+      if: ${{ matrix.laminar == 'no-laminar' && matrix.airflow == '2' }}
 
-    - name: Uninstall Airflow
-      run: uv pip uninstall apache-airflow
-      if: ${{ matrix.airflow == '' }}
+    - name: Install Airflow 3.x
+      run: uv pip install -e .[airflow3]
+      if: ${{ matrix.laminar == 'no-laminar' && matrix.airflow == '3' }}
 
     - name: Lint
       run: make lint
@@ -93,26 +90,26 @@ jobs:
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
         path: junit.xml
-      if: ${{ matrix.laminar == 'laminar' }}
+      if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         files: '**/junit.xml'
-      if: ${{ matrix.laminar == 'laminar' }}
+      if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
     - name: Upload coverage
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-      if: ${{ matrix.laminar == 'laminar' }}
+      if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
     - name: Make dist
       run: make dist
-      if: ${{ matrix.laminar == 'laminar' }}
+      if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
     - uses: actions/upload-artifact@v4
       with:
         name: dist-${{matrix.os}}
         path: dist
-      if: ${{ matrix.laminar == 'laminar' }}
+      if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
