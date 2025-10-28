@@ -251,6 +251,7 @@ def supervisor_ssh_cfg():
                     command="bash -c 'sleep 60; exit 1'",
                 )
             },
+            password="test",
         )
         yield cfg
 
