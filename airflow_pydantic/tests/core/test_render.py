@@ -462,7 +462,7 @@ with DAG(
 ) as dag:
     task = SupervisorSSH(
         cfg={
-            "inet_http_server": {"port": "*:9001", "username": None, "password": None},
+            "inet_http_server": {"port": "*:9001", "username": None, "password": "test"},
             "program": {
                 "test": {
                     "command": "bash -c 'sleep 60; exit 1'",
@@ -483,6 +483,7 @@ with DAG(
             "rpcinterface": {"supervisor": {"rpcinterface_factory": "supervisor.rpcinterface:make_main_rpcinterface"}},
             "config_path": Path("/an/arbitrary/path/supervisord.conf"),
             "working_dir": Path("/an/arbitrary/path"),
+            "password": "test",
         },
         host=Host(name="test_host", username="test_user", password=Variable(key="VAR", deserialize_json=True)),
         port=Port(

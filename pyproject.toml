@@ -8,7 +8,7 @@ authors = [{name = "the airflow-pydantic authors", email = "t.paine154@gmail.com
 description = "Pydantic models for Apache Airflow"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-version = "1.5.5"
+version = "1.5.6"
 requires-python = ">=3.9"
 keywords = []
 
@@ -63,6 +63,7 @@ airflow3 = [
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
     "paramiko<4",
+    "structlog<25.5.0",
 ]
 laminar = [
     # Laminar
@@ -77,6 +78,7 @@ laminar = [
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
     "paramiko<4",
+    "structlog<25.5.0",
 ]
 
 [project.scripts]
@@ -86,7 +88,7 @@ Repository = "https://github.com/airflow-laminar/airflow-pydantic"
 Homepage = "https://github.com/airflow-laminar/airflow-pydantic"
 
 [tool.bumpversion]
-current_version = "1.5.5"
+current_version = "1.5.6"
 commit = true
 tag = true
 commit_args = "-s"
