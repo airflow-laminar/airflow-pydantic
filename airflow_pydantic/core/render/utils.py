@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple
 from dateutil.relativedelta import relativedelta
 from pendulum import DateTime, Timezone
 from pkn.pydantic import serialize_path_as_string
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from ...airflow import Param as AirflowParam, Pool as AirflowPool
 from ...utils import (
@@ -387,6 +387,9 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         # NOTE: put before the basics types below
         # If the value is a TriggerRule, we can use a string
         return imports, ast.Constant(value=value.value)
+
+    if isinstance(value, SecretStr):
+        return imports, ast.Constant(value=value.get_secret_value())
 
     if isinstance(value, (str, int, float, bool)):
         # If the value is a primitive type, we can use ast.Constant
