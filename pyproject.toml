@@ -8,13 +8,8 @@ authors = [{name = "the airflow-pydantic authors", email = "t.paine154@gmail.com
 description = "Pydantic models for Apache Airflow"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-<<<<<<< before updating
 version = "1.5.6"
-requires-python = ">=3.9"
-=======
-version = "0.1.0"
 requires-python = ">=3.10"
->>>>>>> after updating
 keywords = []
 
 classifiers = [
