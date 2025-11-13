@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.DateTimeSensorAsync
+=====================================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: DateTimeSensorAsync

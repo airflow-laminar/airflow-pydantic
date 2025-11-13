@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.WaitSensor
+============================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: WaitSensor

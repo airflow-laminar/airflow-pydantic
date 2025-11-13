@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.Pool
+======================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: Pool

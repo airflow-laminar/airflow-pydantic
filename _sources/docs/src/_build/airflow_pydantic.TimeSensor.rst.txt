@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.TimeSensor
+============================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: TimeSensor

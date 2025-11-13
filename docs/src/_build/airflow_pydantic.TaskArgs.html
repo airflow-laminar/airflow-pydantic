@@ -202,13 +202,32 @@
 <li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.Dag.html">airflow_pydantic.Dag</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">airflow_pydantic.TaskArgs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.Task.html">airflow_pydantic.Task</a></li>
-<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.PythonOperatorArgs.html">airflow_pydantic.PythonOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ApprovalOperatorArgs.html">airflow_pydantic.ApprovalOperatorArgs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.BashOperatorArgs.html">airflow_pydantic.BashOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.BranchDayOfWeekOperatorArgs.html">airflow_pydantic.BranchDayOfWeekOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.BranchExternalPythonOperatorArgs.html">airflow_pydantic.BranchExternalPythonOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.BranchPythonOperatorArgs.html">airflow_pydantic.BranchPythonOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.BranchPythonVirtualenvOperatorArgs.html">airflow_pydantic.BranchPythonVirtualenvOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.EmptyOperatorArgs.html">airflow_pydantic.EmptyOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ExternalPythonOperatorArgs.html">airflow_pydantic.ExternalPythonOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ExternalTaskMarkerArgs.html">airflow_pydantic.ExternalTaskMarkerArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.HITLEntryOperatorArgs.html">airflow_pydantic.HITLEntryOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.HITLOperatorArgs.html">airflow_pydantic.HITLOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.HITLBranchOperatorArgs.html">airflow_pydantic.HITLBranchOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.PythonOperatorArgs.html">airflow_pydantic.PythonOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.PythonVirtualenvOperatorArgs.html">airflow_pydantic.PythonVirtualenvOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ShortCircuitOperatorArgs.html">airflow_pydantic.ShortCircuitOperatorArgs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.SSHOperatorArgs.html">airflow_pydantic.SSHOperatorArgs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.DatetimeArg.html">airflow_pydantic.DatetimeArg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ScheduleArg.html">airflow_pydantic.ScheduleArg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.CallablePath.html">airflow_pydantic.CallablePath</a></li>
-<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ImportPath.html">airflow_pydantic.ImportPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.TriggerDagRunOperatorArgs.html">airflow_pydantic.TriggerDagRunOperatorArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.BashSensor.html">airflow_pydantic.BashSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.DateTimeSensor.html">airflow_pydantic.DateTimeSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.DateTimeSensorAsync.html">airflow_pydantic.DateTimeSensorAsync</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.DayOfWeekSensor.html">airflow_pydantic.DayOfWeekSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.ExternalTaskSensor.html">airflow_pydantic.ExternalTaskSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.FileSensor.html">airflow_pydantic.FileSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.PythonSensor.html">airflow_pydantic.PythonSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.TimeSensor.html">airflow_pydantic.TimeSensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="airflow_pydantic.WaitSensor.html">airflow_pydantic.WaitSensor</a></li>
 </ul>
 </li>
 </ul>
@@ -697,6 +716,7 @@
 <span class="w">            </span><span class="s2">&quot;all_success&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="s2">&quot;all_failed&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="s2">&quot;all_done&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;all_done_min_one_success&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="s2">&quot;all_done_setup_success&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="s2">&quot;one_success&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="s2">&quot;one_failed&quot;</span><span class="p">,</span>
@@ -742,7 +762,7 @@
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retry_exponential_backoff</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_date</span> <span class="pre">(datetime.datetime</span> <span class="pre">|</span> <span class="pre">Tuple[datetime.datetime,</span> <span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">task_display_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger_rule</span> <span class="pre">(airflow.utils.trigger_rule.TriggerRule</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger_rule</span> <span class="pre">(airflow.task.trigger_rule.TriggerRule</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -820,7 +840,7 @@
 
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.TaskArgs.pool">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Pool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.pool" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="airflow_pydantic.Pool.html#airflow_pydantic.Pool" title="airflow_pydantic.utils.pool.Pool"><span class="pre">Pool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.TaskArgs.pool" title="Link to this definition">¶</a></dt>
 <dd><p>the slot pool this task should run in, slot pools are a way to limit concurrency for certain tasks</p>
 </dd></dl>
 

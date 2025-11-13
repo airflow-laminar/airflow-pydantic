@@ -22,11 +22,44 @@
 .. autosummary::
    :toctree: _build
 
-    PythonOperatorArgs
+    ApprovalOperatorArgs
     BashOperatorArgs
+    BranchDayOfWeekOperatorArgs
+    BranchExternalPythonOperatorArgs
+    BranchPythonOperatorArgs
+    BranchPythonVirtualenvOperatorArgs
+    EmptyOperatorArgs
+    ExternalPythonOperatorArgs
+    ExternalTaskMarkerArgs
+    HITLEntryOperatorArgs
+    HITLOperatorArgs
+    HITLBranchOperatorArgs
+    PythonOperatorArgs
+    PythonVirtualenvOperatorArgs
+    ShortCircuitOperatorArgs
     SSHOperatorArgs
+    TriggerDagRunOperatorArgs
+
 ```
 
+## Sensors
+
+```{eval-rst}
+.. currentmodule:: airflow_pydantic
+
+.. autosummary::
+   :toctree: _build
+
+    BashSensor
+    DateTimeSensor
+    DateTimeSensorAsync
+    DayOfWeekSensor
+    ExternalTaskSensor
+    FileSensor
+    PythonSensor
+    TimeSensor
+    WaitSensor
+```
 
 ## Utilities
 
@@ -35,6 +68,18 @@
 
 .. autosummary::
    :toctree: _build
+
+    Param
+    Pool
+    SSHHook
+    Variable
+
+  CronDataIntervalTimetable
+  CronTriggerTimetable
+  DeltaDataIntervalTimetable
+  DeltaTriggerTimetable
+  EventsTimetable
+  MultipleCronTriggerTimetable
 
     DatetimeArg
     ScheduleArg

@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.ShortCircuitOperatorArgs
+==========================================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: ShortCircuitOperatorArgs

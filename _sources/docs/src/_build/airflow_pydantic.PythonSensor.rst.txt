@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.PythonSensor
+==============================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: PythonSensor

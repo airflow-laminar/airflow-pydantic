@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.DeltaDataIntervalTimetable
+============================================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: DeltaDataIntervalTimetable

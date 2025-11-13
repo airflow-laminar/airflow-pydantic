@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.DayOfWeekSensor
+=================================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: DayOfWeekSensor

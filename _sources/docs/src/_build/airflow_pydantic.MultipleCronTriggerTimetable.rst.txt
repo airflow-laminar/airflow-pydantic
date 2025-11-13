@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.MultipleCronTriggerTimetable
+==============================================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: MultipleCronTriggerTimetable

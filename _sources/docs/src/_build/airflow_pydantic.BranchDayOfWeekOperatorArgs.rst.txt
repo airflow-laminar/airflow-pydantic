@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.BranchDayOfWeekOperatorArgs
+=============================================
+
+.. currentmodule:: airflow_pydantic
+
+.. autopydantic_model:: BranchDayOfWeekOperatorArgs

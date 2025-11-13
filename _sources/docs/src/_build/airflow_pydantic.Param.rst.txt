@@ -1,0 +1,6 @@
+﻿airflow\_pydantic.Param
+=======================
+
+.. currentmodule:: airflow_pydantic
+
+.. autodata:: Param
