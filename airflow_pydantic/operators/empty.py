@@ -30,12 +30,12 @@ class EmptyTask(Task, EmptyTaskArgs):
         from airflow_pydantic.airflow import EmptyOperator, _AirflowPydanticMarker
 
         if not isinstance(v, Type):
-            raise ValueError(f"operator must be 'airflow.operators.empty.EmptyOperator', got: {v}")
+            raise ValueError(f"operator must be 'airflow.providers.standard.operators.empty.EmptyOperator', got: {v}")
         if issubclass(v, _AirflowPydanticMarker):
             _log.info("EmptyOperator is a marker class, returning as is")
             return v
         if not issubclass(v, EmptyOperator):
-            raise ValueError(f"operator must be 'airflow.operators.empty.EmptyOperator', got: {v}")
+            raise ValueError(f"operator must be 'airflow.providers.standard.operators.empty.EmptyOperator', got: {v}")
         return v
 
 

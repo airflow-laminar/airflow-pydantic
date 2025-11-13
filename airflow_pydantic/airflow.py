@@ -1,23 +1,36 @@
 from datetime import timedelta
 from enum import Enum
 from getpass import getuser
+from importlib.metadata import version
+from importlib.util import find_spec
 from logging import getLogger
 from typing import Any, Set
 
 from .migration import _airflow_3
 
-__all__ = (
+__all__ = [
     "AirflowFailException",
     "AirflowSkipException",
     "BashOperator",
     "BashSensor",
+    "BranchDateTimeOperator",
+    "BranchDayOfWeekOperator",
     "BranchPythonOperator",
+    "BranchPythonVirtualenvOperator",
+    "BranchExternalPythonOperator",
     "CronDataIntervalTimetable",
     "CronTriggerTimetable",
     "DAG",
+    "DateTimeSensor",
+    "DateTimeSensorAsync",
+    "DayOfWeekSensor",
     "DeltaDataIntervalTimetable",
+    "DeltaTriggerTimetable",
     "EmptyOperator",
     "EventsTimetable",
+    "ExternalPythonOperator",
+    "ExternalTaskSensor",
+    "FileSensor",
     "MultipleCronTriggerTimetable",
     "NEW_SESSION",
     "get_parsing_context",
@@ -26,14 +39,19 @@ __all__ = (
     "PoolNotFound",
     "PythonOperator",
     "PythonSensor",
+    "PythonVirtualenvOperator",
     "provide_session",
     "ShortCircuitOperator",
     "SSHHook",
     "SSHOperator",
+    "TimeSensor",
+    "TimeDeltaSensor",
+    "TriggerDagRunOperator",
     "TriggerRule",
     "Variable",
+    "WaitSensor",
     "_AirflowPydanticMarker",
-)
+]
 
 _log = getLogger(__name__)
 
@@ -51,15 +69,45 @@ if _airflow_3():
     from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401
     from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401
     from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
+    from airflow.providers.standard.operators.datetime import BranchDateTimeOperator  # noqa: F401
     from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
+
+    if find_spec("apache-airflow") or find_spec("airflow"):
+        if version("apache-airflow") >= "3.0.0":
+            from airflow.providers.standard.operators.hitl import (
+                ApprovalOperator,  # noqa: F401
+                HITLBranchOperator,  # noqa: F401
+                HITLOperator,  # noqa: F401
+            )
+
+            # NOTE: Airflow 3 Only
+            __all__.extend(
+                [
+                    "ApprovalOperator",
+                    "HITLBranchOperator",
+                    "HITLOperator",
+                ]
+            )
+
     from airflow.providers.standard.operators.python import (
+        BranchExternalPythonOperator,  # noqa: F401
         BranchPythonOperator,  # noqa: F401
+        BranchPythonVirtualenvOperator,  # noqa: F401
+        ExternalPythonOperator,  # noqa: F401
         PythonOperator,  # noqa: F401
+        PythonVirtualenvOperator,  # noqa: F401
         ShortCircuitOperator,  # noqa: F401
     )
     from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator  # noqa: F401
+    from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator  # noqa: F401
     from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
+    from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync  # noqa: F401
+    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor  # noqa: F401
+    from airflow.providers.standard.sensors.filesystem import FileSensor  # noqa: F401
     from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
+    from airflow.providers.standard.sensors.time import TimeSensor  # noqa: F401
+    from airflow.providers.standard.sensors.time_delta import TimeDeltaSensor, WaitSensor  # noqa: F401
+    from airflow.providers.standard.sensors.weekday import DayOfWeekSensor  # noqa: F401
     from airflow.sdk import get_parsing_context  # noqa: F401
     from airflow.timetables.events import EventsTimetable  # noqa: F401
     from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
@@ -77,15 +125,27 @@ elif _airflow_3() is False:
     from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401  # noqa: F401
     from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401  # noqa: F401
     from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
+    from airflow.providers.standard.operators.datetime import BranchDateTimeOperator  # noqa: F401
     from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
     from airflow.providers.standard.operators.python import (
+        BranchExternalPythonOperator,  # noqa: F401
         BranchPythonOperator,  # noqa: F401
+        BranchPythonVirtualenvOperator,  # noqa: F401
+        ExternalPythonOperator,  # noqa: F401
         PythonOperator,  # noqa: F401
+        PythonVirtualenvOperator,  # noqa: F401
         ShortCircuitOperator,  # noqa: F401
     )
     from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator  # noqa: F401
+    from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator  # noqa: F401
     from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
+    from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync  # noqa: F401
+    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor  # noqa: F401
+    from airflow.providers.standard.sensors.filesystem import FileSensor  # noqa: F401
     from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
+    from airflow.providers.standard.sensors.time import TimeSensor  # noqa: F401
+    from airflow.providers.standard.sensors.time_delta import TimeDeltaSensor, WaitSensor  # noqa: F401
+    from airflow.providers.standard.sensors.weekday import DayOfWeekSensor  # noqa: F401
     from airflow.timetables.events import EventsTimetable  # noqa: F401
     from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
     from airflow.timetables.trigger import CronTriggerTimetable  # noqa: F401
@@ -95,6 +155,14 @@ elif _airflow_3() is False:
     from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 else:
+    # NOTE: Airflow 3 Only
+    __all__.extend(
+        [
+            "ApprovalOperator",
+            "HITLBranchOperator",
+            "HITLOperator",
+        ]
+    )
 
     class DAG(_AirflowPydanticMarker):
         def __init__(self, **kwargs):
@@ -209,29 +277,68 @@ else:
         # Airflow not installed, so no parsing context
         return _ParsingContext()
 
-    class PythonOperator(_AirflowPydanticMarker):
-        _original = "airflow.providers.standard.operators.python.PythonOperator"
+    class BashOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.bash.BashOperator"
+
+    class BranchDateTimeOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.datetime.BranchDateTimeOperator"
+
+    class BranchExternalPythonOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.python.BranchExternalPythonOperator"
 
     class BranchPythonOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.python.BranchPythonOperator"
 
-    class ShortCircuitOperator(_AirflowPydanticMarker):
-        _original = "airflow.providers.standard.operators.python.ShortCircuitOperator"
-
-    class BashOperator(_AirflowPydanticMarker):
-        _original = "airflow.providers.standard.operators.bash.BashOperator"
-
-    class PythonSensor(_AirflowPydanticMarker):
-        _original = "airflow.providers.standard.sensors.python.PythonSensor"
-
-    class BashSensor(_AirflowPydanticMarker):
-        _original = "airflow.providers.standard.sensors.bash.BashSensor"
+    class BranchPythonVirtualenvOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.python.BranchPythonVirtualenvOperator"
 
     class EmptyOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.empty.EmptyOperator"
 
+    class ExternalPythonOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.python.ExternalPythonOperator"
+
+    class PythonOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.python.PythonOperator"
+
+    class PythonVirtualenvOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.python.PythonVirtualenvOperator"
+
+    class ShortCircuitOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.python.ShortCircuitOperator"
+
     class TriggerDagRunOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.trigger_dagrun.TriggerDagRunOperator"
+
+    class BashSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.bash.BashSensor"
+
+    class DateTimeSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.date_time.DateTimeSensor"
+
+    class DateTimeSensorAsync(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.date_time.DateTimeSensorAsync"
+
+    class DayOfWeekSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.weekday.DayOfWeekSensor"
+
+    class ExternalTaskSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.external_task.ExternalTaskSensor"
+
+    class FileSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.filesystem.FileSensor"
+
+    class PythonSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.python.PythonSensor"
+
+    class TimeSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.time.TimeSensor"
+
+    class TimeDeltaSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.time_delta.TimeDeltaSensor"
+
+    class WaitSensor(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.time_delta.WaitSensor"
 
     class SSHHook(_AirflowPydanticMarker):
         def __init__(self, remote_host: str, username: str = None, password: str = None, key_file: str = None, **kwargs):
@@ -284,6 +391,15 @@ else:
 
 
 if _airflow_3() in (False, None):
+
+    class ApprovalOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.hitl.ApprovalOperator"
+
+    class HITLOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.hitl.HITLOperator"
+
+    class HITLBranchOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.hitl.HITLBranchOperator"
 
     class DeltaTriggerTimetable(_AirflowPydanticMarker):
         _original = "airflow.timetables.trigger.DeltaTriggerTimetable"
