@@ -15,6 +15,8 @@ from airflow_pydantic import (
     BashTaskArgs,
     Dag,
     DagArgs,
+    DateTimeSensor,
+    DateTimeSensorArgs,
     Host,
     Pool,
     Port,
@@ -25,9 +27,13 @@ from airflow_pydantic import (
     SSHTask,
     SSHTaskArgs,
     TaskArgs,
+    TimeSensor,
+    TimeSensorArgs,
     TriggerDagRunTask,
     TriggerDagRunTaskArgs,
     Variable,
+    WaitSensor,
+    WaitSensorArgs,
 )
 from airflow_pydantic.airflow import SSHHook
 from airflow_pydantic.testing import pools, variables
@@ -212,6 +218,51 @@ def ssh_operator_balancer_template(ssh_operator_balancer):
 
 
 @fixture
+def time_sensor_args():
+    return TimeSensorArgs(
+        target_time=time(12, 0),
+    )
+
+
+@fixture
+def time_sensor(time_sensor_args):
+    return TimeSensor(
+        task_id="test-time-sensor",
+        **time_sensor_args.model_dump(exclude_unset=True),
+    )
+
+
+@fixture
+def wait_sensor_args():
+    return WaitSensorArgs(
+        time_to_wait=timedelta(minutes=10),
+    )
+
+
+@fixture
+def wait_sensor(wait_sensor_args):
+    return WaitSensor(
+        task_id="test-wait-sensor",
+        **wait_sensor_args.model_dump(exclude_unset=True),
+    )
+
+
+@fixture
+def datetime_sensor_args():
+    return DateTimeSensorArgs(
+        target_time=datetime(2025, 1, 1, 12, 0),
+    )
+
+
+@fixture
+def datetime_sensor(datetime_sensor_args):
+    return DateTimeSensor(
+        task_id="test-datetime-sensor",
+        **datetime_sensor_args.model_dump(exclude_unset=True),
+    )
+
+
+@fixture
 def supervisor_cfg():
     if not has_supervisor:
         pytest.skip("airflow_supervisor is not installed, skipping supervisor fixtures")
@@ -310,7 +361,7 @@ def task_args():
 
 
 @fixture
-def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator, bash_sensor, python_sensor):
+def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator, bash_sensor, python_sensor, wait_sensor, time_sensor, datetime_sensor):
     return Dag(
         dag_id="a-dag",
         **dag_args.model_dump(exclude_unset=True),
@@ -321,6 +372,9 @@ def dag(dag_args, task_args, python_operator, bash_operator, ssh_operator, bash_
             "task3": ssh_operator,
             "task4": bash_sensor,
             "task5": python_sensor,
+            "task6": wait_sensor,
+            "task7": time_sensor,
+            "task8": datetime_sensor,
         },
     )
 

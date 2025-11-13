@@ -20,7 +20,7 @@ _log = getLogger(__name__)
 class DateTimeSensorArgs(BaseSensorArgs):
     # datetime sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/date_time/index.html#airflow.providers.standard.sensors.date_time.DateTimeSensor
-    target_time: Optional[DatetimeArg] = Field(default=None, description="The target date and time to wait for")
+    target_time: DatetimeArg = Field(description="The target date and time to wait for")
 
 
 class DateTimeSensor(Task, DateTimeSensorArgs):
@@ -44,7 +44,7 @@ class DateTimeSensor(Task, DateTimeSensorArgs):
 class DateTimeSensorAsyncArgs(BaseSensorArgs):
     # datetime sensor async args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/date_time/index.html#airflow.providers.standard.sensors.date_time.DateTimeSensorAsync
-    target_time: Optional[DatetimeArg] = Field(default=None, description="The target date and time to wait for")
+    target_time: DatetimeArg = Field(description="The target date and time to wait for")
     start_from_trigger: Optional[bool] = Field(
         default=None, description="If True, the sensor will start from the trigger state when used in deferrable mode"
     )
