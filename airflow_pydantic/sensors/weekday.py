@@ -18,9 +18,7 @@ _log = getLogger(__name__)
 class DayOfWeekSensorArgs(BaseSensorArgs):
     # dayofweek sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/weekday/index.html#airflow.providers.standard.sensors.weekday.DayOfWeekSensor
-    week_day: List[str] = Field(
-        default=None, description="Day of the week to check (full name). Optionally, a set of days can also be provided using a set"
-    )
+    week_day: List[str] = Field(description="Day of the week to check (full name). Optionally, a set of days can also be provided using a set")
     use_task_logical_date: Optional[bool] = Field(
         default=None,
         description="If True, uses task’s logical date to compare with week_day. Execution Date is Useful for backfilling. If False, uses system’s day of the week. Useful when you don’t want to run anything on weekdays on the system.",

@@ -21,7 +21,7 @@ _log = getLogger(__name__)
 class TimeDeltaSensorArgs(BaseSensorArgs):
     # timedelta sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/time_delta/index.html#airflow.providers.standard.sensors.time_delta.TimeDeltaSensor
-    delta: timedelta = Field(default=None, description="Time to wait before succeeding.")
+    delta: timedelta = Field(description="Time to wait before succeeding.")
     deferrable: Optional[bool] = Field(default=None, description="If True, the sensor will operate in deferrable mode")
 
 
@@ -46,7 +46,7 @@ class TimeDeltaSensor(Task, TimeDeltaSensorArgs):
 class WaitSensorArgs(BaseSensorArgs):
     # wait sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/time_delta/index.html#airflow.providers.standard.sensors.time_delta.WaitSensor
-    time_to_wait: Union[timedelta, int] = Field(default=None, description="Time length to wait after the task starts before succeeding.")
+    time_to_wait: Union[timedelta, int] = Field(description="Time length to wait after the task starts before succeeding.")
     deferrable: Optional[bool] = Field(default=None, description="If True, the sensor will operate in deferrable mode")
 
 

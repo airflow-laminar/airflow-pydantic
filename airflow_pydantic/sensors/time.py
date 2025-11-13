@@ -1,10 +1,11 @@
+from datetime import time
 from logging import getLogger
 from typing import Optional, Type
 
 from pydantic import Field, field_validator
 
 from ..core import Task
-from ..utils import DatetimeArg, ImportPath
+from ..utils import ImportPath
 from .base import BaseSensorArgs
 
 __all__ = (
@@ -18,7 +19,7 @@ _log = getLogger(__name__)
 class TimeSensorArgs(BaseSensorArgs):
     # time sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/time/index.html#airflow.providers.standard.sensors.time.TimeSensor
-    target_time: Optional[DatetimeArg] = Field(default=None, description="The target date and time to wait for")
+    target_time: time = Field(description="The target date and time to wait for")
     deferrable: Optional[bool] = Field(default=None, description="If True, the sensor will operate in deferrable mode")
 
 
