@@ -284,7 +284,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">DateTimeSensorArgs</span><span class="p">(</span><span class="n">BaseSensorArgs</span><span class="p">):</span>
     <span class="c1"># datetime sensor args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/date_time/index.html#airflow.providers.standard.sensors.date_time.DateTimeSensor</span>
-    <span class="n">target_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DatetimeArg</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target date and time to wait for&quot;</span><span class="p">)</span>
+    <span class="n">target_time</span><span class="p">:</span> <span class="n">DatetimeArg</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target date and time to wait for&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="DateTimeSensor">
@@ -314,7 +314,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">DateTimeSensorAsyncArgs</span><span class="p">(</span><span class="n">BaseSensorArgs</span><span class="p">):</span>
     <span class="c1"># datetime sensor async args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/date_time/index.html#airflow.providers.standard.sensors.date_time.DateTimeSensorAsync</span>
-    <span class="n">target_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DatetimeArg</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target date and time to wait for&quot;</span><span class="p">)</span>
+    <span class="n">target_time</span><span class="p">:</span> <span class="n">DatetimeArg</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The target date and time to wait for&quot;</span><span class="p">)</span>
     <span class="n">start_from_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;If True, the sensor will start from the trigger state when used in deferrable mode&quot;</span>
     <span class="p">)</span>
