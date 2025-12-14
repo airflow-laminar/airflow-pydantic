@@ -297,10 +297,20 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">sshtunnel</span><span class="w"> </span><span class="kn">import</span> <span class="n">SSHTunnelForwarder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tenacity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Retrying</span><span class="p">,</span> <span class="n">stop_after_attempt</span><span class="p">,</span> <span class="n">wait_fixed</span><span class="p">,</span> <span class="n">wait_random</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">airflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirflowException</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">airflow.providers.common.compat.sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseHook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">airflow.providers.common.compat.sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirflowException</span><span class="p">,</span> <span class="n">BaseHook</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">getuser</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NOTSET</span><span class="p">,</span> <span class="n">ArgNotSet</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.sdk.definitions._internal.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NOTSET</span><span class="p">,</span> <span class="n">ArgNotSet</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NOTSET</span><span class="p">,</span> <span class="n">ArgNotSet</span>  <span class="c1"># type: ignore[attr-defined,no-redef]</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.sdk.definitions._internal.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_arg_set</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_arg_set</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>  <span class="c1"># type: ignore[misc,no-redef]</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTSET</span>
+
 
 <span class="n">CMD_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
 
@@ -704,9 +714,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running command: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
 
         <span class="n">cmd_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">ArgNotSet</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_arg_set</span><span class="p">(</span><span class="n">timeout</span><span class="p">):</span>
             <span class="n">cmd_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmd_timeout</span><span class="p">,</span> <span class="n">ArgNotSet</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">is_arg_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmd_timeout</span><span class="p">):</span>
             <span class="n">cmd_timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_timeout</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cmd_timeout</span> <span class="o">=</span> <span class="n">CMD_TIMEOUT</span>
@@ -827,8 +837,8 @@
     <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../../../_static/design-tabs.js?v=f930bc37"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
-    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
     <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
