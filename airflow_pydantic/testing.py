@@ -8,10 +8,12 @@ __all__ = ("pools", "variables")
 def pools(return_value=None, side_effect=None):
     with (
         patch("airflow_pydantic.airflow.Pool.get_pool") as get_pool_mock,
-        patch("airflow_pydantic.airflow.Pool.create_or_update_pool") as create_or_update_pool_mock,
+        patch("airflow_pydantic.airflow.Pool.create_or_update_pool") as pool_create_or_update_pool_mock,
+        patch("airflow_pydantic.airflow.create_or_update_pool") as create_or_update_pool_mock,
         patch("airflow_pydantic.airflow.get_parsing_context") as context_mock,
     ):
         get_pool_mock.return_value = return_value
+        pool_create_or_update_pool_mock.return_value = return_value
         create_or_update_pool_mock.return_value = return_value
         if side_effect:
             get_pool_mock.side_effect = side_effect

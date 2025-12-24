@@ -17,7 +17,7 @@ _log = getLogger(__name__)
 
 
 class DagRenderMixin:
-    def render(self, format: bool = True, debug_filename: str = "") -> str:
+    def render(self, format: bool = True, debug_filename: str = "", airflow_major_version: int = 2) -> str:
         """
         Render the DAG to a string representation, suitable for use in a .py file.
         """
@@ -36,7 +36,7 @@ class DagRenderMixin:
         dag_args = self.model_dump(exclude_unset=True, exclude=["type_", "tasks", "default_args", "enabled"])
 
         for k, v in dag_args.items():
-            new_imports, value = _get_parts_from_value(k, v, self)
+            new_imports, value = _get_parts_from_value(k, v, self, airflow_major_version=airflow_major_version)
             if new_imports:
                 imports.extend(new_imports)
             if isinstance(value, ast.AST):

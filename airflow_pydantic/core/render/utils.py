@@ -41,7 +41,7 @@ def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
-def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
+def _build_pool_callable(pool, airflow_major_version: int = 2) -> Tuple[ast.ImportFrom, ast.Call]:
     imports = []
     if isinstance(pool, Pool):
         # Swap
@@ -64,7 +64,26 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
     else:
         raise TypeError(f"Unsupported type for pool: {type(pool)}. Expected Pool, AirflowPool, or str.")
 
-    if len(pool.keys()) == 1:
+    # Replace the pool with the Pool class
+    if airflow_major_version == 2:
+        if len(pool.keys()) == 1:
+            imports.append(
+                ast.ImportFrom(
+                    module="airflow.models.pool",
+                    names=[ast.alias(name="Pool")],
+                    level=0,
+                )
+            )
+            # Replace the pool with the Pool class
+            return imports, ast.Attribute(
+                value=ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="get_pool", ctx=ast.Load()),
+                    args=[ast.Constant(value=pool["pool"])],
+                    keywords=[],
+                ),
+                attr="pool",
+                ctx=ast.Load(),
+            )
         imports.append(
             ast.ImportFrom(
                 module="airflow.models.pool",
@@ -72,41 +91,53 @@ def _build_pool_callable(pool) -> Tuple[ast.ImportFrom, ast.Call]:
                 level=0,
             )
         )
-        # Replace the pool with the Pool class
         return imports, ast.Attribute(
             value=ast.Call(
-                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="get_pool", ctx=ast.Load()),
-                args=[ast.Constant(value=pool["pool"])],
-                keywords=[],
+                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
+                args=[],
+                keywords=[
+                    ast.keyword(arg="name", value=ast.Constant(value=pool["pool"])),
+                    ast.keyword(arg="slots", value=ast.Constant(value=pool.get("slots", 128))),
+                    ast.keyword(arg="description", value=ast.Constant(value=pool.get("description", ""))),
+                    ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.get("include_deferred", False))),
+                ],
             ),
             attr="pool",
             ctx=ast.Load(),
         )
-    imports.append(
-        ast.ImportFrom(
-            module="airflow.models.pool",
-            names=[ast.alias(name="Pool")],
-            level=0,
-        )
-    )
-    # Replace the pool with the Pool class
-    return imports, ast.Attribute(
-        value=ast.Call(
-            func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
-            args=[],
-            keywords=[
-                ast.keyword(arg="name", value=ast.Constant(value=pool["pool"])),
-                ast.keyword(arg="slots", value=ast.Constant(value=pool.get("slots", 128))),
-                ast.keyword(arg="description", value=ast.Constant(value=pool.get("description", ""))),
-                ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.get("include_deferred", False))),
-            ],
-        ),
-        attr="pool",
-        ctx=ast.Load(),
-    )
+    # TODO just use it as a string literal in airflow 3 for now
+    return [], ast.Constant(value=pool["pool"])
+    # imports.append(
+    #     ast.ImportFrom(
+    #         module="subprocess",
+    #         names=[ast.alias(name="check_call")],
+    #         level=0,
+    #     )
+    # )
+    # return imports, ast.Attribute(
+    #     value=ast.Call(
+    #         func=ast.Name(id="check_call", ctx=ast.Load()),
+    #         args=[
+    #             ast.List(
+    #                 elts=[
+    #                     ast.Constant(value="airflow"),
+    #                     ast.Constant(value="pools"),
+    #                     ast.Constant(value="set"),
+    #                     ast.Constant(value=pool["pool"]),
+    #                     ast.Constant(value=str(pool.get("slots", 128))),
+    #                     ast.Constant(value=pool.get("description", "")),
+    #                 ],
+    #                 ctx=ast.Load(),
+    #             )
+    #         ],
+    #         keywords=[],
+    #     ),
+    #     attr="pool",
+    #     ctx=ast.Load(),
+    # )
 
 
-def _build_param_callable(param, key) -> Tuple[List[ast.ImportFrom], ast.Call]:
+def _build_param_callable(param, key, airflow_major_version: int = 2) -> Tuple[List[ast.ImportFrom], ast.Call]:
     imports = []
     # If the value is a Param, we can use a dict with the properties
     imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
@@ -132,19 +163,19 @@ def _build_param_callable(param, key) -> Tuple[List[ast.ImportFrom], ast.Call]:
     if isinstance(param["schema"]["type"], list) and len(param["schema"]["type"]) == 1:
         # If the type is a single item list, we can use it directly
         param["schema"]["type"] = param["schema"]["type"][0]
-    new_imports, new_type = _get_parts_from_value(key, param["schema"]["type"])
+    new_imports, new_type = _get_parts_from_value(key, param["schema"]["type"], None, airflow_major_version=airflow_major_version)
     keywords.append(ast.keyword(arg="type", value=new_type))
     if new_imports:
         # If we have imports, we need to add them to the imports list
         imports.extend(new_imports)
 
-    new_imports, new_value = _get_parts_from_value(key, param["value"])
+    new_imports, new_value = _get_parts_from_value(key, param["value"], None, airflow_major_version=airflow_major_version)
     if new_imports:
         # If we have imports, we need to add them to the imports list
         imports.extend(new_imports)
 
     if new_value.value is None:
-        new_value = _get_parts_from_value(key, default_value)[1]
+        new_value = _get_parts_from_value(key, default_value, None, airflow_major_version=airflow_major_version)[1]
 
     return imports, ast.Call(
         func=ast.Name(id="Param", ctx=ast.Load()),
@@ -211,7 +242,7 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.Import
     return imports, call
 
 
-def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
+def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None, airflow_major_version: int = 2) -> Tuple[List[ast.ImportFrom], ast.AST]:
     from airflow_pydantic import Host, Port
 
     imports = []
@@ -290,7 +321,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             return imports, ast.Name(id=name, ctx=ast.Load())
 
     if key in ("pool",):
-        return _build_pool_callable(value)
+        return _build_pool_callable(value, airflow_major_version=airflow_major_version)
 
     if isinstance(value, Host):
         imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Host")], level=0))
@@ -298,7 +329,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         # Construct Call with host
         keywords = []
         for k, v in value.model_dump(exclude_unset=True).items():
-            keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+            keyword_imports, keyword_value = _get_parts_from_value(k, v, value, airflow_major_version=airflow_major_version)
             if keyword_imports:
                 imports.extend(keyword_imports)
             keywords.append(ast.keyword(arg=k, value=keyword_value))
@@ -313,7 +344,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Port")], level=0))
         keywords = []
         for k, v in value.model_dump(exclude_unset=True).items():
-            keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+            keyword_imports, keyword_value = _get_parts_from_value(k, v, value, airflow_major_version=airflow_major_version)
             if keyword_imports:
                 imports.extend(keyword_imports)
             keywords.append(ast.keyword(arg=k, value=keyword_value))
@@ -333,7 +364,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         imports.append(ast.ImportFrom(module="airflow_pydantic", names=[ast.alias(name="Variable")], level=0))
         keywords = []
         for k, v in value.model_dump(exclude_unset=True).items():
-            keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+            keyword_imports, keyword_value = _get_parts_from_value(k, v, value, airflow_major_version=airflow_major_version)
             if keyword_imports:
                 imports.extend(keyword_imports)
             keywords.append(ast.keyword(arg=k, value=keyword_value))
@@ -373,7 +404,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
                 for arg in v:
                     args.append(ast.Constant(value=arg))
             else:
-                keyword_imports, keyword_value = _get_parts_from_value(k, v, value)
+                keyword_imports, keyword_value = _get_parts_from_value(k, v, value, airflow_major_version=airflow_major_version)
                 if keyword_imports:
                     imports.extend(keyword_imports)
                 keywords.append(ast.keyword(arg=k, value=keyword_value))
@@ -400,7 +431,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
     if isinstance(value, list):
         new_values = []
         for v in value:
-            new_imports, new_value = _get_parts_from_value("", v)
+            new_imports, new_value = _get_parts_from_value("", v, None, airflow_major_version=airflow_major_version)
             if new_imports:
                 # If we have imports, we need to add them to the imports list
                 imports.extend(new_imports)
@@ -412,7 +443,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         # NOTE: See abvoe for primary
         if model_ref and isinstance(getattr(model_ref, key, None), BaseModel):
             try:
-                return _get_parts_from_value(key, getattr(model_ref, key), model_ref)
+                return _get_parts_from_value(key, getattr(model_ref, key), model_ref, airflow_major_version=airflow_major_version)
             except RenderError:
                 # Just parse as a dict, some types we don't handle specifically:
                 # - SueprvisorAirflowConfiguration
@@ -421,7 +452,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         new_keys = []
         new_values = []
         for k, v in value.items():
-            new_imports, new_value = _get_parts_from_value(k, v)
+            new_imports, new_value = _get_parts_from_value(k, v, None, airflow_major_version=airflow_major_version)
             if new_imports:
                 # If we have imports, we need to add them to the imports list
 
@@ -445,7 +476,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
         imports.append(ast.ImportFrom(module="pendulum", names=[ast.alias(name="datetime", asname="pdatetime")], level=0))
         kwargs = []
         for attr in ("year", "month", "day", "tz"):
-            new_imports, new_value = _get_parts_from_value(attr, getattr(value, attr))
+            new_imports, new_value = _get_parts_from_value(attr, getattr(value, attr), None, airflow_major_version=airflow_major_version)
             imports.extend(new_imports)
             kwargs.append(ast.keyword(arg=attr, value=new_value))
         return imports, ast.Call(
@@ -525,12 +556,12 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None):
             keywords=kwargs,
         )
     if isinstance(value, AirflowParam):
-        new_imports, new_value = _build_param_callable(value, key)
+        new_imports, new_value = _build_param_callable(value, key, airflow_major_version=airflow_major_version)
         imports.extend(new_imports)
         return imports, new_value
 
     if isinstance(value, AirflowPool):
-        new_import, new_value = _build_pool_callable(value)
+        new_import, new_value = _build_pool_callable(value, airflow_major_version=airflow_major_version)
         imports.append(new_import)
         return imports, new_value
 
