@@ -6,7 +6,7 @@ from typing import Callable, List, Optional, Union
 from pydantic import Field, model_validator
 from typing_extensions import Self
 
-from ...airflow import create_or_update_pool
+from ...airflow import create_or_update_pool, get_pool
 from ...core import BaseModel
 from ...utils import Pool, Variable
 from .host import Host
@@ -89,7 +89,7 @@ class BalancerConfiguration(BaseModel):
                     elif isinstance(host.pool, str):
                         pool_name = host.pool
 
-                    res = AirflowPool.get_pool(pool_name)
+                    res = get_pool(pool_name)
 
                     # airflow return value differs version-to-version
                     if res is None:
@@ -116,6 +116,9 @@ class BalancerConfiguration(BaseModel):
                     except Exception:
                         # If the database is not available, we cannot create the pool
                         pass
+                except RuntimeError:
+                    # If the database is not available, we cannot create the pool
+                    pass
 
             if not host.username and self.default_username:
                 host.username = self.default_username
