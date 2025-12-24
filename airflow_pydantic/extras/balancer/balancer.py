@@ -4,14 +4,9 @@ from random import choice
 from typing import Callable, List, Optional, Union
 
 from pydantic import Field, model_validator
-
-try:
-    from sqlalchemy.exc import OperationalError
-except ImportError:
-    OperationalError = RuntimeError
-
 from typing_extensions import Self
 
+from ...airflow import create_or_update_pool
 from ...core import BaseModel
 from ...utils import Pool, Variable
 from .host import Host
@@ -101,7 +96,7 @@ class BalancerConfiguration(BaseModel):
                         raise PoolNotFound
                     elif res.slots != host.size:
                         if self.override_pool_size:
-                            AirflowPool.create_or_update_pool(
+                            create_or_update_pool(
                                 name=pool_name,
                                 slots=host.size,
                                 description=host.pool.description,
@@ -112,13 +107,13 @@ class BalancerConfiguration(BaseModel):
                 except PoolNotFound:
                     try:
                         # else set to default
-                        AirflowPool.create_or_update_pool(
+                        create_or_update_pool(
                             name=host.name,
                             slots=host.size,
                             description=f"Balancer pool for host({host.name})",
                             include_deferred=False,
                         )
-                    except OperationalError:
+                    except Exception:
                         # If the database is not available, we cannot create the pool
                         pass
 

@@ -12,14 +12,14 @@ __all__ = (
 )
 
 
-def render_base_task_args(self, raw: bool = False, **kwargs: Dict[str, str]) -> RenderedCode:
+def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 2, **kwargs: Dict[str, str]) -> RenderedCode:
     # Extract the importable from the operator path
     imports = []
     globals_ = []
 
     args = {**self.model_dump(exclude_unset=True, exclude=["type_"]), **kwargs}
     for k, v in args.items():
-        new_imports, value = _get_parts_from_value(k, v, self)
+        new_imports, value = _get_parts_from_value(k, v, self, airflow_major_version=airflow_major_version)
         if new_imports:
             imports.extend(new_imports)
         if isinstance(value, ast.AST):
@@ -47,7 +47,7 @@ def render_base_task_args(self, raw: bool = False, **kwargs: Dict[str, str]) -> 
 
 
 class TaskRenderMixin:
-    def render(self, raw: bool = False, dag_from_context: bool = False, **kwargs: Dict[str, str]) -> RenderedCode:
+    def render(self, raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs: Dict[str, str]) -> RenderedCode:
         if not self.task_id:
             raise ValueError("task_id must be set to render a task")
 
@@ -77,7 +77,7 @@ class TaskRenderMixin:
                 continue
 
             # Default case
-            import_, value = _get_parts_from_value(k, v, self)
+            import_, value = _get_parts_from_value(k, v, self, airflow_major_version=airflow_major_version)
             if import_:
                 imports.extend(import_)
             if isinstance(value, ast.AST):

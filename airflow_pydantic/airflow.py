@@ -4,6 +4,8 @@ from getpass import getuser
 from importlib.metadata import version
 from importlib.util import find_spec
 from logging import getLogger
+from shlex import quote
+from subprocess import check_call
 from typing import Any, Set
 
 from .migration import _airflow_3
@@ -114,6 +116,12 @@ if _airflow_3():
     from airflow.timetables.trigger import CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable  # noqa: F401
     from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
+
+    def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
+        if check_call(["airflow", "pools", "set", name, str(slots), quote(description)]) != 0:
+            _log.error(f"Failed to create or update pool {name}")
+            raise PoolNotFound(f"Failed to create or update pool {name}")
+
 elif _airflow_3() is False:
     _log.info("Using Airflow 2.x imports")
 
@@ -154,6 +162,10 @@ elif _airflow_3() is False:
     from airflow.utils.dag_parsing_context import get_parsing_context  # noqa: F401
     from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
+
+    def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
+        Pool.create_or_update_pool(name, slots, description, include_deferred, *args, **kwargs)
+
 else:
     # NOTE: Airflow 3 Only
     __all__.extend(
@@ -258,6 +270,10 @@ else:
         def create_or_update_pool(cls, name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
             # Simulate creating or updating a pool in Airflow
             pass
+
+    def create_or_update_pool(cls, name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
+        # Simulate creating or updating a pool in Airflow
+        pass
 
     class PoolNotFound(Exception):
         pass

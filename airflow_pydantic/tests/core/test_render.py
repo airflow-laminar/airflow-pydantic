@@ -34,6 +34,18 @@ class TestRender:
             == "SSHOperator(pool=Pool.get_pool('blerg').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command=\"bash -lc 'set -ex\\ntest1\\ntest2'\", cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
+    def test_render_operator_ssh_airflow_3(self, ssh_operator):
+        imports, globals_, task = ssh_operator.render(airflow_major_version=3)
+        assert imports == [
+            "from airflow.providers.ssh.operators.ssh import SSHOperator",
+            "from airflow.providers.ssh.hooks.ssh import SSHHook",
+        ]
+        assert globals_ == []
+        assert (
+            task
+            == "SSHOperator(pool='blerg', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command=\"bash -lc 'set -ex\\ntest1\\ntest2'\", cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+        )
+
     def test_render_operator_ssh_host_variable(self, ssh_operator_balancer):
         imports, globals_, task = ssh_operator_balancer.render()
         assert imports == [
@@ -46,6 +58,19 @@ class TestRender:
         assert (
             task
             == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+        )
+
+    def test_render_operator_ssh_host_variable_airflow_3(self, ssh_operator_balancer):
+        imports, globals_, task = ssh_operator_balancer.render(airflow_major_version=3)
+        assert imports == [
+            "from airflow.providers.ssh.operators.ssh import SSHOperator",
+            "from airflow.providers.ssh.hooks.ssh import SSHHook",
+            "from airflow.models.variable import Variable as AirflowVariable",
+        ]
+        assert globals_ == []
+        assert (
+            task
+            == "SSHOperator(pool='test_host', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_host_variable_from_template(self, ssh_operator_balancer_template):
