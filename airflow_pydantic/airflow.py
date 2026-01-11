@@ -3,11 +3,7 @@ from enum import Enum
 from getpass import getuser
 from importlib.metadata import version
 from importlib.util import find_spec
-from json import loads
 from logging import getLogger
-from shlex import quote
-from shutil import which
-from subprocess import PIPE, Popen, check_call
 from typing import Any, Set
 
 from .migration import _airflow_3
@@ -65,6 +61,7 @@ class _AirflowPydanticMarker: ...
 
 if _airflow_3():
     _log.info("Using Airflow 3.x imports")
+    from airflow.api.client import get_current_api_client
     from airflow.exceptions import AirflowFailException, AirflowSkipException
     from airflow.models.dag import DAG  # noqa: F401
     from airflow.models.param import Param  # noqa: F401
@@ -119,19 +116,28 @@ if _airflow_3():
     from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 
-    def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
-        if check_call([which("airflow"), "pools", "set", name, str(slots), quote(description)]) != 0:
-            _log.error(f"Failed to create or update pool {name}")
-            raise PoolNotFound(f"Failed to create or update pool {name}")
-
     def get_pool(pool_name: str, *args, **kwargs) -> Pool:
         # get pool using airflow CLI and extract json
-        process = Popen([which("airflow"), "pools", "get", pool_name, "--output", "json"], stdout=PIPE, stderr=PIPE)
-        stdout, stderr = process.communicate()
-        if process.returncode != 0:
-            raise PoolNotFound(f"Pool {pool_name} not found: {stderr.decode().strip()}")
-        pool_data = loads(stdout.decode().strip())
-        return Pool(pool=pool_data["name"], slots=pool_data["slots"], description=pool_data["description"])
+        client = get_current_api_client()
+        ret = client.get_pool(name=pool_name)
+
+        # ret is tuple, but we expect a Pool object
+        pool = Pool(
+            pool=ret[0],
+            slots=ret[1],
+            description=ret[2],
+            include_deferred=ret[3],
+        )
+        return pool
+
+    def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
+        try:
+            client = get_current_api_client()
+            client.create_pool(name=name, slots=slots, description=description, include_deferred=include_deferred)
+            return get_pool(name)
+        except AttributeError as e:
+            _log.error(f"Failed to create or update pool {name}: {e}")
+            return None
 
 elif _airflow_3() is False:
     _log.info("Using Airflow 2.x imports")
@@ -285,7 +291,7 @@ else:
             # Simulate creating or updating a pool in Airflow
             pass
 
-    def create_or_update_pool(cls, name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
+    def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
         # Simulate creating or updating a pool in Airflow
         pass
 

@@ -143,13 +143,12 @@ class BalancerConfiguration(BaseModel):
             _used_ports.add((port.host.name, port.port))
 
             # Create pools
-            # TODO reenable
-            # Pool.create_or_update_pool(
-            #     name=port.pool,
-            #     slots=1,
-            #     description=f"Balancer pool for host({port.port}) port({port.port})",
-            #     include_deferred=True,
-            # )
+            create_or_update_pool(
+                name=port.pool,
+                slots=1,
+                description=f"Balancer pool for host({port.port}) port({port.port})",
+                include_deferred=True,
+            )
 
         # sort hosts by name, sort ports by host name then port number
         # NOTE: since we're in a validator and we have validate_on_assignment, bypass here
