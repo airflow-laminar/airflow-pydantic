@@ -6,6 +6,10 @@ hidden: true
 ---
 
 
+docs/src/getting-started.md
+
+docs/src/examples.md
+
 docs/src/API.md
 
 
@@ -23,6 +27,8 @@ Pydantic models for Apache Airflow
 ## Overview
 
 [Pydantic](https://docs.pydantic.dev/latest/) models of Apache Airflow data structures.
+
+**Primary Use Case:** This library is designed to enable **declarative DAG definitions** using [airflow-config](https://github.com/airflow-laminar/airflow-config) or other YAML/JSON-based configuration frameworks. By representing Airflow constructs as Pydantic models, DAGs can be defined in configuration files rather than Python code, enabling better separation of concerns, easier testing, and configuration-driven workflows.
 
 ## Core
 
@@ -76,10 +82,85 @@ Pydantic models for Apache Airflow
 
 ## Usage
 
+### Declarative DAGs with airflow-config (Recommended)
+
+The primary use of `airflow-pydantic` is to build **declarative, configuration-driven DAGs** using [airflow-config](https://github.com/airflow-laminar/airflow-config) or similar YAML/JSON-based frameworks:
+
+```yaml
+# config/my_dag.yaml
+default_args:
+  _target_: airflow_pydantic.TaskArgs
+  owner: data-team
+  retries: 3
+
+default_dag_args:
+  _target_: airflow_pydantic.DagArgs
+  schedule: "@daily"
+  start_date: "2024-01-01"
+  catchup: false
+```
+
+This approach allows you to:
+
+- Define DAGs in YAML/JSON instead of Python
+- Separate configuration from code
+- Easily manage environment-specific settings
+- Version control your DAG configurations
+- Generate and validate DAGs programmatically
+
+### Programmatic Usage
+
 All operators and sensors support two methods:
 
-- `instantiate()`: Create a concrete Airflow instance
-- `render()`: Return Python code to instantiate the instance, for use in [airflow-config](https://github.com/airflow-laminar/airflow-config)
+- `instantiate()`: Create a concrete Airflow instance at runtime
+- `render()`: Generate Python code as a string for the Airflow construct
+
+#### Code Generation with render()
+
+The `render()` method generates valid Python code from your Pydantic models, enabling code generation workflows:
+
+```python
+from airflow_pydantic import Dag, BashTask
+from datetime import datetime
+
+dag = Dag(
+    dag_id="generated-dag",
+    schedule="@daily",
+    start_date=datetime(2024, 1, 1),
+    tasks={
+        "hello": BashTask(
+            task_id="hello",
+            bash_command="echo 'Hello World'",
+        ),
+    },
+)
+
+# Generate Python code
+python_code = dag.render()
+
+# Save to a DAG file
+with open("dags/generated_dag.py", "w") as f:
+    f.write(python_code)
+```
+
+**Generated File:**
+
+```python
+from datetime import datetime
+
+from airflow.models import DAG
+from airflow.providers.standard.operators.bash import BashOperator
+
+with DAG(schedule="@daily", start_date=datetime.fromisoformat("2024-01-01T00:00:00"), dag_id="generated-dag") as dag:
+    hello = BashOperator(bash_command="echo 'Hello World'", task_id="hello", dag=dag)
+```
+
+This is useful for:
+
+- Generating DAG files from configuration during CI/CD
+- Creating DAG templates programmatically
+- Migrating from configuration-driven to static DAG files
+- Debugging and inspecting generated DAG code
 
 > [!NOTE]
 > This library was generated using [copier](https://copier.readthedocs.io/en/stable/) from the [Base Python Project Template repository](https://github.com/python-project-templates/base).
