@@ -350,6 +350,9 @@ else:
     class TriggerDagRunOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.trigger_dagrun.TriggerDagRunOperator"
 
+    class BranchDayOfWeekOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.weekday.BranchDayOfWeekOperator"
+
     class BashSensor(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.sensors.bash.BashSensor"
 
