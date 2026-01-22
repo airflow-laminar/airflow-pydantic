@@ -112,7 +112,7 @@ ignore = [
 [tool.coverage.run]
 branch = true
 omit = [
-    "airflow_pydantic/tests/integration/",
+    "airflow_pydantic/tests/*",
 ]
 [tool.coverage.report]
 exclude_also = [
@@ -161,5 +161,9 @@ section-order = ["future", "standard-library", "third-party", "first-party", "lo
 [tool.yardang]
 title = "airflow-pydantic"
 root = "README.md"
-pages = ["docs/src/API.md"]
+pages = [
+    "docs/src/getting-started.md",
+    "docs/src/examples.md",
+    "docs/src/API.md",
+]
 use-autoapi = false
