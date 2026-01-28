@@ -1,3 +1,7 @@
+import json
+import os
+import subprocess
+import tempfile
 from datetime import timedelta
 from enum import Enum
 from getpass import getuser
@@ -116,28 +120,224 @@ if _airflow_3():
     from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
     from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
 
-    def get_pool(pool_name: str, *args, **kwargs) -> Pool:
-        # get pool using airflow CLI and extract json
-        client = get_current_api_client()
-        ret = client.get_pool(name=pool_name)
+    def _is_database_available() -> bool:
+        """
+        Check if database access is available.
 
-        # ret is tuple, but we expect a Pool object
-        pool = Pool(
-            pool=ret[0],
-            slots=ret[1],
-            description=ret[2],
-            include_deferred=ret[3],
-        )
-        return pool
+        In Airflow 3, DAG parsing happens in a separate process without database access.
+        This function checks multiple indicators:
+        1. Process context - if we're in a "client" context (parsing), DB isn't available
+        2. Engine availability - check if SQLAlchemy engine is configured
+        3. Actual connection test - try to execute a simple query
+        """
+        # Check if we're in a DAG parsing (client) context
+        # In Airflow 3, DAG parsing sets _AIRFLOW_PROCESS_CONTEXT=client
+        process_context = os.environ.get("_AIRFLOW_PROCESS_CONTEXT", "")
+        if process_context == "client":
+            return False
+
+        try:
+            from airflow import settings
+
+            # Check if engine exists
+            if settings.engine is None:
+                return False
+
+            # Check if Session is configured
+            if settings.Session is None:
+                return False
+
+            # Try to actually use the session to verify DB is accessible
+            from sqlalchemy import text
+
+            with settings.Session() as session:
+                session.execute(text("SELECT 1"))
+            return True
+        except Exception:
+            return False
+
+    def _get_pool_via_cli(pool_name: str) -> Pool | None:
+        """Get pool information using the Airflow CLI."""
+        try:
+            result = subprocess.run(
+                ["airflow", "pools", "get", pool_name, "--output", "json"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                pools = json.loads(result.stdout)
+                if pools and len(pools) > 0:
+                    p = pools[0]
+                    return Pool(
+                        pool=p.get("pool", pool_name),
+                        slots=p.get("slots", 0),
+                        description=p.get("description", ""),
+                        include_deferred=p.get("include_deferred", False),
+                    )
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError, json.JSONDecodeError) as e:
+            _log.debug(f"CLI get_pool failed for {pool_name}: {e}")
+        except FileNotFoundError:
+            _log.debug("Airflow CLI not found in PATH")
+        return None
+
+    def _create_pool_via_cli(name: str, slots: int, description: str, include_deferred: bool) -> bool:
+        """Create or update a pool using the Airflow CLI."""
+        try:
+            cmd = ["airflow", "pools", "set", name, str(slots), description or ""]
+            if include_deferred:
+                cmd.append("--include-deferred")
+
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if result.returncode == 0:
+                _log.debug(f"Created pool {name} via CLI")
+                return True
+            else:
+                _log.debug(f"CLI create_pool failed for {name}: {result.stderr}")
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError) as e:
+            _log.debug(f"CLI create_pool failed for {name}: {e}")
+        except FileNotFoundError:
+            _log.debug("Airflow CLI not found in PATH")
+        return False
+
+    def _get_pool_via_airflowctl(pool_name: str) -> Pool | None:
+        """Get pool information using airflowctl."""
+        try:
+            result = subprocess.run(
+                ["airflowctl", "pools", "get", pool_name, "--output", "json"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                pools = json.loads(result.stdout)
+                if pools and len(pools) > 0:
+                    p = pools[0]
+                    return Pool(
+                        pool=p.get("name", pool_name),
+                        slots=p.get("slots", 0),
+                        description=p.get("description", ""),
+                        include_deferred=p.get("include_deferred", False),
+                    )
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError, json.JSONDecodeError) as e:
+            _log.debug(f"airflowctl get_pool failed for {pool_name}: {e}")
+        except FileNotFoundError:
+            _log.debug("airflowctl not found in PATH")
+        return None
+
+    def _create_pool_via_airflowctl(name: str, slots: int, description: str, include_deferred: bool) -> bool:
+        """Create or update a pool using airflowctl via JSON import."""
+        try:
+            # airflowctl uses a different format - list of pool objects for import
+            pool_data = [
+                {
+                    "name": name,
+                    "slots": slots,
+                    "description": description or "",
+                    "include_deferred": include_deferred,
+                }
+            ]
+
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+                json.dump(pool_data, f)
+                temp_path = f.name
+
+            try:
+                result = subprocess.run(
+                    ["airflowctl", "pools", "import", temp_path],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                )
+                if result.returncode == 0:
+                    _log.debug(f"Created pool {name} via airflowctl")
+                    return True
+                else:
+                    _log.debug(f"airflowctl create_pool failed for {name}: {result.stderr}")
+            finally:
+                os.unlink(temp_path)
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError) as e:
+            _log.debug(f"airflowctl create_pool failed for {name}: {e}")
+        except FileNotFoundError:
+            _log.debug("airflowctl not found in PATH")
+        return False
+
+    def get_pool(pool_name: str, *args, **kwargs) -> Pool:
+        """
+        Get a pool by name.
+
+        Tries multiple methods:
+        1. Direct database access via API client (if available)
+        2. Airflow CLI
+        3. airflowctl
+        """
+        # Try direct database access first
+        if _is_database_available():
+            try:
+                client = get_current_api_client()
+                ret = client.get_pool(name=pool_name)
+                return Pool(
+                    pool=ret[0],
+                    slots=ret[1],
+                    description=ret[2],
+                    include_deferred=ret[3],
+                )
+            except PoolNotFound:
+                raise
+            except Exception as e:
+                _log.debug(f"Direct get_pool failed for {pool_name}: {e}")
+
+        # Try CLI fallback
+        pool = _get_pool_via_cli(pool_name)
+        if pool:
+            return pool
+
+        # Try airflowctl fallback
+        pool = _get_pool_via_airflowctl(pool_name)
+        if pool:
+            return pool
+
+        raise PoolNotFound(f"Pool {pool_name} not found")
 
     def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
-        try:
-            client = get_current_api_client()
-            client.create_pool(name=name, slots=slots, description=description, include_deferred=include_deferred)
-            return get_pool(name)
-        except AttributeError as e:
-            _log.error(f"Failed to create or update pool {name}: {e}")
-            return None
+        """
+        Create or update a pool.
+
+        Tries multiple methods:
+        1. Direct database access via API client (if available)
+        2. Airflow CLI
+        3. airflowctl
+        """
+        # Try direct database access first
+        if _is_database_available():
+            try:
+                client = get_current_api_client()
+                client.create_pool(name=name, slots=slots, description=description, include_deferred=include_deferred)
+                return get_pool(name)
+            except Exception as e:
+                _log.debug(f"Direct create_pool failed for {name}: {e}")
+
+        # Try CLI fallback
+        if _create_pool_via_cli(name, slots, description, include_deferred):
+            try:
+                return get_pool(name)
+            except PoolNotFound:
+                return None
+
+        # Try airflowctl fallback
+        if _create_pool_via_airflowctl(name, slots, description, include_deferred):
+            try:
+                return get_pool(name)
+            except PoolNotFound:
+                return None
+
+        _log.warning(f"Could not create pool {name} - no available method succeeded")
+        return None
 
 elif _airflow_3() is False:
     _log.info("Using Airflow 2.x imports")
