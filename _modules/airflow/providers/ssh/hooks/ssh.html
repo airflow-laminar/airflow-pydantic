@@ -299,6 +299,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">sshtunnel</span><span class="w"> </span><span class="kn">import</span> <span class="n">SSHTunnelForwarder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tenacity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Retrying</span><span class="p">,</span> <span class="n">stop_after_attempt</span><span class="p">,</span> <span class="n">wait_fixed</span><span class="p">,</span> <span class="n">wait_random</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">airflow.providers.common.compat.connection</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_async_connection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.providers.common.compat.sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirflowException</span><span class="p">,</span> <span class="n">BaseHook</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">getuser</span>
 
@@ -884,9 +885,8 @@
 <span class="sd">        Returns an asyncssh SSHClientConnection that can be used to run commands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">asyncssh</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">asgiref.sync</span><span class="w"> </span><span class="kn">import</span> <span class="n">sync_to_async</span>
 
-        <span class="n">conn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">sync_to_async</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_connection</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh_conn_id</span><span class="p">)</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_async_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh_conn_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_extras</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
 
