@@ -156,10 +156,8 @@ airflow_pydantic/labextension
 # Rust
 target
 
-<<<<<<< before updating
-airflow_pydantic/tests/core/rendered
-=======
 # Hydra
 outputs/
 multirun/
->>>>>>> after updating
+
+airflow_pydantic/tests/core/rendered
