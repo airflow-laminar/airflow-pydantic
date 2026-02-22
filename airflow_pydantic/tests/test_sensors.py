@@ -93,18 +93,18 @@ class TestDateTimeSensorArgs:
 
     def test_datetime_sensor_args_creation(self):
         """Test basic DateTimeSensorArgs creation."""
-        target = datetime(2024, 6, 15, 12, 0, 0)
+        target = datetime(2024, 6, 15, 12, 0, 0)  # noqa: DTZ001
         args = DateTimeSensorArgs(target_time=target)
         assert args.target_time == target
 
     def test_datetime_sensor_args_with_string(self):
         """Test DateTimeSensorArgs with string datetime."""
         args = DateTimeSensorArgs(target_time="2024-06-15T12:00:00")
-        assert args.target_time == datetime(2024, 6, 15, 12, 0, 0)
+        assert args.target_time == datetime(2024, 6, 15, 12, 0, 0)  # noqa: DTZ001
 
     def test_datetime_sensor_args_roundtrip(self):
         """Test DateTimeSensorArgs serialization roundtrip."""
-        target = datetime(2024, 6, 15, 12, 0, 0)
+        target = datetime(2024, 6, 15, 12, 0, 0)  # noqa: DTZ001
         args = DateTimeSensorArgs(target_time=target)
         dumped = args.model_dump(exclude_unset=True)
         restored = DateTimeSensorArgs.model_validate(dumped)
@@ -116,14 +116,14 @@ class TestDateTimeSensorAsyncArgs:
 
     def test_datetime_sensor_async_args_creation(self):
         """Test basic DateTimeSensorAsyncArgs creation."""
-        target = datetime(2024, 6, 15, 12, 0, 0)
+        target = datetime(2024, 6, 15, 12, 0, 0)  # noqa: DTZ001
         args = DateTimeSensorAsyncArgs(target_time=target)
         assert args.target_time == target
 
     def test_datetime_sensor_async_args_with_triggers(self):
         """Test DateTimeSensorAsyncArgs with trigger options."""
         args = DateTimeSensorAsyncArgs(
-            target_time=datetime(2024, 6, 15, 12, 0, 0),
+            target_time=datetime(2024, 6, 15, 12, 0, 0),  # noqa: DTZ001
             start_from_trigger=True,
             end_from_trigger=True,
             trigger_kwargs={"some_arg": "value"},

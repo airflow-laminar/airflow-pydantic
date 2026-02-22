@@ -152,16 +152,16 @@ class TestEventsTimetable:
     def test_events_timetable_basic(self):
         """Test basic EventsTimetable creation."""
         events = [
-            datetime(2024, 1, 15, 9, 0),
-            datetime(2024, 2, 15, 9, 0),
-            datetime(2024, 3, 15, 9, 0),
+            datetime(2024, 1, 15, 9, 0),  # noqa: DTZ001
+            datetime(2024, 2, 15, 9, 0),  # noqa: DTZ001
+            datetime(2024, 3, 15, 9, 0),  # noqa: DTZ001
         ]
         tt = EventsTimetable(event_dates=events)
         assert len(tt.event_dates) == 3
 
     def test_events_timetable_with_options(self):
         """Test EventsTimetable with options."""
-        events = [datetime(2024, 6, 1)]
+        events = [datetime(2024, 6, 1)]  # noqa: DTZ001
         tt = EventsTimetable(
             event_dates=events,
             restrict_to_events=True,
@@ -174,7 +174,7 @@ class TestEventsTimetable:
 
     def test_events_timetable_roundtrip(self):
         """Test EventsTimetable serialization roundtrip."""
-        events = [datetime(2024, 1, 1), datetime(2024, 7, 1)]
+        events = [datetime(2024, 1, 1), datetime(2024, 7, 1)]  # noqa: DTZ001
         tt = EventsTimetable(event_dates=events)
         dumped = tt.model_dump(exclude_unset=True)
         restored = EventsTimetable.model_validate(dumped)

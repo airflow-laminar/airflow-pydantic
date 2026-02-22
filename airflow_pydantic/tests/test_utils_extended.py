@@ -1,7 +1,6 @@
 """Tests for utility modules."""
 
 from datetime import datetime, timedelta
-from typing import Dict, List
 
 import pytest
 from pydantic import BaseModel
@@ -251,11 +250,11 @@ class TestParamType:
 
     def test_resolve_type_generic_dict(self):
         """Test type resolution for generic Dict."""
-        assert ParamType._resolve_type(Dict[str, int]) == "object"
+        assert ParamType._resolve_type(dict[str, int]) == "object"
 
     def test_resolve_type_generic_list(self):
         """Test type resolution for generic List."""
-        assert ParamType._resolve_type(List[int]) == "array"
+        assert ParamType._resolve_type(list[int]) == "array"
 
     def test_resolve_type_unknown(self):
         """Test type resolution for unknown type returns None."""

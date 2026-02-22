@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING
 
 from pydantic import Field
 
@@ -14,27 +14,27 @@ __all__ = ("Host",)
 
 class Host(BaseModel):
     name: str
-    username: Optional[str] = None
+    username: str | None = None
 
     # Password
-    password: Optional[Union[str, Variable]] = None
+    password: str | Variable | None = None
 
     # Or get key file
-    key_file: Optional[str] = None
+    key_file: str | None = None
 
-    os: Optional[str] = None
+    os: str | None = None
 
     # Airflow / balance
-    pool: Optional[Pool] = None
-    size: Optional[int] = None
-    queues: List[str] = Field(default_factory=list)
+    pool: Pool | None = None
+    size: int | None = None
+    queues: list[str] = Field(default_factory=list)
 
-    tags: List[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
 
     def override(self, **kwargs) -> "Host":
         return Host(**{**self.model_dump(), **kwargs})
 
-    def hook(self, username: str = None, use_local: bool = True, **hook_kwargs) -> "SSHHook":
+    def hook(self, username: str | None = None, use_local: bool = True, **hook_kwargs) -> "SSHHook":
         from airflow_pydantic.airflow import SSHHook
 
         if use_local and not self.name.count(".") > 0:

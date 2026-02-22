@@ -1,6 +1,6 @@
 from datetime import datetime
 from importlib.metadata import version
-from typing import Literal, Optional, Union
+from typing import Literal
 from unittest.mock import patch
 
 import pytest
@@ -81,9 +81,8 @@ class TestDag:
             assert _log.info.call_args_list[4][0][1] == []
             assert _log.info.call_args_list[4][0][2] == "test-dag"
 
-        with pytest.raises(TypeError):
-            with model.instantiate(config="wrong"):
-                ...
+        with pytest.raises(TypeError), model.instantiate(config="wrong"):
+            ...
 
     def test_dag_none_schedule(self, dag_none_schedule):
         if _airflow_3() is None:
@@ -105,7 +104,7 @@ class TestDag:
     def test_dag_convert_params(self, bash_sensor_args):
         d = Dag(
             dag_id="a-dag",
-            start_date=datetime(2020, 1, 1),
+            start_date=datetime(2020, 1, 1),  # noqa: DTZ001
             schedule=None,
             default_args={},
             params=bash_sensor_args,
@@ -142,16 +141,16 @@ with DAG(
         )
         if _airflow_3() is not None:
             d.instantiate()
-            exec(d.render())
+            exec(d.render())  # noqa: S102
 
     def test_dag_convert_params_regressions(self):
         class MyParams(BaseModel):
-            a: Optional[Union[int, BaseModel]] = None
-            b: Optional[Literal["a", "b"]] = None
+            a: int | BaseModel | None = None
+            b: Literal["a", "b"] | None = None
 
         d = Dag(
             dag_id="a-dag",
-            start_date=datetime(2020, 1, 1),
+            start_date=datetime(2020, 1, 1),  # noqa: DTZ001
             schedule=None,
             default_args={},
             params=MyParams,
@@ -180,7 +179,7 @@ with DAG(
         )
         if _airflow_3() is not None:
             d.instantiate()
-            exec(d.render())
+            exec(d.render())  # noqa: S102
 
     def test_dag_with_attribute_dependencies(self, dag_with_attribute_dependencies):
         d = dag_with_attribute_dependencies.instantiate()

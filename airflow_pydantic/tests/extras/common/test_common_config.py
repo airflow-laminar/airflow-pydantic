@@ -44,4 +44,4 @@ with DAG(
 """
         )
 
-        exec(conf.dags["test_clean"].render())
+        exec(conf.dags["test_clean"].render())  # noqa: S102

@@ -183,7 +183,7 @@ with DAG(
             with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
                 mock_get_pool.return_value = Pool()
                 dag.instantiate()
-                exec(dag.render())
+                exec(dag.render())  # noqa: S102
 
     def test_render_with_dependencies(self, dag):
         dag.tasks["task1"].dependencies = []
@@ -287,7 +287,7 @@ with DAG(
             with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
                 mock_get_pool.return_value = Pool()
                 dag.instantiate()
-                exec(dag.render())
+                exec(dag.render())  # noqa: S102
 
     def test_render_with_externals(self, dag_with_external):
         assert isinstance(dag_with_external, Dag)
@@ -376,7 +376,7 @@ with DAG(
             with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
                 mock_get_pool.return_value = Pool()
                 dag_with_external.instantiate()
-                exec(dag_with_external.render())
+                exec(dag_with_external.render())  # noqa: S102
 
     def test_render_with_external_supervisor_config(self, dag_with_supervisor):
         assert isinstance(dag_with_supervisor, Dag)
@@ -453,7 +453,7 @@ with DAG(
         )
         if _HAVE_AIRFLOW:
             dag_with_supervisor.instantiate()
-            exec(dag_with_supervisor.render())
+            exec(dag_with_supervisor.render())  # noqa: S102
 
     def test_render_with_external_supervisor_ssh_config(self, dag_with_supervisor_ssh):
         from airflow_pydantic.testing import variables
@@ -538,7 +538,7 @@ with DAG(
         if _HAVE_AIRFLOW:
             with variables({"user": "test", "password": "password"}):
                 dag_with_supervisor_ssh.instantiate()
-                exec(dag_with_supervisor_ssh.render())
+                exec(dag_with_supervisor_ssh.render())  # noqa: S102
 
     def test_render_single_task_python_sensor_and_params(self, dag, python_sensor):
         dag.tasks = {"test_python_sensor": python_sensor}
@@ -672,4 +672,4 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW:
-            exec(dag_with_attribute_dependencies.render())
+            exec(dag_with_attribute_dependencies.render())  # noqa: S102

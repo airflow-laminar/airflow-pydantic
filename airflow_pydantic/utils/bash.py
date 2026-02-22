@@ -1,5 +1,4 @@
 from shlex import quote as shell_quote
-from typing import Dict, List, Optional
 
 from pydantic import BaseModel, model_serializer
 
@@ -8,11 +7,11 @@ __all__ = ("BashCommands", "in_bash")
 
 def in_bash(
     command: str,
-    quote: Optional[str] = "'",
-    escape: Optional[bool] = False,
-    login: Optional[bool] = True,
-    cwd: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
+    quote: str | None = "'",
+    escape: bool | None = False,
+    login: bool | None = True,
+    cwd: str | None = None,
+    env: dict[str, str] | None = None,
 ) -> str:
     """Run command inside bash.
 
@@ -41,12 +40,12 @@ def in_bash(
 
 
 class BashCommands(BaseModel):
-    commands: List[str]
-    quote: Optional[str] = "'"
-    escape: Optional[bool] = False
-    login: Optional[bool] = True
-    cwd: Optional[str] = ""
-    env: Optional[Dict[str, str]] = None
+    commands: list[str]
+    quote: str | None = "'"
+    escape: bool | None = False
+    login: bool | None = True
+    cwd: str | None = ""
+    env: dict[str, str] | None = None
 
     @model_serializer()
     def _serialize(self) -> str:

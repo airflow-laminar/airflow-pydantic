@@ -1,22 +1,20 @@
-from typing import Optional
-
 from pydantic import Field
 
 from ...operators import PythonTask, PythonTaskArgs
 from ...utils import CallablePath, ImportPath
 
 __all__ = (
-    "SkipOperatorArgs",
-    "SkipOperator",
-    "FailOperatorArgs",
     "FailOperator",
-    "PassOperatorArgs",
+    "FailOperatorArgs",
     "PassOperator",
+    "PassOperatorArgs",
+    "SkipOperator",
+    "SkipOperatorArgs",
 )
 
 
 class SkipTaskArgs(PythonTaskArgs):
-    python_callable: Optional[CallablePath] = Field(default="airflow_pydantic.skip", description="python_callable")
+    python_callable: CallablePath | None = Field(default="airflow_pydantic.skip", description="python_callable")
 
 
 # Alias
@@ -24,7 +22,7 @@ SkipOperatorArgs = SkipTaskArgs
 
 
 class FailTaskArgs(PythonTaskArgs):
-    python_callable: Optional[CallablePath] = Field(default="airflow_pydantic.fail", description="python_callable")
+    python_callable: CallablePath | None = Field(default="airflow_pydantic.fail", description="python_callable")
 
 
 # Alias
@@ -32,7 +30,7 @@ FailOperatorArgs = FailTaskArgs
 
 
 class PassTaskArgs(PythonTaskArgs):
-    python_callable: Optional[CallablePath] = Field(default="airflow_pydantic.pass_", description="python_callable")
+    python_callable: CallablePath | None = Field(default="airflow_pydantic.pass_", description="python_callable")
 
 
 # Alias

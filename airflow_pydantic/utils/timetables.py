@@ -1,5 +1,4 @@
 from datetime import timedelta
-from typing import List, Optional, Union
 
 from pydantic_extra_types.timezone_name import TimeZoneName
 
@@ -16,14 +15,14 @@ from .common import DatetimeArg
 from .relativedelta import RelativeDelta
 
 __all__ = (
-    "Timezone",
-    "FixedTimezone",
-    "CronTriggerTimetable",
     "CronDataIntervalTimetable",
+    "CronTriggerTimetable",
     "DeltaDataIntervalTimetable",
     "DeltaTriggerTimetable",
     "EventsTimetable",
+    "FixedTimezone",
     "MultipleCronTriggerTimetable",
+    "Timezone",
 )
 
 Timezone = TimeZoneName
@@ -32,19 +31,19 @@ FixedTimezone = timedelta
 
 class CronTriggerTimetable(BaseModel):
     cron: str
-    timezone: Optional[Union[str, Timezone, FixedTimezone]] = None
-    interval: Optional[Union[timedelta, RelativeDelta]] = None
-    run_immediately: Optional[Union[bool, timedelta]] = None
+    timezone: str | Timezone | FixedTimezone | None = None
+    interval: timedelta | RelativeDelta | None = None
+    run_immediately: bool | timedelta | None = None
 
     def instance(self) -> BaseCronTriggerTimetable:
         return BaseCronTriggerTimetable(**self.model_dump(exclude_unset=True))
 
 
 class MultipleCronTriggerTimetable(BaseModel):
-    crons: List[str]
-    timezone: Union[str, Timezone, FixedTimezone]
-    interval: Optional[Union[timedelta, RelativeDelta]] = None
-    run_immediately: Optional[Union[bool, timedelta]] = None
+    crons: list[str]
+    timezone: str | Timezone | FixedTimezone
+    interval: timedelta | RelativeDelta | None = None
+    run_immediately: bool | timedelta | None = None
 
     def instance(self) -> BaseMultipleCronTriggerTimetable:
         return BaseMultipleCronTriggerTimetable(*self.crons, **self.model_dump(exclude_unset=True, exclude=["crons"]))
@@ -52,32 +51,32 @@ class MultipleCronTriggerTimetable(BaseModel):
 
 class CronDataIntervalTimetable(BaseModel):
     cron: str
-    timezone: Optional[Union[str, Timezone, FixedTimezone]] = None
+    timezone: str | Timezone | FixedTimezone | None = None
 
     def instance(self) -> BaseCronDataIntervalTimetable:
         return BaseCronDataIntervalTimetable(**self.model_dump(exclude_unset=True))
 
 
 class DeltaDataIntervalTimetable(BaseModel):
-    delta: Union[timedelta, RelativeDelta]
+    delta: timedelta | RelativeDelta
 
     def instance(self) -> BaseDeltaDataIntervalTimetable:
         return BaseDeltaDataIntervalTimetable(**self.model_dump(exclude_unset=True))
 
 
 class DeltaTriggerTimetable(BaseModel):
-    delta: Union[timedelta, RelativeDelta]
-    interval: Optional[Union[timedelta, RelativeDelta]] = None
+    delta: timedelta | RelativeDelta
+    interval: timedelta | RelativeDelta | None = None
 
     def instance(self) -> BaseDeltaTriggerTimetable:
         return BaseDeltaTriggerTimetable(**self.model_dump(exclude_unset=True))
 
 
 class EventsTimetable(BaseModel):
-    event_dates: List[DatetimeArg]
-    restrict_to_events: Optional[bool] = False
-    presorted: Optional[bool] = False
-    description: Optional[str] = None
+    event_dates: list[DatetimeArg]
+    restrict_to_events: bool | None = False
+    presorted: bool | None = False
+    description: str | None = None
 
     def instance(self) -> BaseEventsTimetable:
         return BaseEventsTimetable(**self.model_dump(exclude_unset=True))

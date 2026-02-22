@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import (
     Field,
     model_validator,
@@ -13,12 +11,12 @@ __all__ = ("Variable",)
 
 class Variable(BaseModel):
     key: str = Field(description="Variable key")
-    val: Optional[str] = Field(default="", description="Variable value", alias="_val", exclude=True)
-    description: Optional[str] = Field(default="", description="Variable description")
-    is_encrypted: Optional[bool] = Field(default=False, description="Whether the variable is encrypted")
+    val: str | None = Field(default="", description="Variable value", alias="_val", exclude=True)
+    description: str | None = Field(default="", description="Variable description")
+    is_encrypted: bool | None = Field(default=False, description="Whether the variable is encrypted")
 
     # Not technically a field, but needed
-    deserialize_json: Optional[bool] = Field(default=False, description="Whether to deserialize JSON")
+    deserialize_json: bool | None = Field(default=False, description="Whether to deserialize JSON")
 
     @model_validator(mode="before")
     @classmethod
@@ -26,7 +24,7 @@ class Variable(BaseModel):
         if isinstance(v, str):
             v = {"key": v}
         elif isinstance(v, BaseVariable):
-            v = dict(key=v.key, val=v._val, description=v.description, is_encrypted=v.is_encrypted)
+            v = {"key": v.key, "val": v._val, "description": v.description, "is_encrypted": v.is_encrypted}
         return v
 
     def get(self):

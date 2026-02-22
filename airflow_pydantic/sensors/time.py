@@ -1,6 +1,5 @@
 from datetime import time
 from logging import getLogger
-from typing import Optional, Type
 
 from pydantic import Field, field_validator
 
@@ -9,8 +8,8 @@ from ..utils import ImportPath
 from .base import BaseSensorArgs
 
 __all__ = (
-    "TimeSensorArgs",
     "TimeSensor",
+    "TimeSensorArgs",
 )
 
 _log = getLogger(__name__)
@@ -20,7 +19,7 @@ class TimeSensorArgs(BaseSensorArgs):
     # time sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/time/index.html#airflow.providers.standard.sensors.time.TimeSensor
     target_time: time = Field(description="The target date and time to wait for")
-    deferrable: Optional[bool] = Field(default=None, description="If True, the sensor will operate in deferrable mode")
+    deferrable: bool | None = Field(default=None, description="If True, the sensor will operate in deferrable mode")
 
 
 class TimeSensor(Task, TimeSensorArgs):
@@ -28,14 +27,14 @@ class TimeSensor(Task, TimeSensorArgs):
 
     @field_validator("operator")
     @classmethod
-    def validate_operator(cls, v: Type) -> Type:
+    def validate_operator(cls, v: type) -> type:
         from airflow_pydantic.airflow import TimeSensor, _AirflowPydanticMarker
 
-        if not isinstance(v, Type):
-            raise ValueError(f"operator must be 'airflow.providers.standard.sensors.time.TimeSensor', got: {v}")
+        if not isinstance(v, type):
+            raise TypeError(f"operator must be 'airflow.providers.standard.sensors.time.TimeSensor', got: {v}")
         if issubclass(v, _AirflowPydanticMarker):
             _log.info("TimeSensor is a marker class, returning as is")
             return v
         if not issubclass(v, TimeSensor):
-            raise ValueError(f"operator must be 'airflow.providers.standard.sensors.time.TimeSensor', got: {v}")
+            raise TypeError(f"operator must be 'airflow.providers.standard.sensors.time.TimeSensor', got: {v}")
         return v

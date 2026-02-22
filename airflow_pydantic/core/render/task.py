@@ -1,5 +1,4 @@
 import ast
-from typing import Dict
 
 from pkn.pydantic import serialize_path_as_string
 
@@ -7,12 +6,12 @@ from ...airflow import _AirflowPydanticMarker
 from .utils import RenderedCode, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
 
 __all__ = (
-    "render_base_task_args",
     "TaskRenderMixin",
+    "render_base_task_args",
 )
 
 
-def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 2, **kwargs: Dict[str, str]) -> RenderedCode:
+def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 2, **kwargs: dict[str, str]) -> RenderedCode:
     # Extract the importable from the operator path
     imports = []
     globals_ = []
@@ -31,7 +30,7 @@ def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 
 
     # Return dictionary literal of args
     value = ast.Dict(
-        keys=[ast.Constant(value=k) for k in args.keys()],
+        keys=[ast.Constant(value=k) for k in args],
         values=[v if isinstance(v, ast.AST) else ast.Constant(value=v) for v in args.values()],
     )
     if not raw:
@@ -47,7 +46,7 @@ def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 
 
 
 class TaskRenderMixin:
-    def render(self, raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs: Dict[str, str]) -> RenderedCode:
+    def render(self, raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs: dict[str, str]) -> RenderedCode:
         if not self.task_id:
             raise ValueError("task_id must be set to render a task")
 

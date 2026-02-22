@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
 from pydantic import (
     Field,
@@ -25,21 +25,21 @@ __all__ = ("SSHHook",)
 
 
 class SSHHookType:
-    ssh_conn_id: Optional[str] = Field(
+    ssh_conn_id: str | None = Field(
         description="Connections from where all the required parameters can be fetched like username, password or key_file, though priority is given to the params passed during init."
     )
-    remote_host: Optional[str] = Field(default="", description="remote host to connect")
-    username: Optional[str] = Field(description="username to connect to the remote_host")
-    password: Optional[str] = Field(description="password of the username to connect to the remote_host")
-    key_file: Optional[str] = Field(description="path to key file to use to connect to the remote_host")
-    port: Optional[int] = Field(default=22, description="port of remote host to connect (Default is paramiko SSH_PORT)")
-    conn_timeout: Optional[int] = Field(description="timeout (in seconds) for the attempt to connect to the remote_host.")
-    cmd_timeout: Optional[float] = Field(default=10, description="timeout (in seconds) for executing the command. The default is 10 seconds.")
-    keepalive_interval: Optional[int] = Field(default=30, description="send a keepalive packet to remote host every keepalive_interval seconds")
-    banner_timeout: Optional[float] = Field(default=30, description="timeout to wait for banner from the server in seconds")
+    remote_host: str | None = Field(default="", description="remote host to connect")
+    username: str | None = Field(description="username to connect to the remote_host")
+    password: str | None = Field(description="password of the username to connect to the remote_host")
+    key_file: str | None = Field(description="path to key file to use to connect to the remote_host")
+    port: int | None = Field(default=22, description="port of remote host to connect (Default is paramiko SSH_PORT)")
+    conn_timeout: int | None = Field(description="timeout (in seconds) for the attempt to connect to the remote_host.")
+    cmd_timeout: float | None = Field(default=10, description="timeout (in seconds) for executing the command. The default is 10 seconds.")
+    keepalive_interval: int | None = Field(default=30, description="send a keepalive packet to remote host every keepalive_interval seconds")
+    banner_timeout: float | None = Field(default=30, description="timeout to wait for banner from the server in seconds")
     # disabled_algorithms: Optional[dict[str, Any]] = Field(description="dictionary mapping algorithm type to an iterable of algorithm identifiers, which will be disabled for the lifetime of the transport")
     # ciphers: Optional[list[str]] = Field(description="list of ciphers to use in order of preference")
-    auth_timeout: Optional[int] = Field(description="timeout (in seconds) for the attempt to authenticate with the remote_host")
+    auth_timeout: int | None = Field(description="timeout (in seconds) for the attempt to authenticate with the remote_host")
     # host_proxy_cmd: Optional[str] = Field(description="")
 
     @classmethod

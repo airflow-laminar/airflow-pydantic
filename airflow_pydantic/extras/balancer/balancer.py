@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from logging import getLogger
 from pathlib import Path
 from random import choice
-from typing import Callable, List, Optional, Union
 
 from pydantic import Field, model_validator
 from typing_extensions import Self
@@ -18,16 +18,16 @@ _log = getLogger(__name__)
 
 
 class BalancerConfiguration(BaseModel):
-    hosts: List[Host] = Field(default_factory=list)
-    ports: List[Port] = Field(default_factory=list)
+    hosts: list[Host] = Field(default_factory=list)
+    ports: list[Port] = Field(default_factory=list)
 
     default_username: str = "airflow"
 
     # Password
-    default_password: Optional[Union[str, Variable]] = None
+    default_password: str | Variable | None = None
 
     # Or get key file
-    default_key_file: Optional[str] = None
+    default_key_file: str | None = None
 
     # The queue that might include the host running airflow itself
     primary_queue: str = "default"
@@ -49,11 +49,11 @@ class BalancerConfiguration(BaseModel):
 
     @property
     def all_hosts(self):
-        return sorted(list(set(self.hosts)))
+        return sorted(set(self.hosts))
 
     @property
     def all_ports(self):
-        return sorted(list(set(self.ports)))
+        return sorted(set(self.ports))
 
     @model_validator(mode="after")
     def _validate(self) -> Self:
@@ -80,9 +80,7 @@ class BalancerConfiguration(BaseModel):
             if get_parsing_context().dag_id is not None:
                 # check airflow first
                 try:
-                    if isinstance(host.pool, Pool):
-                        pool_name = host.pool.pool
-                    elif isinstance(host.pool, AirflowPool):
+                    if isinstance(host.pool, (Pool, AirflowPool)):
                         pool_name = host.pool.pool
                     elif isinstance(host.pool, dict):
                         pool_name = host.pool.get("pool")
@@ -113,7 +111,7 @@ class BalancerConfiguration(BaseModel):
                             description=f"Balancer pool for host({host.name})",
                             include_deferred=False,
                         )
-                    except Exception:
+                    except Exception:  # noqa: BLE001, S110
                         # If the database is not available, we cannot create the pool
                         pass
                 except RuntimeError:
@@ -150,7 +148,7 @@ class BalancerConfiguration(BaseModel):
                     description=f"Balancer pool for host({port.port}) port({port.port})",
                     include_deferred=True,
                 )
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 # If the database is not available, we cannot create the pool
                 pass
 
@@ -162,12 +160,12 @@ class BalancerConfiguration(BaseModel):
 
     def filter_hosts(
         self,
-        name: Optional[Union[str, List[str]]] = None,
-        queue: Optional[Union[str, List[str]]] = None,
-        os: Optional[Union[str, List[str]]] = None,
-        tag: Optional[Union[str, List[str]]] = None,
-        custom: Optional[Callable] = None,
-    ) -> List[Host]:
+        name: str | list[str] | None = None,
+        queue: str | list[str] | None = None,
+        os: str | list[str] | None = None,
+        tag: str | list[str] | None = None,
+        custom: Callable | None = None,
+    ) -> list[Host]:
         from .query import BalancerHostQueryConfiguration
 
         query = BalancerHostQueryConfiguration(
@@ -183,12 +181,12 @@ class BalancerConfiguration(BaseModel):
 
     def select_host(
         self,
-        name: Optional[Union[str, List[str]]] = None,
-        queue: Optional[Union[str, List[str]]] = None,
-        os: Union[str, List[str]] = "",
-        tag: Union[str, List[str]] = "",
-        custom: Callable = None,
-    ) -> List[Host]:
+        name: str | list[str] | None = None,
+        queue: str | list[str] | None = None,
+        os: str | list[str] = "",
+        tag: str | list[str] = "",
+        custom: Callable | None = None,
+    ) -> list[Host]:
         from .query import BalancerHostQueryConfiguration
 
         query = BalancerHostQueryConfiguration(
@@ -204,10 +202,10 @@ class BalancerConfiguration(BaseModel):
 
     def filter_ports(
         self,
-        name: Optional[Union[str, List[str]]] = None,
-        tag: Optional[Union[str, List[str]]] = None,
-        custom: Optional[Callable] = None,
-    ) -> List[Host]:
+        name: str | list[str] | None = None,
+        tag: str | list[str] | None = None,
+        custom: Callable | None = None,
+    ) -> list[Host]:
         from .query import BalancerPortQueryConfiguration
 
         query = BalancerPortQueryConfiguration(
@@ -221,10 +219,10 @@ class BalancerConfiguration(BaseModel):
 
     def select_port(
         self,
-        name: Optional[Union[str, List[str]]] = None,
-        tag: Union[str, List[str]] = "",
-        custom: Callable = None,
-    ) -> List[Host]:
+        name: str | list[str] | None = None,
+        tag: str | list[str] = "",
+        custom: Callable | None = None,
+    ) -> list[Host]:
         from .query import BalancerPortQueryConfiguration
 
         query = BalancerPortQueryConfiguration(
@@ -250,7 +248,7 @@ class BalancerConfiguration(BaseModel):
         return port
 
     @staticmethod
-    def load_path(yaml_file: str | Path, _config_dir: str | Path = None) -> Self:
+    def load_path(yaml_file: str | Path, _config_dir: str | Path | None = None) -> Self:
         """Load configuration from yaml file"""
         from hydra import compose, initialize_config_dir
         from hydra.utils import instantiate
@@ -293,7 +291,7 @@ class BalancerConfiguration(BaseModel):
     def load(
         config_dir: Path | str = "config",
         config_name: Path | str = "",
-        overrides: Optional[list[str]] = None,
+        overrides: list[str] | None = None,
         *,
         basepath: str = "",
         _offset: int = 4,

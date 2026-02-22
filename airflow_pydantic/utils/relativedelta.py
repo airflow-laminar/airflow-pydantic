@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
 from dateutil.relativedelta import relativedelta, weekday as weekdaytype
 from pydantic import Field, GetCoreSchemaHandler, model_serializer, model_validator
@@ -17,14 +17,14 @@ from pydantic_core.core_schema import (
 )
 
 __all__ = (
-    "Weekday",
     "RelativeDelta",
+    "Weekday",
 )
 
 
 class WeekdayType:
     weekday: int = Field(ge=0, le=6)
-    n: Optional[int]
+    n: int | None
 
     @classmethod
     def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> CoreSchema:
@@ -79,30 +79,30 @@ Weekday = Annotated[weekdaytype, WeekdayType]
 
 
 class RelativeDeltaType:
-    years: Optional[int] = None
-    months: Optional[int] = None
-    days: Optional[int] = None
-    hours: Optional[int] = None
-    minutes: Optional[int] = None
-    seconds: Optional[int] = None
-    microseconds: Optional[int] = None
+    years: int | None = None
+    months: int | None = None
+    days: int | None = None
+    hours: int | None = None
+    minutes: int | None = None
+    seconds: int | None = None
+    microseconds: int | None = None
 
-    year: Optional[int] = None
-    month: Optional[int] = Field(ge=1, le=12)
-    day: Optional[int] = Field(ge=1, le=31)
-    hour: Optional[int] = Field(ge=0, le=23)
-    minute: Optional[int] = Field(ge=0, le=59)
-    second: Optional[int] = Field(ge=0, le=59)
-    microsecond: Optional[int] = Field(ge=0, le=999999)
-    weekday: Optional[Weekday] = None
-    leapdays: Optional[int] = None
+    year: int | None = None
+    month: int | None = Field(ge=1, le=12)
+    day: int | None = Field(ge=1, le=31)
+    hour: int | None = Field(ge=0, le=23)
+    minute: int | None = Field(ge=0, le=59)
+    second: int | None = Field(ge=0, le=59)
+    microsecond: int | None = Field(ge=0, le=999999)
+    weekday: Weekday | None = None
+    leapdays: int | None = None
 
     # validation only fields
-    yearday: Optional[int] = Field(None, exclude=True)
-    nlyearday: Optional[int] = Field(None, exclude=True)
-    weeks: Optional[int] = Field(None, exclude=True)
-    dt1: Optional[int] = Field(None, exclude=True)
-    dt2: Optional[int] = Field(None, exclude=True)
+    yearday: int | None = Field(None, exclude=True)
+    nlyearday: int | None = Field(None, exclude=True)
+    weeks: int | None = Field(None, exclude=True)
+    dt1: int | None = Field(None, exclude=True)
+    dt2: int | None = Field(None, exclude=True)
 
     @classmethod
     def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: GetCoreSchemaHandler) -> CoreSchema:

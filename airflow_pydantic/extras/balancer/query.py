@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from fnmatch import fnmatch
 from logging import getLogger
 from random import choice
-from typing import Callable, List, Literal, Optional, Union
+from typing import Literal
 
 from pkn.pydantic import CallablePath
 from pydantic import Field
@@ -26,15 +27,15 @@ class BalancerHostQueryConfiguration(BaseModel):
         description="Kind of query to perform, either 'filter' to return a list of matching hosts or 'select' to return a single host.",
     )
     balancer: BalancerConfiguration
-    name: Optional[Union[str, List[str]]] = None
-    queue: Optional[Union[str, List[str]]] = None
-    os: Optional[Union[str, List[str]]] = None
-    tag: Optional[Union[str, List[str]]] = None
-    custom: Optional[Union[Callable, CallablePath]] = None
+    name: str | list[str] | None = None
+    queue: str | list[str] | None = None
+    os: str | list[str] | None = None
+    tag: str | list[str] | None = None
+    custom: Callable | CallablePath | None = None
 
     def execute(
         self,
-    ) -> Union[List[Host], Host]:
+    ) -> list[Host] | Host:
         """
         Execute the query against the provided hosts and ports.
         """
@@ -84,13 +85,13 @@ class BalancerPortQueryConfiguration(BaseModel):
         description="Kind of query to perform, either 'filter' to return a list of matching hosts or 'select' to return a single host.",
     )
     balancer: BalancerConfiguration
-    name: Optional[Union[str, List[str]]] = None
-    tag: Optional[Union[str, List[str]]] = None
-    custom: Optional[Union[Callable, CallablePath]] = None
+    name: str | list[str] | None = None
+    tag: str | list[str] | None = None
+    custom: Callable | CallablePath | None = None
 
     def execute(
         self,
-    ) -> Union[List[Host], Host]:
+    ) -> list[Host] | Host:
         """
         Execute the query against the provided hosts and ports.
         """

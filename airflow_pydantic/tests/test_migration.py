@@ -29,27 +29,25 @@ class TestMigration:
         """Test _airflow_3 when airflow is installed."""
         _airflow_3.cache_clear()
 
-        with patch("airflow_pydantic.migration.find_spec") as mock_find_spec:
-            with patch("airflow_pydantic.migration.version") as mock_version:
-                mock_find_spec.return_value = True
-                mock_version.return_value = "2.9.0"
+        with patch("airflow_pydantic.migration.find_spec") as mock_find_spec, patch("airflow_pydantic.migration.version") as mock_version:
+            mock_find_spec.return_value = True
+            mock_version.return_value = "2.9.0"
 
-                _airflow_3.cache_clear()
-                result = _airflow_3()
-                assert result is False
+            _airflow_3.cache_clear()
+            result = _airflow_3()
+            assert result is False
 
     def test_airflow_3_with_airflow3_installed(self):
         """Test _airflow_3 when airflow 3 is installed."""
         _airflow_3.cache_clear()
 
-        with patch("airflow_pydantic.migration.find_spec") as mock_find_spec:
-            with patch("airflow_pydantic.migration.version") as mock_version:
-                mock_find_spec.return_value = True
-                mock_version.return_value = "3.0.0"
+        with patch("airflow_pydantic.migration.find_spec") as mock_find_spec, patch("airflow_pydantic.migration.version") as mock_version:
+            mock_find_spec.return_value = True
+            mock_version.return_value = "3.0.0"
 
-                _airflow_3.cache_clear()
-                result = _airflow_3()
-                assert result is True
+            _airflow_3.cache_clear()
+            result = _airflow_3()
+            assert result is True
 
     def test_airflow_3_not_installed(self):
         """Test _airflow_3 when airflow is not installed."""
@@ -68,11 +66,10 @@ class TestMigration:
 
         from importlib.metadata import PackageNotFoundError
 
-        with patch("airflow_pydantic.migration.find_spec") as mock_find_spec:
-            with patch("airflow_pydantic.migration.version") as mock_version:
-                mock_find_spec.return_value = True
-                mock_version.side_effect = PackageNotFoundError("apache-airflow")
+        with patch("airflow_pydantic.migration.find_spec") as mock_find_spec, patch("airflow_pydantic.migration.version") as mock_version:
+            mock_find_spec.return_value = True
+            mock_version.side_effect = PackageNotFoundError("apache-airflow")
 
-                _airflow_3.cache_clear()
-                result = _airflow_3()
-                assert result is None
+            _airflow_3.cache_clear()
+            result = _airflow_3()
+            assert result is None

@@ -1,5 +1,3 @@
-from typing import Optional, Type
-
 from pydantic import Field, field_validator
 
 from ...airflow import PythonOperator
@@ -9,11 +7,11 @@ from .airflow_functions import clean_dag_runs, clean_dags
 
 __all__ = (
     "DagClean",
-    "DagRunClean",
-    "DagCleanOperatorArgs",
-    "DagCleanTaskArgs",
     "DagCleanOperator",
+    "DagCleanOperatorArgs",
     "DagCleanTask",
+    "DagCleanTaskArgs",
+    "DagRunClean",
 )
 
 
@@ -84,11 +82,11 @@ class DagClean(PythonOperator):
 
 
 class DagCleanTaskArgs(TaskArgs):
-    delete_successful: Optional[bool] = Field(default=True)
-    delete_failed: Optional[bool] = Field(default=True)
-    mark_failed_as_successful: Optional[bool] = Field(default=False)
-    max_dagruns: Optional[int] = Field(default=10)
-    days_to_keep: Optional[int] = Field(default=10)
+    delete_successful: bool | None = Field(default=True)
+    delete_failed: bool | None = Field(default=True)
+    mark_failed_as_successful: bool | None = Field(default=False)
+    max_dagruns: int | None = Field(default=10)
+    days_to_keep: int | None = Field(default=10)
 
 
 # Alias
@@ -100,7 +98,7 @@ class DagCleanTask(Task, DagCleanTaskArgs):
 
     @field_validator("operator")
     @classmethod
-    def validate_operator(cls, v: Type) -> Type:
+    def validate_operator(cls, v: type) -> type:
         if v is not DagClean:
             raise ValueError(f"operator must be 'airflow_pydantic.extras.common.clean.DagClean', got: {v}")
         return v

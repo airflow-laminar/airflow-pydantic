@@ -8,23 +8,24 @@ from getpass import getuser
 from importlib.metadata import version
 from importlib.util import find_spec
 from logging import getLogger
-from typing import Any, Set
+from typing import Any
 
 from .migration import _airflow_3
 
 __all__ = [
+    "DAG",
+    "NEW_SESSION",
     "AirflowFailException",
     "AirflowSkipException",
     "BashOperator",
     "BashSensor",
     "BranchDateTimeOperator",
     "BranchDayOfWeekOperator",
+    "BranchExternalPythonOperator",
     "BranchPythonOperator",
     "BranchPythonVirtualenvOperator",
-    "BranchExternalPythonOperator",
     "CronDataIntervalTimetable",
     "CronTriggerTimetable",
-    "DAG",
     "DateTimeSensor",
     "DateTimeSensorAsync",
     "DayOfWeekSensor",
@@ -36,25 +37,24 @@ __all__ = [
     "ExternalTaskSensor",
     "FileSensor",
     "MultipleCronTriggerTimetable",
-    "NEW_SESSION",
-    "get_parsing_context",
     "Param",
     "Pool",
     "PoolNotFound",
     "PythonOperator",
     "PythonSensor",
     "PythonVirtualenvOperator",
-    "provide_session",
-    "ShortCircuitOperator",
     "SSHHook",
     "SSHOperator",
-    "TimeSensor",
+    "ShortCircuitOperator",
     "TimeDeltaSensor",
+    "TimeSensor",
     "TriggerDagRunOperator",
     "TriggerRule",
     "Variable",
     "WaitSensor",
     "_AirflowPydanticMarker",
+    "get_parsing_context",
+    "provide_session",
 ]
 
 _log = getLogger(__name__)
@@ -67,58 +67,57 @@ if _airflow_3():
     _log.info("Using Airflow 3.x imports")
     from airflow.api.client import get_current_api_client
     from airflow.exceptions import AirflowFailException, AirflowSkipException
-    from airflow.models.dag import DAG  # noqa: F401
-    from airflow.models.param import Param  # noqa: F401
-    from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
-    from airflow.models.variable import Variable  # noqa: F401
-    from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401
-    from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401
-    from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
-    from airflow.providers.standard.operators.datetime import BranchDateTimeOperator  # noqa: F401
-    from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
+    from airflow.models.dag import DAG
+    from airflow.models.param import Param
+    from airflow.models.pool import Pool, PoolNotFound
+    from airflow.models.variable import Variable
+    from airflow.providers.ssh.hooks.ssh import SSHHook
+    from airflow.providers.ssh.operators.ssh import SSHOperator
+    from airflow.providers.standard.operators.bash import BashOperator
+    from airflow.providers.standard.operators.datetime import BranchDateTimeOperator
+    from airflow.providers.standard.operators.empty import EmptyOperator
 
-    if find_spec("apache-airflow") or find_spec("airflow"):
-        if version("apache-airflow") >= "3.0.0":
-            from airflow.providers.standard.operators.hitl import (
-                ApprovalOperator,  # noqa: F401
-                HITLBranchOperator,  # noqa: F401
-                HITLOperator,  # noqa: F401
-            )
+    if (find_spec("apache-airflow") or find_spec("airflow")) and version("apache-airflow") >= "3.0.0":
+        from airflow.providers.standard.operators.hitl import (
+            ApprovalOperator,
+            HITLBranchOperator,
+            HITLOperator,
+        )
 
-            # NOTE: Airflow 3 Only
-            __all__.extend(
-                [
-                    "ApprovalOperator",
-                    "HITLBranchOperator",
-                    "HITLOperator",
-                ]
-            )
+        # NOTE: Airflow 3 Only
+        __all__.extend(
+            [
+                "ApprovalOperator",
+                "HITLBranchOperator",
+                "HITLOperator",
+            ]
+        )
 
     from airflow.providers.standard.operators.python import (
-        BranchExternalPythonOperator,  # noqa: F401
-        BranchPythonOperator,  # noqa: F401
-        BranchPythonVirtualenvOperator,  # noqa: F401
-        ExternalPythonOperator,  # noqa: F401
-        PythonOperator,  # noqa: F401
-        PythonVirtualenvOperator,  # noqa: F401
-        ShortCircuitOperator,  # noqa: F401
+        BranchExternalPythonOperator,
+        BranchPythonOperator,
+        BranchPythonVirtualenvOperator,
+        ExternalPythonOperator,
+        PythonOperator,
+        PythonVirtualenvOperator,
+        ShortCircuitOperator,
     )
-    from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator  # noqa: F401
-    from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator  # noqa: F401
-    from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
-    from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync  # noqa: F401
-    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor  # noqa: F401
-    from airflow.providers.standard.sensors.filesystem import FileSensor  # noqa: F401
-    from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
-    from airflow.providers.standard.sensors.time import TimeSensor  # noqa: F401
-    from airflow.providers.standard.sensors.time_delta import TimeDeltaSensor, WaitSensor  # noqa: F401
-    from airflow.providers.standard.sensors.weekday import DayOfWeekSensor  # noqa: F401
-    from airflow.sdk import get_parsing_context  # noqa: F401
-    from airflow.timetables.events import EventsTimetable  # noqa: F401
-    from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
-    from airflow.timetables.trigger import CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable  # noqa: F401
-    from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
-    from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
+    from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+    from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator
+    from airflow.providers.standard.sensors.bash import BashSensor
+    from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync
+    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor
+    from airflow.providers.standard.sensors.filesystem import FileSensor
+    from airflow.providers.standard.sensors.python import PythonSensor
+    from airflow.providers.standard.sensors.time import TimeSensor
+    from airflow.providers.standard.sensors.time_delta import TimeDeltaSensor, WaitSensor
+    from airflow.providers.standard.sensors.weekday import DayOfWeekSensor
+    from airflow.sdk import get_parsing_context
+    from airflow.timetables.events import EventsTimetable
+    from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable
+    from airflow.timetables.trigger import CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable
+    from airflow.utils.session import NEW_SESSION, provide_session
+    from airflow.utils.trigger_rule import TriggerRule
 
     def _is_database_available() -> bool:
         """
@@ -152,8 +151,8 @@ if _airflow_3():
 
             with settings.Session() as session:
                 session.execute(text("SELECT 1"))
-            return True
-        except Exception:
+            return True  # noqa: TRY300
+        except Exception:  # noqa: BLE001
             return False
 
     def _get_pool_via_cli(pool_name: str) -> Pool | None:
@@ -164,6 +163,7 @@ if _airflow_3():
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
             if result.returncode == 0 and result.stdout.strip():
                 pools = json.loads(result.stdout)
@@ -193,6 +193,7 @@ if _airflow_3():
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
             if result.returncode == 0:
                 _log.debug(f"Created pool {name} via CLI")
@@ -213,6 +214,7 @@ if _airflow_3():
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
             if result.returncode == 0 and result.stdout.strip():
                 pools = json.loads(result.stdout)
@@ -253,6 +255,7 @@ if _airflow_3():
                     capture_output=True,
                     text=True,
                     timeout=30,
+                    check=False,
                 )
                 if result.returncode == 0:
                     _log.debug(f"Created pool {name} via airflowctl")
@@ -289,7 +292,7 @@ if _airflow_3():
                 )
             except PoolNotFound:
                 raise
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 _log.debug(f"Direct get_pool failed for {pool_name}: {e}")
 
         # Try CLI fallback
@@ -319,7 +322,7 @@ if _airflow_3():
                 client = get_current_api_client()
                 client.create_pool(name=name, slots=slots, description=description, include_deferred=include_deferred)
                 return get_pool(name)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 _log.debug(f"Direct create_pool failed for {name}: {e}")
 
         # Try CLI fallback
@@ -343,42 +346,42 @@ elif _airflow_3() is False:
     _log.info("Using Airflow 2.x imports")
 
     from airflow.exceptions import AirflowFailException, AirflowSkipException
-    from airflow.models.dag import DAG  # noqa: F401
-    from airflow.models.param import Param  # noqa: F401
-    from airflow.models.pool import Pool, PoolNotFound  # noqa: F401
-    from airflow.models.variable import Variable  # noqa: F401
-    from airflow.providers.ssh.hooks.ssh import SSHHook  # noqa: F401  # noqa: F401
-    from airflow.providers.ssh.operators.ssh import SSHOperator  # noqa: F401  # noqa: F401
-    from airflow.providers.standard.operators.bash import BashOperator  # noqa: F401
-    from airflow.providers.standard.operators.datetime import BranchDateTimeOperator  # noqa: F401
-    from airflow.providers.standard.operators.empty import EmptyOperator  # noqa: F401
+    from airflow.models.dag import DAG
+    from airflow.models.param import Param
+    from airflow.models.pool import Pool, PoolNotFound
+    from airflow.models.variable import Variable
+    from airflow.providers.ssh.hooks.ssh import SSHHook
+    from airflow.providers.ssh.operators.ssh import SSHOperator
+    from airflow.providers.standard.operators.bash import BashOperator
+    from airflow.providers.standard.operators.datetime import BranchDateTimeOperator
+    from airflow.providers.standard.operators.empty import EmptyOperator
     from airflow.providers.standard.operators.python import (
-        BranchExternalPythonOperator,  # noqa: F401
-        BranchPythonOperator,  # noqa: F401
-        BranchPythonVirtualenvOperator,  # noqa: F401
-        ExternalPythonOperator,  # noqa: F401
-        PythonOperator,  # noqa: F401
-        PythonVirtualenvOperator,  # noqa: F401
-        ShortCircuitOperator,  # noqa: F401
+        BranchExternalPythonOperator,
+        BranchPythonOperator,
+        BranchPythonVirtualenvOperator,
+        ExternalPythonOperator,
+        PythonOperator,
+        PythonVirtualenvOperator,
+        ShortCircuitOperator,
     )
-    from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator  # noqa: F401
-    from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator  # noqa: F401
-    from airflow.providers.standard.sensors.bash import BashSensor  # noqa: F401
-    from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync  # noqa: F401
-    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor  # noqa: F401
-    from airflow.providers.standard.sensors.filesystem import FileSensor  # noqa: F401
-    from airflow.providers.standard.sensors.python import PythonSensor  # noqa: F401
-    from airflow.providers.standard.sensors.time import TimeSensor  # noqa: F401
-    from airflow.providers.standard.sensors.time_delta import TimeDeltaSensor, WaitSensor  # noqa: F401
-    from airflow.providers.standard.sensors.weekday import DayOfWeekSensor  # noqa: F401
-    from airflow.timetables.events import EventsTimetable  # noqa: F401
-    from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable  # noqa: F401
-    from airflow.timetables.trigger import CronTriggerTimetable  # noqa: F401
+    from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+    from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator
+    from airflow.providers.standard.sensors.bash import BashSensor
+    from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync
+    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor
+    from airflow.providers.standard.sensors.filesystem import FileSensor
+    from airflow.providers.standard.sensors.python import PythonSensor
+    from airflow.providers.standard.sensors.time import TimeSensor
+    from airflow.providers.standard.sensors.time_delta import TimeDeltaSensor, WaitSensor
+    from airflow.providers.standard.sensors.weekday import DayOfWeekSensor
+    from airflow.timetables.events import EventsTimetable
+    from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable
+    from airflow.timetables.trigger import CronTriggerTimetable
 
     # NOTE: No MultipleCronTriggerTimetable, DeltaTriggerTimetable
-    from airflow.utils.dag_parsing_context import get_parsing_context  # noqa: F401
-    from airflow.utils.session import NEW_SESSION, provide_session  # noqa: F401
-    from airflow.utils.trigger_rule import TriggerRule  # noqa: F401
+    from airflow.utils.dag_parsing_context import get_parsing_context
+    from airflow.utils.session import NEW_SESSION, provide_session
+    from airflow.utils.trigger_rule import TriggerRule
 
     def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
         Pool.create_or_update_pool(name, slots, description, include_deferred, *args, **kwargs)
@@ -410,12 +413,8 @@ else:
     class AirflowFailException(Exception):
         """Exception raised when a task fails in Airflow."""
 
-        pass
-
     class AirflowSkipException(Exception):
         """Exception raised when a task is skipped in Airflow."""
-
-        pass
 
     class TriggerRule(str, Enum):
         """Class with task's trigger rules."""
@@ -439,7 +438,7 @@ else:
             return trigger_rule in cls.all_triggers()
 
         @classmethod
-        def all_triggers(cls) -> Set[str]:
+        def all_triggers(cls) -> set[str]:
             """Return all trigger rules."""
             return set(cls.__members__.values())
 
@@ -584,7 +583,7 @@ else:
         _original = "airflow.providers.standard.sensors.time_delta.WaitSensor"
 
     class SSHHook(_AirflowPydanticMarker):
-        def __init__(self, remote_host: str, username: str = None, password: str = None, key_file: str = None, **kwargs):
+        def __init__(self, remote_host: str, username: str | None = None, password: str | None = None, key_file: str | None = None, **kwargs):
             self.remote_host = remote_host
             self.username = username or getuser()
             self.password = password
@@ -603,7 +602,7 @@ else:
     class EventsTimetable(_AirflowPydanticMarker):
         _original = "airflow.timetables.events.EventsTimetable"
 
-        def __init__(self, event_dates, restrict_to_events: bool = False, presorted: bool = False, description: str = None):
+        def __init__(self, event_dates, restrict_to_events: bool = False, presorted: bool = False, description: str | None = None):
             self.event_dates = event_dates
             self.restrict_to_events = restrict_to_events
             self.presorted = presorted
@@ -630,7 +629,7 @@ else:
             self.timezone = timezone
 
     NEW_SESSION = Any
-    provide_session = lambda f: f  # noqa: E731
+    provide_session = lambda f: f
 
 
 if _airflow_3() in (False, None):

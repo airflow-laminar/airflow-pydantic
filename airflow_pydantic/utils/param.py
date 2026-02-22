@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from types import FunctionType, MethodType
-from typing import Annotated, Any, Literal, Optional, get_origin
+from typing import Annotated, Any, Literal, get_origin
 
 from pydantic import (
     BaseModel,
@@ -27,16 +27,16 @@ __all__ = ("Param", "ParamType")
 
 
 class ParamType:
-    value: Optional[Any] = Field(
+    value: Any | None = Field(
         default=None,
         description="Param value, can be any type",
     )
-    title: Optional[str] = Field(
+    title: str | None = Field(
         default=None,
         description="Param title",
     )
-    description: Optional[str] = Field(default=None, description="Param description")
-    type: Optional[Literal["string", "number", "integer", "boolean", "array", "object", "null"]] = Field(
+    description: str | None = Field(default=None, description="Param description")
+    type: Literal["string", "number", "integer", "boolean", "array", "object", "null"] | None = Field(
         default=None, description="Param type, e.g. 'string', 'integer', 'boolean', etc."
     )
 
@@ -85,7 +85,7 @@ class ParamType:
                 if get_origin(typ_) is list:
                     # Handle generic list types
                     return "array"
-            except Exception:
+            except Exception:  # noqa: BLE001
                 # Ignore and return None
                 ...
             return None
