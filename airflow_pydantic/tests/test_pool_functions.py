@@ -29,47 +29,43 @@ class TestIsDatabaseAvailable:
         """Test that database is not available when engine is None."""
         from airflow_pydantic.airflow import _is_database_available
 
-        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False):
-            with patch("airflow.settings") as mock_settings:
-                mock_settings.engine = None
-                assert _is_database_available() is False
+        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False), patch("airflow.settings") as mock_settings:
+            mock_settings.engine = None
+            assert _is_database_available() is False
 
     def test_returns_false_when_session_is_none(self):
         """Test that database is not available when Session is None."""
         from airflow_pydantic.airflow import _is_database_available
 
-        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False):
-            with patch("airflow.settings") as mock_settings:
-                mock_settings.engine = MagicMock()
-                mock_settings.Session = None
-                assert _is_database_available() is False
+        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False), patch("airflow.settings") as mock_settings:
+            mock_settings.engine = MagicMock()
+            mock_settings.Session = None
+            assert _is_database_available() is False
 
     def test_returns_false_when_query_fails(self):
         """Test that database is not available when query fails."""
         from airflow_pydantic.airflow import _is_database_available
 
-        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False):
-            with patch("airflow.settings") as mock_settings:
-                mock_settings.engine = MagicMock()
-                mock_session = MagicMock()
-                mock_session.__enter__ = MagicMock(return_value=mock_session)
-                mock_session.__exit__ = MagicMock(return_value=False)
-                mock_session.execute.side_effect = Exception("DB connection failed")
-                mock_settings.Session.return_value = mock_session
-                assert _is_database_available() is False
+        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False), patch("airflow.settings") as mock_settings:
+            mock_settings.engine = MagicMock()
+            mock_session = MagicMock()
+            mock_session.__enter__ = MagicMock(return_value=mock_session)
+            mock_session.__exit__ = MagicMock(return_value=False)
+            mock_session.execute.side_effect = Exception("DB connection failed")
+            mock_settings.Session.return_value = mock_session
+            assert _is_database_available() is False
 
     def test_returns_true_when_database_is_available(self):
         """Test that database is available when all checks pass."""
         from airflow_pydantic.airflow import _is_database_available
 
-        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False):
-            with patch("airflow.settings") as mock_settings:
-                mock_settings.engine = MagicMock()
-                mock_session = MagicMock()
-                mock_session.__enter__ = MagicMock(return_value=mock_session)
-                mock_session.__exit__ = MagicMock(return_value=False)
-                mock_settings.Session.return_value = mock_session
-                assert _is_database_available() is True
+        with patch.dict("os.environ", {"_AIRFLOW_PROCESS_CONTEXT": ""}, clear=False), patch("airflow.settings") as mock_settings:
+            mock_settings.engine = MagicMock()
+            mock_session = MagicMock()
+            mock_session.__enter__ = MagicMock(return_value=mock_session)
+            mock_session.__exit__ = MagicMock(return_value=False)
+            mock_settings.Session.return_value = mock_session
+            assert _is_database_available() is True
 
 
 class TestGetPoolViaCli:
@@ -97,6 +93,7 @@ class TestGetPoolViaCli:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
 
     def test_returns_none_on_nonzero_exit(self):
@@ -183,6 +180,7 @@ class TestCreatePoolViaCli:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
 
     def test_includes_deferred_flag_when_true(self):
@@ -201,6 +199,7 @@ class TestCreatePoolViaCli:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
 
     def test_handles_empty_description(self):
@@ -219,6 +218,7 @@ class TestCreatePoolViaCli:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
 
     def test_returns_false_on_nonzero_exit(self):
@@ -275,6 +275,7 @@ class TestGetPoolViaAirflowctl:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
 
     def test_returns_none_on_nonzero_exit(self):
@@ -308,25 +309,25 @@ class TestCreatePoolViaAirflowctl:
         mock_result = MagicMock()
         mock_result.returncode = 0
 
-        with patch("subprocess.run", return_value=mock_result) as mock_run:
-            with patch("tempfile.NamedTemporaryFile") as mock_tempfile:
-                mock_file = MagicMock()
-                mock_file.name = "/tmp/test_pool.json"
-                mock_file.__enter__ = MagicMock(return_value=mock_file)
-                mock_file.__exit__ = MagicMock(return_value=False)
-                mock_tempfile.return_value = mock_file
+        with patch("subprocess.run", return_value=mock_result) as mock_run, patch("tempfile.NamedTemporaryFile") as mock_tempfile:
+            mock_file = MagicMock()
+            mock_file.name = "/tmp/test_pool.json"
+            mock_file.__enter__ = MagicMock(return_value=mock_file)
+            mock_file.__exit__ = MagicMock(return_value=False)
+            mock_tempfile.return_value = mock_file
 
-                with patch("os.unlink") as mock_unlink:
-                    result = _create_pool_via_airflowctl("test_pool", 10, "Test", False)
+            with patch("os.unlink") as mock_unlink:
+                result = _create_pool_via_airflowctl("test_pool", 10, "Test", False)
 
-                    assert result is True
-                    mock_run.assert_called_once_with(
-                        ["airflowctl", "pools", "import", "/tmp/test_pool.json"],
-                        capture_output=True,
-                        text=True,
-                        timeout=30,
-                    )
-                    mock_unlink.assert_called_once_with("/tmp/test_pool.json")
+                assert result is True
+                mock_run.assert_called_once_with(
+                    ["airflowctl", "pools", "import", "/tmp/test_pool.json"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=False,
+                )
+                mock_unlink.assert_called_once_with("/tmp/test_pool.json")
 
     def test_returns_false_on_nonzero_exit(self):
         """Test that False is returned when airflowctl returns non-zero exit code."""
@@ -336,17 +337,16 @@ class TestCreatePoolViaAirflowctl:
         mock_result.returncode = 1
         mock_result.stderr = "Error creating pool"
 
-        with patch("subprocess.run", return_value=mock_result):
-            with patch("tempfile.NamedTemporaryFile") as mock_tempfile:
-                mock_file = MagicMock()
-                mock_file.name = "/tmp/test_pool.json"
-                mock_file.__enter__ = MagicMock(return_value=mock_file)
-                mock_file.__exit__ = MagicMock(return_value=False)
-                mock_tempfile.return_value = mock_file
+        with patch("subprocess.run", return_value=mock_result), patch("tempfile.NamedTemporaryFile") as mock_tempfile:
+            mock_file = MagicMock()
+            mock_file.name = "/tmp/test_pool.json"
+            mock_file.__enter__ = MagicMock(return_value=mock_file)
+            mock_file.__exit__ = MagicMock(return_value=False)
+            mock_tempfile.return_value = mock_file
 
-                with patch("os.unlink"):
-                    result = _create_pool_via_airflowctl("test_pool", 10, "Test", False)
-                    assert result is False
+            with patch("os.unlink"):
+                result = _create_pool_via_airflowctl("test_pool", 10, "Test", False)
+                assert result is False
 
     def test_returns_false_on_file_not_found(self):
         """Test that False is returned when airflowctl is not found."""
@@ -367,13 +367,15 @@ class TestGetPoolFallback:
         mock_client = MagicMock()
         mock_client.get_pool.return_value = ("test_pool", 10, "Test", True)
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=True):
-            with patch("airflow_pydantic.airflow.get_current_api_client", return_value=mock_client):
-                pool = get_pool("test_pool")
+        with (
+            patch("airflow_pydantic.airflow._is_database_available", return_value=True),
+            patch("airflow_pydantic.airflow.get_current_api_client", return_value=mock_client),
+        ):
+            pool = get_pool("test_pool")
 
-                assert pool.pool == "test_pool"
-                assert pool.slots == 10
-                mock_client.get_pool.assert_called_once_with(name="test_pool")
+            assert pool.pool == "test_pool"
+            assert pool.slots == 10
+            mock_client.get_pool.assert_called_once_with(name="test_pool")
 
     def test_falls_back_to_cli_when_db_unavailable(self):
         """Test that CLI is used when DB is unavailable."""
@@ -383,12 +385,11 @@ class TestGetPoolFallback:
         mock_result.returncode = 0
         mock_result.stdout = json.dumps([{"pool": "test_pool", "slots": 10, "description": "Test", "include_deferred": False}])
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=False):
-            with patch("subprocess.run", return_value=mock_result):
-                pool = get_pool("test_pool")
+        with patch("airflow_pydantic.airflow._is_database_available", return_value=False), patch("subprocess.run", return_value=mock_result):
+            pool = get_pool("test_pool")
 
-                assert pool.pool == "test_pool"
-                assert pool.slots == 10
+            assert pool.pool == "test_pool"
+            assert pool.slots == 10
 
     def test_falls_back_to_airflowctl_when_cli_fails(self):
         """Test that airflowctl is used when CLI fails."""
@@ -406,21 +407,22 @@ class TestGetPoolFallback:
                 mock_result.stdout = json.dumps([{"name": "test_pool", "slots": 10, "description": "Test", "include_deferred": False}])
             return mock_result
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=False):
-            with patch("subprocess.run", side_effect=run_side_effect):
-                pool = get_pool("test_pool")
+        with patch("airflow_pydantic.airflow._is_database_available", return_value=False), patch("subprocess.run", side_effect=run_side_effect):
+            pool = get_pool("test_pool")
 
-                assert pool.pool == "test_pool"
-                assert pool.slots == 10
+            assert pool.pool == "test_pool"
+            assert pool.slots == 10
 
     def test_raises_pool_not_found_when_all_methods_fail(self):
         """Test that PoolNotFound is raised when all methods fail."""
         from airflow_pydantic.airflow import PoolNotFound, get_pool
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=False):
-            with patch("subprocess.run", side_effect=FileNotFoundError()):
-                with pytest.raises(PoolNotFound):
-                    get_pool("test_pool")
+        with (
+            patch("airflow_pydantic.airflow._is_database_available", return_value=False),
+            patch("subprocess.run", side_effect=FileNotFoundError()),
+            pytest.raises(PoolNotFound),
+        ):
+            get_pool("test_pool")
 
 
 class TestCreateOrUpdatePoolFallback:
@@ -433,12 +435,14 @@ class TestCreateOrUpdatePoolFallback:
         mock_client = MagicMock()
         mock_client.get_pool.return_value = ("test_pool", 10, "Test", False)
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=True):
-            with patch("airflow_pydantic.airflow.get_current_api_client", return_value=mock_client):
-                pool = create_or_update_pool("test_pool", slots=10, description="Test")
+        with (
+            patch("airflow_pydantic.airflow._is_database_available", return_value=True),
+            patch("airflow_pydantic.airflow.get_current_api_client", return_value=mock_client),
+        ):
+            pool = create_or_update_pool("test_pool", slots=10, description="Test")
 
-                assert pool is not None
-                mock_client.create_pool.assert_called_once_with(name="test_pool", slots=10, description="Test", include_deferred=False)
+            assert pool is not None
+            mock_client.create_pool.assert_called_once_with(name="test_pool", slots=10, description="Test", include_deferred=False)
 
     def test_falls_back_to_cli_when_db_unavailable(self):
         """Test that CLI is used when DB is unavailable."""
@@ -461,19 +465,17 @@ class TestCreateOrUpdatePoolFallback:
             else:
                 return mock_get_result
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=False):
-            with patch("subprocess.run", side_effect=run_side_effect):
-                pool = create_or_update_pool("test_pool", slots=10, description="Test")
+        with patch("airflow_pydantic.airflow._is_database_available", return_value=False), patch("subprocess.run", side_effect=run_side_effect):
+            pool = create_or_update_pool("test_pool", slots=10, description="Test")
 
-                assert pool is not None
-                assert pool.pool == "test_pool"
+            assert pool is not None
+            assert pool.pool == "test_pool"
 
     def test_returns_none_when_all_methods_fail(self):
         """Test that None is returned when all methods fail."""
         from airflow_pydantic.airflow import create_or_update_pool
 
-        with patch("airflow_pydantic.airflow._is_database_available", return_value=False):
-            with patch("subprocess.run", side_effect=FileNotFoundError()):
-                pool = create_or_update_pool("test_pool", slots=10, description="Test")
+        with patch("airflow_pydantic.airflow._is_database_available", return_value=False), patch("subprocess.run", side_effect=FileNotFoundError()):
+            pool = create_or_update_pool("test_pool", slots=10, description="Test")
 
-                assert pool is None
+            assert pool is None

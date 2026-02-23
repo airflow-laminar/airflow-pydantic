@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any
 
 from pydantic import Field, field_validator
 
@@ -7,8 +7,8 @@ from ..core import Task, TaskArgs
 from ..utils import BashCommands, ImportPath
 
 __all__ = (
-    "BashSensorArgs",
     "BashSensor",
+    "BashSensorArgs",
 )
 
 _log = getLogger(__name__)
@@ -17,10 +17,10 @@ _log = getLogger(__name__)
 class BashSensorArgs(TaskArgs):
     # bash sensor args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/bash/index.html#airflow.providers.standard.sensors.bash.BashSensor
-    bash_command: Union[str, List[str], BashCommands] = Field(default=None, description="bash command string, list of strings, or model")
-    env: Optional[Dict[str, str]] = Field(default=None)
-    output_encoding: Optional[str] = Field(default=None, description="Output encoding for the command, default is 'utf-8'")
-    retry_exit_code: Optional[bool] = Field(default=None)
+    bash_command: str | list[str] | BashCommands = Field(default=None, description="bash command string, list of strings, or model")
+    env: dict[str, str] | None = Field(default=None)
+    output_encoding: str | None = Field(default=None, description="Output encoding for the command, default is 'utf-8'")
+    retry_exit_code: bool | None = Field(default=None)
 
     @field_validator("bash_command")
     @classmethod
@@ -40,14 +40,14 @@ class BashSensor(Task, BashSensorArgs):
 
     @field_validator("operator")
     @classmethod
-    def validate_operator(cls, v: Type) -> Type:
+    def validate_operator(cls, v: type) -> type:
         from airflow_pydantic.airflow import BashSensor, _AirflowPydanticMarker
 
-        if not isinstance(v, Type):
-            raise ValueError(f"operator must be 'airflow.providers.standard.sensors.bash.BashSensor', got: {v}")
+        if not isinstance(v, type):
+            raise TypeError(f"operator must be 'airflow.providers.standard.sensors.bash.BashSensor', got: {v}")
         if issubclass(v, _AirflowPydanticMarker):
             _log.info("BashOperator is a marker class, returning as is")
             return v
         if not issubclass(v, BashSensor):
-            raise ValueError(f"operator must be 'airflow.providers.standard.sensors.bash.BashSensor', got: {v}")
+            raise TypeError(f"operator must be 'airflow.providers.standard.sensors.bash.BashSensor', got: {v}")
         return v

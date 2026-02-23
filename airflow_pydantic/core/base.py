@@ -11,8 +11,6 @@ __all__ = ("BaseModel",)
 
 
 class BaseModel(PydanticBaseModel, validate_assignment=True):
-    ...
-
     @model_validator(mode="before")
     @classmethod
     def _apply_template(cls, values):

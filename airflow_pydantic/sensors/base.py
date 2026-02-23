@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from ..core import TaskArgs
 
@@ -7,11 +7,11 @@ __all__ = ("BaseSensorArgs",)
 
 
 class BaseSensorArgs(TaskArgs):
-    poke_interval: Optional[Union[timedelta, float]] = None
-    timeout: Optional[Union[timedelta, float]] = None
-    soft_fail: Optional[bool] = None
-    mode: Optional[Literal["poke", "reschedule"]] = None
-    exponential_backoff: Optional[bool] = None
-    max_wait: Optional[Union[timedelta, float]] = None
-    silent_fail: Optional[bool] = None
-    never_fail: Optional[bool] = None
+    poke_interval: timedelta | float | None = None
+    timeout: timedelta | float | None = None
+    soft_fail: bool | None = None
+    mode: Literal["poke", "reschedule"] | None = None
+    exponential_backoff: bool | None = None
+    max_wait: timedelta | float | None = None
+    silent_fail: bool | None = None
+    never_fail: bool | None = None

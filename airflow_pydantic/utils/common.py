@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Any, Tuple, Union
+from typing import Annotated, Any
 
 from pendulum import datetime as pendulum_datetime
 from pydantic import AfterValidator
@@ -17,9 +17,8 @@ def _datetime_or_datetime_and_timezone(val: Any):
         return val
     elif isinstance(val, (tuple,)):
         dt = val[0]
-        dt = pendulum_datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond, tz=val[1])
-        return dt
+        return pendulum_datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond, tz=val[1])
     raise ValueError(f"Expected datetime or Dict[str, datetime|str], got {val!r}")
 
 
-DatetimeArg = Annotated[Union[datetime, Tuple[datetime, str]], AfterValidator(_datetime_or_datetime_and_timezone)]
+DatetimeArg = Annotated[datetime | tuple[datetime, str], AfterValidator(_datetime_or_datetime_and_timezone)]

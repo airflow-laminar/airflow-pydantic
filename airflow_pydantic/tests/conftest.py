@@ -250,7 +250,7 @@ def wait_sensor(wait_sensor_args):
 @fixture
 def datetime_sensor_args():
     return DateTimeSensorArgs(
-        target_time=datetime(2025, 1, 1, 12, 0),
+        target_time=datetime(2025, 1, 1, 12, 0),  # noqa: DTZ001
     )
 
 
@@ -328,8 +328,8 @@ def dag_args():
     return DagArgs(
         description="",
         schedule="* * * * *",
-        start_date=datetime(2025, 1, 1),
-        end_date=datetime(2026, 1, 1),
+        start_date=datetime(2025, 1, 1),  # noqa: DTZ001
+        end_date=datetime(2026, 1, 1),  # noqa: DTZ001
         max_active_tasks=1,
         max_active_runs=1,
         catchup=False,
@@ -349,8 +349,8 @@ def task_args():
         email_on_retry=True,
         retries=3,
         retry_delay=timedelta(minutes=5),
-        start_date=datetime(2025, 1, 1),
-        end_date=datetime(2026, 1, 1),
+        start_date=datetime(2025, 1, 1),  # noqa: DTZ001
+        end_date=datetime(2026, 1, 1),  # noqa: DTZ001
         depends_on_past=True,
         queue="default",
         pool="default",
@@ -443,7 +443,7 @@ def fail():
 def _choose(**kwargs):
     from airflow_ha import Action, Result
 
-    return (Result.PASS, Action.CONTINUE)  # noqa: E731
+    return (Result.PASS, Action.CONTINUE)
 
 
 @fixture

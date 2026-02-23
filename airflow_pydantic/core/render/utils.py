@@ -2,7 +2,6 @@ import ast
 from datetime import datetime, time, timedelta
 from pathlib import Path
 from types import FunctionType, MethodType
-from typing import List, Optional, Tuple
 
 from dateutil.relativedelta import relativedelta
 from pendulum import DateTime, Timezone
@@ -25,11 +24,11 @@ from ...utils import (
 
 __all__ = ("RenderedCode",)
 
-Imports = List[str]
-Globals = List[str]
+Imports = list[str]
+Globals = list[str]
 TaskCode = str
 
-RenderedCode = Tuple[Imports, Globals, TaskCode]
+RenderedCode = tuple[Imports, Globals, TaskCode]
 
 _LAMBDA_TYPE = type(lambda: 0)
 
@@ -41,7 +40,7 @@ def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
-def _build_pool_callable(pool, airflow_major_version: int = 2) -> Tuple[ast.ImportFrom, ast.Call]:
+def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[ast.ImportFrom, ast.Call]:
     imports = []
     if isinstance(pool, Pool):
         # Swap
@@ -137,7 +136,7 @@ def _build_pool_callable(pool, airflow_major_version: int = 2) -> Tuple[ast.Impo
     # )
 
 
-def _build_param_callable(param, key, airflow_major_version: int = 2) -> Tuple[List[ast.ImportFrom], ast.Call]:
+def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.Call]:
     imports = []
     # If the value is a Param, we can use a dict with the properties
     imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
@@ -156,10 +155,8 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> Tuple[L
         keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=param["schema"]["title"])))
 
     # Process type
-    if default_value is not None:
-        # We can remove the "null" from the type if it exists
-        if "null" in param["schema"]["type"]:
-            param["schema"]["type"].remove("null")
+    if default_value is not None and "null" in param["schema"]["type"]:
+        param["schema"]["type"].remove("null")
     if isinstance(param["schema"]["type"], list) and len(param["schema"]["type"]) == 1:
         # If the type is a single item list, we can use it directly
         param["schema"]["type"] = param["schema"]["type"][0]
@@ -184,7 +181,7 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> Tuple[L
     )
 
 
-def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
+def _build_ssh_hook_callable(foo) -> tuple[list[ast.ImportFrom], ast.Call]:
     imports = []
     # If we have a callable, we want to import it
     foo_import, foo_name = serialize_path_as_string(foo).rsplit(".", 1)
@@ -200,7 +197,7 @@ def _build_ssh_hook_callable(foo) -> Tuple[List[ast.ImportFrom], ast.Call]:
     return imports, ret
 
 
-def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.ImportFrom], ast.Call]:
+def _build_ssh_hook_with_variable(host, call: ast.Call) -> tuple[list[ast.ImportFrom], ast.Call]:
     imports = []
     if isinstance(host.password, Variable):
         has_any_variable = False
@@ -242,7 +239,7 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> Tuple[List[ast.Import
     return imports, call
 
 
-def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None, airflow_major_version: int = 2) -> Tuple[List[ast.ImportFrom], ast.AST]:
+def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.AST]:
     from airflow_pydantic import Host, Port
 
     imports = []
@@ -254,23 +251,22 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None, air
     #   - Port
     #   - Pool
     # NOTE: See below for backup
-    if model_ref:
-        if isinstance(
-            getattr(model_ref, key),
-            (
-                Host,
-                Port,
-                Pool,
-                Variable,
-                CronDataIntervalTimetable,
-                CronTriggerTimetable,
-                MultipleCronTriggerTimetable,
-                DeltaDataIntervalTimetable,
-                DeltaTriggerTimetable,
-                EventsTimetable,
-            ),
-        ):
-            value = getattr(model_ref, key)
+    if model_ref and isinstance(
+        getattr(model_ref, key),
+        (
+            Host,
+            Port,
+            Pool,
+            Variable,
+            CronDataIntervalTimetable,
+            CronTriggerTimetable,
+            MultipleCronTriggerTimetable,
+            DeltaDataIntervalTimetable,
+            DeltaTriggerTimetable,
+            EventsTimetable,
+        ),
+    ):
+        value = getattr(model_ref, key)
     if _islambda(value):
         raise NotImplementedError(
             f"Got lambda for {key}:Lambda functions are not supported in the configuration. Please use a regular function instead."
@@ -401,8 +397,7 @@ def _get_parts_from_value(key, value, model_ref: Optional[BaseModel] = None, air
         for k, v in value.model_dump(exclude_unset=True).items():
             if k == "crons":
                 # vararg of strs
-                for arg in v:
-                    args.append(ast.Constant(value=arg))
+                args.extend(ast.Constant(value=arg) for arg in v)
             else:
                 keyword_imports, keyword_value = _get_parts_from_value(k, v, value, airflow_major_version=airflow_major_version)
                 if keyword_imports:

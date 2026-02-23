@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import Type
 
 from pydantic import Field, field_validator
 
@@ -7,8 +6,8 @@ from ..core import Task, TaskArgs
 from ..utils import ImportPath
 
 __all__ = (
-    "ExternalTaskMarkerArgs",
     "ExternalTaskMarker",
+    "ExternalTaskMarkerArgs",
 )
 
 _log = getLogger(__name__)
@@ -24,14 +23,14 @@ class ExternalTaskMarker(Task, ExternalTaskMarkerArgs):
 
     @field_validator("operator")
     @classmethod
-    def validate_operator(cls, v: Type) -> ImportPath:
+    def validate_operator(cls, v: type) -> ImportPath:
         from airflow_pydantic.airflow import ExternalTaskMarker, _AirflowPydanticMarker
 
-        if not isinstance(v, Type):
-            raise ValueError(f"operator must be 'airflow.operators.empty.EmptyOperator', got: {v}")
+        if not isinstance(v, type):
+            raise TypeError(f"operator must be 'airflow.operators.empty.EmptyOperator', got: {v}")
         if issubclass(v, _AirflowPydanticMarker):
             _log.info("EmptyOperator is a marker class, returning as is")
             return v
         if not issubclass(v, ExternalTaskMarker):
-            raise ValueError(f"operator must be 'airflow.operators.empty.EmptyOperator', got: {v}")
+            raise TypeError(f"operator must be 'airflow.operators.empty.EmptyOperator', got: {v}")
         return v

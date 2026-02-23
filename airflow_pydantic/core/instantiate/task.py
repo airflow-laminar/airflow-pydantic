@@ -14,7 +14,7 @@ class TaskInstantiateMixin:
         if "pool" in args:
             if isinstance(args["pool"], dict):
                 # Was converted by model_dump, grab
-                args["pool"] = getattr(self, "pool")
+                args["pool"] = self.pool
             if isinstance(args["pool"], (AirflowPool, Pool)):
                 # Convert
                 args["pool"] = args["pool"].pool

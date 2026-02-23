@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from subprocess import call
-from typing import Callable
 
 from ..airflow import AirflowSkipException
 

@@ -5,7 +5,6 @@ from pathlib import Path
 from shutil import which
 from subprocess import call
 from tempfile import NamedTemporaryFile
-from typing import Dict, List
 
 from ...utils import _task_id_to_python_name
 from .task import render_base_task_args
@@ -23,12 +22,12 @@ class DagRenderMixin:
         """
         if not self.dag_id:
             raise ValueError("DAG must have a dag_id")
-        imports: List[str] = []
-        globals_: List[str] = []
-        task_id_to_task_code: Dict[str, str] = {}
-        task_key_to_task_id: Dict[str, str] = {}
-        task_id_to_task_python_name: Dict[str, str] = {}
-        task_id_to_task_dependencies: Dict[str, List[str]] = {}
+        imports: list[str] = []
+        globals_: list[str] = []
+        task_id_to_task_code: dict[str, str] = {}
+        task_key_to_task_id: dict[str, str] = {}
+        task_id_to_task_python_name: dict[str, str] = {}
+        task_id_to_task_dependencies: dict[str, list[str]] = {}
 
         new_dag = ast.Module(body=[], type_ignores=[])
         # First, Prepare DAG kwargs

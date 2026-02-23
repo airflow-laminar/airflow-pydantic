@@ -6,7 +6,7 @@ from airflow_pydantic import DagClean
 class TestModels:
     def test_dag_clean(self):
         try:
-            from airflow import DAG  # noqa: F401
+            from airflow import DAG
         except ImportError:
             return pytest.skip("Airflow not installed")
 

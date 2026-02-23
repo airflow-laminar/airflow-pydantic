@@ -111,7 +111,7 @@ class TestBaseModel:
 
         class TestModel(BaseModel):
             name: str
-            config: dict = {}
+            config: dict = {}  # noqa: RUF012
 
         template = TestModel(name="template", config={"a": 1, "b": 2})
         model = TestModel(name="new", config={"c": 3}, template=template)
@@ -128,7 +128,7 @@ class TestBaseModel:
             name: str
 
         # Non-dict input should pass through validation
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             TestModel("not a dict")
 
     def test_model_roundtrip(self):

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import (
     Field,
     model_validator,
@@ -15,12 +13,12 @@ class Pool(BaseModel):
     pool: str = Field(
         description="Pool name",
     )
-    slots: Optional[int] = Field(
+    slots: int | None = Field(
         default=None,
         description="Number of slots in the pool",
     )
-    description: Optional[str] = Field(default="", description="Pool description")
-    include_deferred: Optional[bool] = Field(default=False, description="Whether to include deferred tasks in the pool")
+    description: str | None = Field(default="", description="Pool description")
+    include_deferred: bool | None = Field(default=False, description="Whether to include deferred tasks in the pool")
 
     @model_validator(mode="before")
     @classmethod
@@ -28,5 +26,5 @@ class Pool(BaseModel):
         if isinstance(v, str):
             v = {"pool": v}
         elif isinstance(v, BasePool):
-            v = dict(pool=v.pool, slots=v.slots, description=v.description, include_deferred=v.include_deferred)
+            v = {"pool": v.pool, "slots": v.slots, "description": v.description, "include_deferred": v.include_deferred}
         return v

@@ -1,21 +1,17 @@
 import os
 from datetime import datetime, timedelta
 from logging import getLogger
-from typing import TYPE_CHECKING
 
 from pytz import UTC
 
 from ...airflow import AirflowFailException, AirflowSkipException
 
-if TYPE_CHECKING:
-    pass
-
 __all__ = (
-    "skip",
-    "fail",
-    "pass_",
     "clean_dag_runs",
     "clean_dags",
+    "fail",
+    "pass_",
+    "skip",
 )
 
 _log = getLogger(__name__)
@@ -33,7 +29,6 @@ def fail():
 
 def pass_():
     _log.info("Passing task execution")
-    pass
 
 
 def clean_dag_runs(session, delete_successful, delete_failed, mark_failed_as_successful, max_dagruns, days_to_keep):
@@ -41,7 +36,7 @@ def clean_dag_runs(session, delete_successful, delete_failed, mark_failed_as_suc
     from airflow.utils.state import State
 
     # Make cutoff_date timezone-aware (UTC)
-    utc_now = datetime.utcnow().replace(tzinfo=UTC)
+    utc_now = datetime.now(tz=UTC)
     cutoff_date = utc_now - timedelta(days=days_to_keep)
     _log.info(f"Cutoff date for clean: {cutoff_date}")
 
