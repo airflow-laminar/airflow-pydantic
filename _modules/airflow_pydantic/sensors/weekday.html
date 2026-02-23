@@ -265,7 +265,6 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for airflow_pydantic.sensors.weekday</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
 
@@ -274,8 +273,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSensorArgs</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;DayOfWeekSensorArgs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;DayOfWeekSensor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DayOfWeekSensorArgs&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">_log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -284,15 +283,15 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">DayOfWeekSensorArgs</span><span class="p">(</span><span class="n">BaseSensorArgs</span><span class="p">):</span>
     <span class="c1"># dayofweek sensor args</span>
     <span class="c1"># https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/sensors/weekday/index.html#airflow.providers.standard.sensors.weekday.DayOfWeekSensor</span>
-    <span class="n">week_day</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Day of the week to check (full name). Optionally, a set of days can also be provided using a set&quot;</span><span class="p">)</span>
-    <span class="n">use_task_logical_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">week_day</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Day of the week to check (full name). Optionally, a set of days can also be provided using a set&quot;</span><span class="p">)</span>
+    <span class="n">use_task_logical_date</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;If True, uses task’s logical date to compare with week_day. Execution Date is Useful for backfilling. If False, uses system’s day of the week. Useful when you don’t want to run anything on weekdays on the system.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;week_day&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">validate_week_day</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_week_day</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">valid_days</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Monday&quot;</span><span class="p">,</span> <span class="s2">&quot;Tuesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Wednesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Thursday&quot;</span><span class="p">,</span> <span class="s2">&quot;Friday&quot;</span><span class="p">,</span> <span class="s2">&quot;Saturday&quot;</span><span class="p">,</span> <span class="s2">&quot;Sunday&quot;</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">day</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_days</span><span class="p">:</span>
@@ -309,16 +308,16 @@
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.DayOfWeekSensor.html#airflow_pydantic.DayOfWeekSensor.validate_operator">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;operator&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">validate_operator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_operator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">airflow_pydantic.airflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">DayOfWeekSensor</span><span class="p">,</span> <span class="n">_AirflowPydanticMarker</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Type</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;operator must be &#39;airflow.providers.standard.sensors.time.DayOfWeekSensor&#39;, got: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;operator must be &#39;airflow.providers.standard.sensors.time.DayOfWeekSensor&#39;, got: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
             <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;DayOfWeekSensor is a marker class, returning as is&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">v</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DayOfWeekSensor</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;operator must be &#39;airflow.providers.standard.sensors.time.DayOfWeekSensor&#39;, got: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;operator must be &#39;airflow.providers.standard.sensors.time.DayOfWeekSensor&#39;, got: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span></div>
 </div>
 

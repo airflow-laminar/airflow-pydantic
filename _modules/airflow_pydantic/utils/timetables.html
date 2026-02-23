@@ -265,7 +265,6 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for airflow_pydantic.utils.timetables</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_extra_types.timezone_name</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeZoneName</span>
 
@@ -282,14 +281,14 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.relativedelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelativeDelta</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;Timezone&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FixedTimezone&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CronTriggerTimetable&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CronDataIntervalTimetable&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CronTriggerTimetable&quot;</span><span class="p">,</span>
     <span class="s2">&quot;DeltaDataIntervalTimetable&quot;</span><span class="p">,</span>
     <span class="s2">&quot;DeltaTriggerTimetable&quot;</span><span class="p">,</span>
     <span class="s2">&quot;EventsTimetable&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FixedTimezone&quot;</span><span class="p">,</span>
     <span class="s2">&quot;MultipleCronTriggerTimetable&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Timezone&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">Timezone</span> <span class="o">=</span> <span class="n">TimeZoneName</span>
@@ -300,9 +299,9 @@
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.CronTriggerTimetable.html#airflow_pydantic.CronTriggerTimetable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CronTriggerTimetable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">cron</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">timezone</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Timezone</span><span class="p">,</span> <span class="n">FixedTimezone</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">interval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">RelativeDelta</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">run_immediately</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Timezone</span> <span class="o">|</span> <span class="n">FixedTimezone</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">interval</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="n">RelativeDelta</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">run_immediately</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="CronTriggerTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.CronTriggerTimetable.html#airflow_pydantic.CronTriggerTimetable.instance">[docs]</a>
@@ -315,10 +314,10 @@
 <div class="viewcode-block" id="MultipleCronTriggerTimetable">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.MultipleCronTriggerTimetable.html#airflow_pydantic.MultipleCronTriggerTimetable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MultipleCronTriggerTimetable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">crons</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">timezone</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Timezone</span><span class="p">,</span> <span class="n">FixedTimezone</span><span class="p">]</span>
-    <span class="n">interval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">RelativeDelta</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">run_immediately</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">crons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Timezone</span> <span class="o">|</span> <span class="n">FixedTimezone</span>
+    <span class="n">interval</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="n">RelativeDelta</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">run_immediately</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="MultipleCronTriggerTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.MultipleCronTriggerTimetable.html#airflow_pydantic.MultipleCronTriggerTimetable.instance">[docs]</a>
@@ -332,7 +331,7 @@
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.CronDataIntervalTimetable.html#airflow_pydantic.CronDataIntervalTimetable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CronDataIntervalTimetable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">cron</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">timezone</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Timezone</span><span class="p">,</span> <span class="n">FixedTimezone</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Timezone</span> <span class="o">|</span> <span class="n">FixedTimezone</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="CronDataIntervalTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.CronDataIntervalTimetable.html#airflow_pydantic.CronDataIntervalTimetable.instance">[docs]</a>
@@ -345,7 +344,7 @@
 <div class="viewcode-block" id="DeltaDataIntervalTimetable">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.DeltaDataIntervalTimetable.html#airflow_pydantic.DeltaDataIntervalTimetable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DeltaDataIntervalTimetable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">delta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">RelativeDelta</span><span class="p">]</span>
+    <span class="n">delta</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="n">RelativeDelta</span>
 
 <div class="viewcode-block" id="DeltaDataIntervalTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.DeltaDataIntervalTimetable.html#airflow_pydantic.DeltaDataIntervalTimetable.instance">[docs]</a>
@@ -358,8 +357,8 @@
 <div class="viewcode-block" id="DeltaTriggerTimetable">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.DeltaTriggerTimetable.html#airflow_pydantic.DeltaTriggerTimetable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DeltaTriggerTimetable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">delta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">RelativeDelta</span><span class="p">]</span>
-    <span class="n">interval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">RelativeDelta</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">delta</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="n">RelativeDelta</span>
+    <span class="n">interval</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">|</span> <span class="n">RelativeDelta</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="DeltaTriggerTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.DeltaTriggerTimetable.html#airflow_pydantic.DeltaTriggerTimetable.instance">[docs]</a>
@@ -372,10 +371,10 @@
 <div class="viewcode-block" id="EventsTimetable">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.EventsTimetable.html#airflow_pydantic.EventsTimetable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EventsTimetable</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">event_dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DatetimeArg</span><span class="p">]</span>
-    <span class="n">restrict_to_events</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">presorted</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">event_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatetimeArg</span><span class="p">]</span>
+    <span class="n">restrict_to_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">presorted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="EventsTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.EventsTimetable.html#airflow_pydantic.EventsTimetable.instance">[docs]</a>

@@ -264,9 +264,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for airflow_pydantic.utils.pool</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Field</span><span class="p">,</span>
     <span class="n">model_validator</span><span class="p">,</span>
 <span class="p">)</span>
@@ -283,12 +281,12 @@
     <span class="n">pool</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Pool name&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">slots</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of slots in the pool&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Pool description&quot;</span><span class="p">)</span>
-    <span class="n">include_deferred</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to include deferred tasks in the pool&quot;</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Pool description&quot;</span><span class="p">)</span>
+    <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to include deferred tasks in the pool&quot;</span><span class="p">)</span>
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
@@ -296,7 +294,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pool&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BasePool</span><span class="p">):</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">pool</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">include_deferred</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">include_deferred</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pool&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">pool</span><span class="p">,</span> <span class="s2">&quot;slots&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">slots</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="s2">&quot;include_deferred&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">include_deferred</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">v</span></div>
 
 </pre></div>
