@@ -115,6 +115,7 @@ branch = true
 omit = [
     "airflow_pydantic/tests/*",
 ]
+
 [tool.coverage.report]
 exclude_also = [
     "raise NotImplementedError",
