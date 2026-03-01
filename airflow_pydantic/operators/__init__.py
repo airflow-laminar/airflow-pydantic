@@ -1,5 +1,6 @@
 from .bash import *
 from .datetime import *
+from .email import *
 from .empty import *
 from .external_task import *
 from .hitl import *

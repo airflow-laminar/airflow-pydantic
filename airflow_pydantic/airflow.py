@@ -31,6 +31,7 @@ __all__ = [
     "DayOfWeekSensor",
     "DeltaDataIntervalTimetable",
     "DeltaTriggerTimetable",
+    "EmailOperator",
     "EmptyOperator",
     "EventsTimetable",
     "ExternalPythonOperator",
@@ -71,6 +72,7 @@ if _airflow_3():
     from airflow.models.param import Param
     from airflow.models.pool import Pool, PoolNotFound
     from airflow.models.variable import Variable
+    from airflow.providers.smtp.operators.smtp import EmailOperator
     from airflow.providers.ssh.hooks.ssh import SSHHook
     from airflow.providers.ssh.operators.ssh import SSHOperator
     from airflow.providers.standard.operators.bash import BashOperator
@@ -350,6 +352,7 @@ elif _airflow_3() is False:
     from airflow.models.param import Param
     from airflow.models.pool import Pool, PoolNotFound
     from airflow.models.variable import Variable
+    from airflow.providers.smtp.operators.smtp import EmailOperator
     from airflow.providers.ssh.hooks.ssh import SSHHook
     from airflow.providers.ssh.operators.ssh import SSHOperator
     from airflow.providers.standard.operators.bash import BashOperator
@@ -530,6 +533,9 @@ else:
 
     class BranchPythonVirtualenvOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.python.BranchPythonVirtualenvOperator"
+
+    class EmailOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.smtp.operators.smtp.EmailOperator"
 
     class EmptyOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.empty.EmptyOperator"
