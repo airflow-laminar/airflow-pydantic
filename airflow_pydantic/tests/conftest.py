@@ -17,6 +17,8 @@ from airflow_pydantic import (
     DagArgs,
     DateTimeSensor,
     DateTimeSensorArgs,
+    EmailTask,
+    EmailTaskArgs,
     Host,
     Pool,
     Port,
@@ -154,6 +156,23 @@ def trigger_dagrun(trigger_dagrun_args):
     return TriggerDagRunTask(
         task_id="test-trigger-dagrun",
         **trigger_dagrun_args.model_dump(exclude_unset=True),
+    )
+
+
+@fixture
+def email_operator_args():
+    return EmailTaskArgs(
+        to=["test@example.com"],
+        subject="Test Subject",
+        html_content="<p>Hello World</p>",
+    )
+
+
+@fixture
+def email_operator(email_operator_args):
+    return EmailTask(
+        task_id="test-email-operator",
+        **email_operator_args.model_dump(exclude_unset=True),
     )
 
 

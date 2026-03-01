@@ -1,6 +1,6 @@
 import pytest
 
-from airflow_pydantic import BashCommands, BashOperatorArgs, BashSensorArgs, PythonOperatorArgs, SSHOperatorArgs
+from airflow_pydantic import BashCommands, BashOperatorArgs, BashSensorArgs, EmailOperatorArgs, PythonOperatorArgs, SSHOperatorArgs
 from airflow_pydantic.migration import _airflow_3
 
 
@@ -62,6 +62,37 @@ class TestOperators:
         if _airflow_3() is None:
             return pytest.skip("Airflow not installed")
         bash_sensor.instantiate()
+
+    def test_email_operator_args(self, email_operator_args):
+        o = email_operator_args
+
+        # Test roundtrips
+        assert o == EmailOperatorArgs.model_validate(o.model_dump(exclude_unset=True))
+        assert o == EmailOperatorArgs.model_validate_json(o.model_dump_json(exclude_unset=True))
+
+    def test_email_operator(self, email_operator):
+        if _airflow_3() is None:
+            return pytest.skip("Airflow not installed")
+        email_operator.instantiate()
+
+    def test_email_operator_args_with_all_fields(self):
+        o = EmailOperatorArgs(
+            to=["a@example.com", "b@example.com"],
+            subject="Test",
+            html_content="<p>test</p>",
+            files=["/tmp/file.txt"],
+            cc="cc@example.com",
+            bcc=["bcc@example.com"],
+            mime_subtype="alternative",
+            mime_charset="utf-8",
+            conn_id="smtp_default",
+            custom_headers={"X-Custom": "value"},
+        )
+        dumped = o.model_dump(exclude_unset=True)
+        assert dumped["to"] == ["a@example.com", "b@example.com"]
+        assert dumped["cc"] == "cc@example.com"
+        assert dumped["bcc"] == ["bcc@example.com"]
+        assert o == EmailOperatorArgs.model_validate(dumped)
 
     def test_bash(self):
         cmds = BashCommands(
