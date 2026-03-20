@@ -153,7 +153,7 @@ if _airflow_3():
 
             with settings.Session() as session:
                 session.execute(text("SELECT 1"))
-            return True  # noqa: TRY300
+            return True
         except Exception:  # noqa: BLE001
             return False
 
