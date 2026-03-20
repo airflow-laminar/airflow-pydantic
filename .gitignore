@@ -146,11 +146,9 @@ target
 outputs/
 multirun/
 
-<<<<<<< before updating
-airflow_pydantic/tests/core/rendered
-=======
 # AI
 ROADMAP.md
 AGENTS.md
 .github/hooks/sdlc.json
->>>>>>> after updating
+
+airflow_pydantic/tests/core/rendered
