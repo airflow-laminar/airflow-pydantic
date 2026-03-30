@@ -99,7 +99,7 @@ jobs:
       if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
     - name: Upload coverage
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
       if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
