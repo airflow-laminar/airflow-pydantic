@@ -151,5 +151,9 @@ multirun/
 ROADMAP.md
 AGENTS.md
 .github/hooks/sdlc.json
+<<<<<<< before updating
 
 airflow_pydantic/tests/core/rendered
+=======
+.superpowers
+>>>>>>> after updating
