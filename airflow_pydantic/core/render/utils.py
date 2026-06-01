@@ -149,13 +149,14 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[l
 
     # Grab the default value from the schema if it exists
     default_value = param["schema"].pop("value", None)
+    param_value = param["value"] if param["value"] is not None else default_value
 
     # Process title
     if "title" in param["schema"]:
         keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=param["schema"]["title"])))
 
     # Process type
-    if default_value is not None and "null" in param["schema"]["type"]:
+    if param_value is not None and "null" in param["schema"]["type"]:
         param["schema"]["type"].remove("null")
     if isinstance(param["schema"]["type"], list) and len(param["schema"]["type"]) == 1:
         # If the type is a single item list, we can use it directly
@@ -166,13 +167,10 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[l
         # If we have imports, we need to add them to the imports list
         imports.extend(new_imports)
 
-    new_imports, new_value = _get_parts_from_value(key, param["value"], None, airflow_major_version=airflow_major_version)
+    new_imports, new_value = _get_parts_from_value(key, param_value, None, airflow_major_version=airflow_major_version)
     if new_imports:
         # If we have imports, we need to add them to the imports list
         imports.extend(new_imports)
-
-    if new_value.value is None:
-        new_value = _get_parts_from_value(key, default_value, None, airflow_major_version=airflow_major_version)[1]
 
     return imports, ast.Call(
         func=ast.Name(id="Param", ctx=ast.Load()),
@@ -239,6 +237,25 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> tuple[list[ast.Import
     return imports, call
 
 
+def _is_implicit_ssh_config_key_file(ssh_hook, key_file: str) -> bool:
+    remote_host = getattr(ssh_hook, "remote_host", None)
+    if not remote_host:
+        return False
+    ssh_config = Path.home() / ".ssh" / "config"
+    if not ssh_config.is_file():
+        return False
+    try:
+        import paramiko
+
+        ssh_conf = paramiko.SSHConfig()
+        with ssh_config.open() as config_fd:
+            ssh_conf.parse(config_fd)
+        identity_files = ssh_conf.lookup(remote_host).get("identityfile") or []
+    except Exception:  # noqa: BLE001
+        return False
+    return any(str(Path(identity_file).expanduser()) == str(Path(key_file).expanduser()) for identity_file in identity_files)
+
+
 def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.AST]:
     from airflow_pydantic import Host, Port
 
@@ -290,6 +307,8 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
                     default_value = getattr(SSHHook.__metadata__[0], arg_name).default
                     arg_value = getattr(value, arg_name, None)
                     if arg_value is None:
+                        continue
+                    if arg_name == "key_file" and _is_implicit_ssh_config_key_file(value, arg_value):
                         continue
                     if arg_value == default_value:
                         # Matches, can skip as well

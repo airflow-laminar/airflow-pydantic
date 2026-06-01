@@ -3,6 +3,7 @@ from types import UnionType
 from typing import Literal
 
 from pydantic import BaseModel as PydanticBaseModel, Field, SerializeAsAny, field_validator, model_validator
+from pydantic_core import PydanticUndefined
 
 from ..migration import _airflow_3
 from ..utils import DatetimeArg, Param, ParamType, ScheduleArg
@@ -91,18 +92,17 @@ class DagArgs(BaseModel, validate_assignment=True):
             from .task import __all_task_fields__
 
             all_omit = __all_task_fields__ + __all_dag_fields__
+            fields = v.__pydantic_fields__ if hasattr(v, "__pydantic_fields__") else v.__fields__
             # Naively convert to dict if it's a PydanticBaseModel
             if isinstance(v, PydanticBaseModel):
-                new_v = {
-                    key: value
-                    for key, value in v.model_dump(exclude_unset=False, exclude=all_omit).items()
-                    if key in (v.__pydantic_fields__ if hasattr(v, "__pydantic_fields__") else v.__fields__)
-                }
+                new_v = {key: value for key, value in v.model_dump(exclude_unset=False, exclude=all_omit).items() if key in fields}
             else:
-                new_v = {k: v for k, v in v.model_fields.items() if k not in all_omit}
+                new_v = {
+                    key: (field.default if field.default is not PydanticUndefined else None) for key, field in fields.items() if key not in all_omit
+                }
 
             for key, value in new_v.items():
-                resolved_type = v.__pydantic_fields__[key].annotation if hasattr(v, "__pydantic_fields__") else v.__fields__[key].annotation
+                resolved_type = fields[key].annotation
                 if hasattr(resolved_type, "__name__") and resolved_type.__name__ == "Optional":
                     # If the type is Optional, we need to extract the inner type
                     resolved_type = resolved_type.__args__[0]
@@ -130,10 +130,7 @@ class DagArgs(BaseModel, validate_assignment=True):
                 new_v[key] = {"value": value}
                 new_v[key]["type"] = param_type
                 new_v[key]["title"] = key.replace("_", " ").title()
-                new_v[key]["description"] = (
-                    v.__pydantic_fields__[key].description if hasattr(v, "__pydantic_fields__") else v.__fields__[key].description
-                )
-                new_v[key]["default"] = v.__pydantic_fields__[key].default if hasattr(v, "__pydantic_fields__") else v.__fields__[key].default
+                new_v[key]["description"] = fields[key].description
 
             v = {k: v for k, v in new_v.items() if v is not None}
             # TODO: exclude none, but extract the type into airflow params

@@ -67,10 +67,20 @@ def create_clean_dags_and_dag_runs():
     return _clean_dags_and_dag_runs
 
 
+def _move_clean_kwargs_to_params(kwargs):
+    clean_params = {}
+    for key in ("delete_successful", "delete_failed", "mark_failed_as_successful", "max_dagruns", "days_to_keep"):
+        if key in kwargs:
+            clean_params[key] = kwargs.pop(key)
+    if clean_params:
+        kwargs["params"] = {**clean_params, **(kwargs.get("params") or {})}
+
+
 class DagRunClean(PythonOperator):
     def __init__(self, **kwargs):
         if "python_callable" in kwargs:
             raise ValueError("DagRunClean does not accept 'python_callable' as an argument.")
+        _move_clean_kwargs_to_params(kwargs)
         super().__init__(python_callable=create_clean_dag_runs(), **kwargs)
 
 
@@ -78,6 +88,7 @@ class DagClean(PythonOperator):
     def __init__(self, **kwargs):
         if "python_callable" in kwargs:
             raise ValueError("DagClean does not accept 'python_callable' as an argument.")
+        _move_clean_kwargs_to_params(kwargs)
         super().__init__(python_callable=create_clean_dags_and_dag_runs(), **kwargs)
 
 
