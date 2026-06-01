@@ -237,6 +237,25 @@ def _build_ssh_hook_with_variable(host, call: ast.Call) -> tuple[list[ast.Import
     return imports, call
 
 
+def _is_implicit_ssh_config_key_file(ssh_hook, key_file: str) -> bool:
+    remote_host = getattr(ssh_hook, "remote_host", None)
+    if not remote_host:
+        return False
+    ssh_config = Path.home() / ".ssh" / "config"
+    if not ssh_config.is_file():
+        return False
+    try:
+        import paramiko
+
+        ssh_conf = paramiko.SSHConfig()
+        with ssh_config.open() as config_fd:
+            ssh_conf.parse(config_fd)
+        identity_files = ssh_conf.lookup(remote_host).get("identityfile") or []
+    except Exception:  # noqa: BLE001
+        return False
+    return any(str(Path(identity_file).expanduser()) == str(Path(key_file).expanduser()) for identity_file in identity_files)
+
+
 def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.AST]:
     from airflow_pydantic import Host, Port
 
@@ -288,6 +307,8 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
                     default_value = getattr(SSHHook.__metadata__[0], arg_name).default
                     arg_value = getattr(value, arg_name, None)
                     if arg_value is None:
+                        continue
+                    if arg_name == "key_file" and _is_implicit_ssh_config_key_file(value, arg_value):
                         continue
                     if arg_value == default_value:
                         # Matches, can skip as well
