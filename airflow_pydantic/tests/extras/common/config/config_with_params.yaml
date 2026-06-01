@@ -11,7 +11,7 @@ dags:
     schedule: "0 0 * * *"
     max_active_tasks: 1
     params:
-      _target_: airflow_common.DagCleanTaskArgs
+      _target_: airflow_pydantic.DagCleanTaskArgs
       delete_successful: true
       delete_failed: true
       mark_failed_as_successful: false
