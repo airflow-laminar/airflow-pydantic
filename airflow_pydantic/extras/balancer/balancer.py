@@ -111,12 +111,11 @@ class BalancerConfiguration(BaseModel):
                             description=f"Balancer pool for host({host.name})",
                             include_deferred=False,
                         )
-                    except Exception:  # noqa: BLE001, S110
-                        # If the database is not available, we cannot create the pool
-                        pass
-                except RuntimeError:
-                    # If the database is not available, we cannot create the pool
-                    pass
+                    except Exception:  # noqa: BLE001
+                        _log.warning("Could not create pool %s - no available method succeeded", host.name, exc_info=True)
+                except Exception:  # noqa: BLE001
+                    # API may not be fully available during DAG parsing (e.g. 500 errors)
+                    _log.warning("Could not access pool %s via API", host.name, exc_info=True)
 
             if not host.username and self.default_username:
                 host.username = self.default_username
@@ -140,17 +139,18 @@ class BalancerConfiguration(BaseModel):
                 raise ValueError(f"Duplicate port usage for host: {port.host.name}:{port.port}")
             _used_ports.add((port.host.name, port.port))
 
-            # Create pools
-            try:
-                create_or_update_pool(
-                    name=port.pool,
-                    slots=1,
-                    description=f"Balancer pool for host({port.port}) port({port.port})",
-                    include_deferred=True,
-                )
-            except Exception:  # noqa: BLE001, S110
-                # If the database is not available, we cannot create the pool
-                pass
+            # Create pools (only during DAG parsing, not during bare config loading)
+            if get_parsing_context().dag_id is not None:
+                try:
+                    create_or_update_pool(
+                        name=port.pool,
+                        slots=1,
+                        description=f"Balancer pool for host({port.port}) port({port.port})",
+                        include_deferred=True,
+                    )
+                except Exception:  # noqa: BLE001, S110
+                    # If the database is not available, we cannot create the pool
+                    pass
 
         # sort hosts by name, sort ports by host name then port number
         # NOTE: since we're in a validator and we have validate_on_assignment, bypass here

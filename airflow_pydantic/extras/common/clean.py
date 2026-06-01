@@ -2,6 +2,7 @@ from pydantic import Field, field_validator
 
 from ...airflow import PythonOperator
 from ...core import Task, TaskArgs
+from ...migration import _airflow_3
 from ...utils import CallablePath
 from .airflow_functions import clean_dag_runs, clean_dags
 
@@ -15,56 +16,92 @@ __all__ = (
 )
 
 
-def create_clean_dag_runs():
-    # Wrapped to avoid airflow imports
-    from airflow.utils.session import provide_session
+if _airflow_3():
 
-    @provide_session
-    def _clean_dag_runs(session=None, **context):
-        params = context["params"]
+    def create_clean_dag_runs():
+        def _clean_dag_runs(**context):
+            params = context["params"]
 
-        # Get the configurable parameters
-        delete_successful = params.get("delete_successful", DagCleanTaskArgs.model_fields["delete_successful"].default)
-        delete_failed = params.get("delete_failed", DagCleanTaskArgs.model_fields["delete_failed"].default)
-        mark_failed_as_successful = params.get("mark_failed_as_successful", DagCleanTaskArgs.model_fields["mark_failed_as_successful"].default)
-        max_dagruns = params.get("max_dagruns", DagCleanTaskArgs.model_fields["max_dagruns"].default)
-        days_to_keep = params.get("days_to_keep", DagCleanTaskArgs.model_fields["days_to_keep"].default)
+            delete_successful = params.get("delete_successful", DagCleanTaskArgs.model_fields["delete_successful"].default)
+            delete_failed = params.get("delete_failed", DagCleanTaskArgs.model_fields["delete_failed"].default)
+            mark_failed_as_successful = params.get("mark_failed_as_successful", DagCleanTaskArgs.model_fields["mark_failed_as_successful"].default)
+            max_dagruns = params.get("max_dagruns", DagCleanTaskArgs.model_fields["max_dagruns"].default)
+            days_to_keep = params.get("days_to_keep", DagCleanTaskArgs.model_fields["days_to_keep"].default)
 
-        clean_dag_runs(
-            session=session,
-            delete_successful=delete_successful,
-            delete_failed=delete_failed,
-            mark_failed_as_successful=mark_failed_as_successful,
-            max_dagruns=max_dagruns,
-            days_to_keep=days_to_keep,
-        )
+            clean_dag_runs(
+                delete_successful=delete_successful,
+                delete_failed=delete_failed,
+                mark_failed_as_successful=mark_failed_as_successful,
+                max_dagruns=max_dagruns,
+                days_to_keep=days_to_keep,
+            )
 
-    return _clean_dag_runs
+        return _clean_dag_runs
 
+    def create_clean_dags():
+        def _clean_dags(**context):
+            clean_dags()
 
-def create_clean_dags():
-    # Wrapped to avoid airflow imports
-    from airflow.utils.session import provide_session
+        return _clean_dags
 
-    @provide_session
-    def _clean_dags(session=None, **context):
-        clean_dags(session=session)
+    def create_clean_dags_and_dag_runs():
+        def _clean_dags_and_dag_runs(**context):
+            clean_dag_runs_fn = create_clean_dag_runs()
+            clean_dags_fn = create_clean_dags()
+            clean_dag_runs_fn(**context)
+            clean_dags_fn(**context)
 
-    return _clean_dags
+        return _clean_dags_and_dag_runs
 
+else:
 
-def create_clean_dags_and_dag_runs():
-    # Wrapped to avoid airflow imports
-    from airflow.utils.session import provide_session
+    def create_clean_dag_runs():
+        # Wrapped to avoid airflow imports
+        from airflow.utils.session import provide_session
 
-    @provide_session
-    def _clean_dags_and_dag_runs(session=None, **context):
-        clean_dag_runs = create_clean_dag_runs()
-        clean_dags = create_clean_dags()
-        clean_dag_runs(session=session, **context)
-        clean_dags(session=session, **context)
+        @provide_session
+        def _clean_dag_runs(session=None, **context):
+            params = context["params"]
 
-    return _clean_dags_and_dag_runs
+            delete_successful = params.get("delete_successful", DagCleanTaskArgs.model_fields["delete_successful"].default)
+            delete_failed = params.get("delete_failed", DagCleanTaskArgs.model_fields["delete_failed"].default)
+            mark_failed_as_successful = params.get("mark_failed_as_successful", DagCleanTaskArgs.model_fields["mark_failed_as_successful"].default)
+            max_dagruns = params.get("max_dagruns", DagCleanTaskArgs.model_fields["max_dagruns"].default)
+            days_to_keep = params.get("days_to_keep", DagCleanTaskArgs.model_fields["days_to_keep"].default)
+
+            clean_dag_runs(
+                session=session,
+                delete_successful=delete_successful,
+                delete_failed=delete_failed,
+                mark_failed_as_successful=mark_failed_as_successful,
+                max_dagruns=max_dagruns,
+                days_to_keep=days_to_keep,
+            )
+
+        return _clean_dag_runs
+
+    def create_clean_dags():
+        # Wrapped to avoid airflow imports
+        from airflow.utils.session import provide_session
+
+        @provide_session
+        def _clean_dags(session=None, **context):
+            clean_dags(session=session)
+
+        return _clean_dags
+
+    def create_clean_dags_and_dag_runs():
+        # Wrapped to avoid airflow imports
+        from airflow.utils.session import provide_session
+
+        @provide_session
+        def _clean_dags_and_dag_runs(session=None, **context):
+            clean_dag_runs = create_clean_dag_runs()
+            clean_dags = create_clean_dags()
+            clean_dag_runs(session=session, **context)
+            clean_dags(session=session, **context)
+
+        return _clean_dags_and_dag_runs
 
 
 class DagRunClean(PythonOperator):
