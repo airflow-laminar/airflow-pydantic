@@ -149,13 +149,14 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[l
 
     # Grab the default value from the schema if it exists
     default_value = param["schema"].pop("value", None)
+    param_value = param["value"] if param["value"] is not None else default_value
 
     # Process title
     if "title" in param["schema"]:
         keywords.insert(0, ast.keyword(arg="title", value=ast.Constant(value=param["schema"]["title"])))
 
     # Process type
-    if default_value is not None and "null" in param["schema"]["type"]:
+    if param_value is not None and "null" in param["schema"]["type"]:
         param["schema"]["type"].remove("null")
     if isinstance(param["schema"]["type"], list) and len(param["schema"]["type"]) == 1:
         # If the type is a single item list, we can use it directly
@@ -166,13 +167,10 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[l
         # If we have imports, we need to add them to the imports list
         imports.extend(new_imports)
 
-    new_imports, new_value = _get_parts_from_value(key, param["value"], None, airflow_major_version=airflow_major_version)
+    new_imports, new_value = _get_parts_from_value(key, param_value, None, airflow_major_version=airflow_major_version)
     if new_imports:
         # If we have imports, we need to add them to the imports list
         imports.extend(new_imports)
-
-    if new_value.value is None:
-        new_value = _get_parts_from_value(key, default_value, None, airflow_major_version=airflow_major_version)[1]
 
     return imports, ast.Call(
         func=ast.Name(id="Param", ctx=ast.Load()),

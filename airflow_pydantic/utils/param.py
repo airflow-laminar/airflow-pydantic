@@ -60,6 +60,11 @@ class ParamType:
 
     @classmethod
     def _validate(cls, v) -> BaseParam:
+        if isinstance(v, dict) and "value" in v:
+            v = v.copy()
+            value = v.pop("value")
+            v.pop("default", None)
+            return BaseParam(value, **v)
         return BaseParam(**v)
 
     @classmethod
