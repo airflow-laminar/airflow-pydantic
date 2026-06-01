@@ -449,8 +449,10 @@ else:
             return self.value
 
     class Param(_AirflowPydanticMarker):
-        def __init__(self, **kwargs):
-            self.value = kwargs.get("value", None)
+        def __init__(self, *args, **kwargs):
+            if len(args) > 1:
+                raise TypeError(f"Param expected at most 1 positional argument, got {len(args)}")
+            self.value = args[0] if args else kwargs.pop("value", None)
             self.default = kwargs.get("default", None)
             self.title = kwargs.get("title", None)
             self.description = kwargs.get("description", None)
