@@ -12,7 +12,7 @@ authors = [
 description = "Pydantic models for Apache Airflow"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-version = "1.5.9"
+version = "1.5.10"
 requires-python = ">=3.10"
 keywords = []
 
@@ -95,7 +95,7 @@ Repository = "https://github.com/airflow-laminar/airflow-pydantic"
 Homepage = "https://github.com/airflow-laminar/airflow-pydantic"
 
 [tool.bumpversion]
-current_version = "1.5.9"
+current_version = "1.5.10"
 commit = true
 tag = true
 commit_args = "-s"
