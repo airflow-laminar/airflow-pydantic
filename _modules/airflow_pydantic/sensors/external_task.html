@@ -313,8 +313,6 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">ExternalTaskSensor</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">ExternalTaskSensorArgs</span><span class="p">):</span>
     <span class="n">operator</span><span class="p">:</span> <span class="n">ImportPath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;airflow_pydantic.airflow.ExternalTaskSensor&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;airflow sensor path&quot;</span><span class="p">,</span> <span class="n">validate_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExternalTaskSensor.validate_operator">
-<a class="viewcode-back" href="../../../docs/src/_build/airflow_pydantic.ExternalTaskSensor.html#airflow_pydantic.ExternalTaskSensor.validate_operator">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;operator&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_operator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
@@ -328,7 +326,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ExternalTaskSensor</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;operator must be &#39;airflow.providers.standard.sensors.external_task.ExternalTaskSensor&#39;, got: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span></div>
-</div>
 
 </pre></div>
         </article>
