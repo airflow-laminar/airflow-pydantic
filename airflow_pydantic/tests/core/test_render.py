@@ -87,6 +87,24 @@ class TestRender:
             == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
+    def test_render_operator_ssh_host_filter(self, ssh_operator_balancer_filter):
+        # A host filter (kind="filter") fans the task out across every matching host via
+        # Airflow dynamic task mapping: `Operator.partial(...).expand(remote_host=[...])`.
+        imports, globals_, task = ssh_operator_balancer_filter.render()
+        assert "from airflow.providers.ssh.operators.ssh import SSHOperator" in imports
+        assert "from airflow.providers.ssh.hooks.ssh import SSHHook" in imports
+        assert "from airflow.models.variable import Variable as AirflowVariable" in imports
+        assert globals_ == []
+        assert task.startswith("SSHOperator.partial(")
+        assert task.endswith(".expand(remote_host=['test_host_1.local', 'test_host_2.local'])")
+        # A single base hook (the first matching host) carries the shared credentials.
+        assert (
+            "ssh_hook=SSHHook(remote_host='test_host_1.local', username='test_user', "
+            "password=AirflowVariable.get('VAR', deserialize_json=True)['password'])"
+        ) in task
+        # Per-host pools cannot be mapped, so no pool is emitted for the fan-out.
+        assert "pool=" not in task
+
     def test_render_dag(self, dag):
         assert isinstance(dag, Dag)
         assert (

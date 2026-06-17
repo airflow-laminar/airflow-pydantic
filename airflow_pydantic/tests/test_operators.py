@@ -51,6 +51,46 @@ class TestOperators:
             return pytest.skip("Airflow not installed")
         ssh_operator.instantiate()
 
+    def test_ssh_operator_host_filter_instantiate(self, ssh_operator_balancer_filter, dag_args):
+        if _airflow_3() is None:
+            return pytest.skip("Airflow not installed")
+        from airflow.models.mappedoperator import MappedOperator
+
+        from airflow_pydantic import Dag
+        from airflow_pydantic.testing import pools, variables
+
+        with pools(), variables({"user": "test", "password": "password"}):
+            d = Dag(
+                dag_id="filter-dag",
+                schedule=None,
+                **dag_args.model_dump(exclude_unset=True, exclude={"schedule"}),
+                tasks={"check": ssh_operator_balancer_filter},
+            )
+            dag_instance = d.instantiate()
+        # A host filter produces a single mapped task that fans out across every matching host.
+        task = dag_instance.get_task("test-ssh-operator")
+        assert isinstance(task, MappedOperator)
+
+    def test_ssh_operator_host_filter_requires_uniform_credentials(self):
+        from pydantic import ValidationError
+
+        from airflow_pydantic import BalancerConfiguration, BalancerHostQueryConfiguration, Host, SSHTask, Variable
+        from airflow_pydantic.testing import pools, variables
+
+        with pools(), variables({"user": "test", "password": "password"}):
+            balancer = BalancerConfiguration(
+                hosts=[
+                    Host(name="host_a", username="user_a", password=Variable(key="VAR", deserialize_json=True), tags=["worker"]),
+                    Host(name="host_b", username="user_b", password=Variable(key="VAR", deserialize_json=True), tags=["worker"]),
+                ]
+            )
+            with pytest.raises((ValidationError, ValueError), match="differing credentials"):
+                SSHTask(
+                    task_id="test-ssh-operator",
+                    command="echo hi",
+                    ssh_hook=BalancerHostQueryConfiguration(kind="filter", balancer=balancer, tag="worker"),
+                )
+
     def test_bash_sensor_args(self, bash_sensor_args):
         o = bash_sensor_args
 
