@@ -237,6 +237,42 @@ def ssh_operator_balancer_template(ssh_operator_balancer):
 
 
 @fixture
+def balancer_multi():
+    with pools():
+        return BalancerConfiguration(
+            hosts=[
+                Host(
+                    name="test_host_1",
+                    username="test_user",
+                    password=Variable(key="VAR", deserialize_json=True),
+                    tags=["worker"],
+                ),
+                Host(
+                    name="test_host_2",
+                    username="test_user",
+                    password=Variable(key="VAR", deserialize_json=True),
+                    tags=["worker"],
+                ),
+            ]
+        )
+
+
+@fixture
+def ssh_operator_balancer_filter(ssh_operator_args, balancer_multi):
+    ssh_operator_args.command = BashCommands(commands=["test1", "test2"], login=True, cwd="/tmp", env={"var": "{{ ti.blerg }}"})
+    with pools(), variables({"user": "test", "password": "password"}):
+        return SSHTask(
+            task_id="test-ssh-operator",
+            **ssh_operator_args.model_dump(exclude_unset=True, exclude=["ssh_hook", "pool"]),
+            ssh_hook=BalancerHostQueryConfiguration(
+                kind="filter",
+                balancer=balancer_multi,
+                tag="worker",
+            ),
+        )
+
+
+@fixture
 def time_sensor_args():
     return TimeSensorArgs(
         target_time=time(12, 0),

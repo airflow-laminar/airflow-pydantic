@@ -1,3 +1,4 @@
+import ast
 from logging import getLogger
 from types import FunctionType, MethodType
 from typing import Any
@@ -7,7 +8,7 @@ from pydantic import Field, TypeAdapter, field_validator, model_validator
 from ..airflow import SSHHook as BaseSSHHook
 from ..core import Task, TaskArgs
 from ..extras import BalancerHostQueryConfiguration, Host
-from ..utils import BashCommands, CallablePath, ImportPath, SSHHook, get_import_path
+from ..utils import BashCommands, CallablePath, ImportPath, SSHHook, Variable, get_import_path
 
 __all__ = (
     "SSHOperator",
@@ -26,6 +27,10 @@ class SSHTaskArgs(TaskArgs):
         default=None, description="predefined ssh_hook to use for remote execution. Either ssh_hook or ssh_conn_id needs to be provided."
     )
     ssh_hook_host: Host | None = Field(default=None, exclude=True)
+
+    # Hosts to fan out over when ssh_hook is a host filter (BalancerHostQueryConfiguration kind="filter").
+    # Rendered / instantiated as `Operator.partial(...).expand(remote_host=[...])`.
+    ssh_hook_hosts: list[Host] | None = Field(default=None, exclude=True)
 
     # Track source of hook in order to defer
     ssh_hook_foo: CallablePath | None = Field(default=None, exclude=True)
@@ -75,6 +80,22 @@ class SSHTaskArgs(TaskArgs):
         else:
             raise ValueError("command must be a string, list of strings, or a BashCommands model")
 
+    @staticmethod
+    def _assert_uniform_credentials(hosts: list[Host]) -> None:
+        # All hosts in a fan-out are reached through a single base SSHHook (only `remote_host` is
+        # mapped per task instance), so they must agree on username / password / key_file.
+        def _creds(host: Host):
+            password = host.password
+            password_key = password.key if isinstance(password, Variable) else password
+            return (host.username, password_key, host.key_file)
+
+        if len({_creds(host) for host in hosts}) > 1:
+            names = ", ".join(sorted(host.name for host in hosts))
+            raise ValueError(
+                f"Host filter for SSH expansion matched hosts with differing credentials ({names}); "
+                "all matching hosts must share username/password/key_file."
+            )
+
     @model_validator(mode="before")
     @classmethod
     def _extract_host_from_ssh_hook(cls, data: Any) -> Any:
@@ -82,22 +103,37 @@ class SSHTaskArgs(TaskArgs):
             ssh_hook = data["ssh_hook"]
             if isinstance(ssh_hook, (BalancerHostQueryConfiguration, Host)):
                 if isinstance(ssh_hook, BalancerHostQueryConfiguration):
-                    # Ensure that the BalancerHostQueryConfiguration is of kind 'select'
-                    if not ssh_hook.kind == "select":
-                        raise ValueError("BalancerHostQueryConfiguration must be of kind 'select'")
+                    if ssh_hook.kind == "select":
+                        # Execute the query to get the Host, just set as it will
+                        # be handled by the field validator
+                        data["ssh_hook"] = ssh_hook.execute()
 
-                    # Execute the query to get the Host, just set as it will
-                    # be handled by the field validator
-                    data["ssh_hook"] = ssh_hook.execute()
-
-                    # Save the host for later use
-                    data["ssh_hook_host"] = data["ssh_hook"]
+                        # Save the host for later use
+                        data["ssh_hook_host"] = data["ssh_hook"]
+                    elif ssh_hook.kind == "filter":
+                        # Fan out: run this task on EVERY matching host via Airflow dynamic task
+                        # mapping (rendered as `.partial(...).expand(remote_host=[...])`).
+                        hosts = ssh_hook.execute()
+                        if isinstance(hosts, Host):
+                            hosts = [hosts]
+                        # A single base hook supplies the shared credentials while only
+                        # `remote_host` is mapped, so all matching hosts must share credentials.
+                        cls._assert_uniform_credentials(hosts)
+                        if data.get("remote_host"):
+                            raise ValueError("Cannot set 'remote_host' together with a host filter; remote_host is mapped per-host during expansion.")
+                        data["ssh_hook_hosts"] = hosts
+                        # Base hook carries the shared credentials; remote_host is overridden per mapped instance.
+                        data["ssh_hook"] = hosts[0]
+                        data["ssh_hook_host"] = hosts[0]
+                    else:
+                        raise ValueError("BalancerHostQueryConfiguration must be of kind 'select' or 'filter'")
                 else:
                     # If it's a Host instance, set it for later use
                     data["ssh_hook_host"] = ssh_hook
 
-                # Override pool from host if not otherwise set
-                if data["ssh_hook_host"].pool and not data.get("pool"):
+                # Override pool from host if not otherwise set.
+                # Skipped when fanning out: per-host pools cannot be mapped over a single task.
+                if not data.get("ssh_hook_hosts") and data["ssh_hook_host"].pool and not data.get("pool"):
                     data["pool"] = data["ssh_hook"].pool
 
             if isinstance(ssh_hook, str):
@@ -182,6 +218,65 @@ class SSHTask(Task, SSHTaskArgs):
         if not issubclass(v, SSHOperator):
             raise TypeError(f"operator must be 'airflow.providers.ssh.operators.ssh.SSHOperator', got: {v}")
         return v
+
+    @staticmethod
+    def _remote_host_name(host: Host) -> str:
+        # Mirror Host.hook(use_local=True): append ".local" to an unqualified hostname.
+        return f"{host.name}.local" if host.name.count(".") == 0 else host.name
+
+    def instantiate(self, **kwargs):
+        # When ssh_hook resolves to a host filter, fan out across every matching host using Airflow
+        # dynamic task mapping. A single base hook supplies the shared credentials and only
+        # `remote_host` is mapped, producing one (independently retryable) task instance per host.
+        if not self.ssh_hook_hosts:
+            return super().instantiate(**kwargs)
+
+        from ..airflow import Pool as AirflowPool
+        from ..utils import Pool
+
+        args = {**self.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
+        if "pool" in args:
+            if isinstance(args["pool"], dict):
+                args["pool"] = self.pool
+            if isinstance(args["pool"], (AirflowPool, Pool)):
+                args["pool"] = args["pool"].pool
+        # `remote_host` is supplied per mapped task instance, not in the partial.
+        args.pop("remote_host", None)
+        remote_hosts = [self._remote_host_name(host) for host in self.ssh_hook_hosts]
+        return self.operator.partial(**args).expand(remote_host=remote_hosts)
+
+    def render(self, raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs):
+        # Default (single-host) rendering is unchanged.
+        if not self.ssh_hook_hosts:
+            return super().render(raw=raw, dag_from_context=dag_from_context, airflow_major_version=airflow_major_version, **kwargs)
+
+        # Build the regular `Operator(**args)` call, then rewrite it as
+        # `Operator.partial(**args).expand(remote_host=[...])`.
+        imports, globals_, call = super().render(raw=True, dag_from_context=dag_from_context, airflow_major_version=airflow_major_version, **kwargs)
+
+        call.keywords = [keyword for keyword in call.keywords if keyword.arg != "remote_host"]
+        partial_call = ast.Call(
+            func=ast.Attribute(value=call.func, attr="partial", ctx=ast.Load()),
+            args=call.args,
+            keywords=call.keywords,
+        )
+        remote_hosts = [self._remote_host_name(host) for host in self.ssh_hook_hosts]
+        call = ast.Call(
+            func=ast.Attribute(value=partial_call, attr="expand", ctx=ast.Load()),
+            args=[],
+            keywords=[
+                ast.keyword(
+                    arg="remote_host",
+                    value=ast.List(elts=[ast.Constant(value=name) for name in remote_hosts], ctx=ast.Load()),
+                )
+            ],
+        )
+
+        if not raw:
+            imports = [ast.unparse(i) for i in imports]
+            globals_ = [ast.unparse(i) for i in globals_]
+            call = ast.unparse(call)
+        return imports, globals_, call
 
 
 # Alias
