@@ -350,6 +350,9 @@
 <span class="sd">        lifetime of the transport</span>
 <span class="sd">    :param ciphers: list of ciphers to use in order of preference</span>
 <span class="sd">    :param auth_timeout: timeout (in seconds) for the attempt to authenticate with the remote_host</span>
+<span class="sd">    :param conn_retry_attempts: number of times to attempt the initial SSH connection before</span>
+<span class="sd">        giving up (default 3). Raising this helps when many tasks target the same SSH server at</span>
+<span class="sd">        once and some connections are transiently refused (e.g. ``sshd`` ``MaxStartups`` throttling).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># List of classes to try loading private keys as, ordered (roughly) by most common to least common</span>
@@ -398,9 +401,11 @@
         <span class="n">ciphers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">auth_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">host_proxy_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">conn_retry_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ssh_conn_id</span> <span class="o">=</span> <span class="n">ssh_conn_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn_retry_attempts</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">conn_retry_attempts</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remote_host</span> <span class="o">=</span> <span class="n">remote_host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
@@ -612,7 +617,7 @@
         <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="n">Retrying</span><span class="p">(</span>
             <span class="n">reraise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">wait</span><span class="o">=</span><span class="n">wait_fixed</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">wait_random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-            <span class="n">stop</span><span class="o">=</span><span class="n">stop_after_attempt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">stop</span><span class="o">=</span><span class="n">stop_after_attempt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conn_retry_attempts</span><span class="p">),</span>
             <span class="n">before_sleep</span><span class="o">=</span><span class="n">log_before_sleep</span><span class="p">,</span>
         <span class="p">):</span>
             <span class="k">with</span> <span class="n">attempt</span><span class="p">:</span>
@@ -822,6 +827,7 @@
         <span class="n">key_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">passphrase</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">private_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">keepalive_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ssh_conn_id</span> <span class="o">=</span> <span class="n">ssh_conn_id</span>
@@ -833,6 +839,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">key_file</span> <span class="o">=</span> <span class="n">key_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span> <span class="o">=</span> <span class="n">passphrase</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">private_key</span> <span class="o">=</span> <span class="n">private_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keepalive_interval</span> <span class="o">=</span> <span class="n">keepalive_interval</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_parse_extras</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse extra fields from the connection into instance fields.&quot;&quot;&quot;</span>
@@ -900,9 +907,25 @@
             <span class="n">conn_config</span><span class="p">[</span><span class="s2">&quot;client_keys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_private_key</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span><span class="p">:</span>
             <span class="n">conn_config</span><span class="p">[</span><span class="s2">&quot;passphrase&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">passphrase</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keepalive_interval</span><span class="p">:</span>
+            <span class="c1"># The trigger holds one connection for the whole job; a keepalive stops idle</span>
+            <span class="c1"># NAT/firewall timeouts from silently dropping it between long poll intervals.</span>
+            <span class="n">conn_config</span><span class="p">[</span><span class="s2">&quot;keepalive_interval&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keepalive_interval</span>
 
         <span class="n">ssh_client_conn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncssh</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">**</span><span class="n">conn_config</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ssh_client_conn</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_conn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open an asyncssh connection that can be reused for multiple commands.</span>
+
+<span class="sd">        Unlike :meth:`run_command`, the returned connection is **not** closed</span>
+<span class="sd">        automatically; the caller owns its lifecycle (e.g.</span>
+<span class="sd">        ``async with await hook.get_conn() as conn: ...`` or an explicit</span>
+<span class="sd">        ``conn.close()``). Reusing one connection avoids a new TCP/SSH handshake</span>
+<span class="sd">        per command, which matters when many tasks poll the same SSH server.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_conn</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
