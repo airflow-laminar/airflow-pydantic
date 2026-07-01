@@ -60,16 +60,12 @@ airflow = [
     "apache-airflow-providers-smtp",
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
-    "paramiko<4",
-    "structlog<26.2.0",
 ]
 airflow3 = [
     "apache-airflow>=3,<3.2",
     "apache-airflow-providers-smtp",
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
-    "paramiko<4",
-    "structlog<26.2.0",
 ]
 laminar = [
     # Laminar
@@ -84,8 +80,6 @@ laminar = [
     "apache-airflow-providers-smtp",
     "apache-airflow-providers-ssh",
     "apache-airflow-providers-standard",
-    "paramiko<4",
-    "structlog<26.2.0",
 ]
 
 [project.scripts]
