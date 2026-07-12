@@ -2,9 +2,9 @@ from collections.abc import Callable
 from logging import getLogger
 from pathlib import Path
 from random import choice
+from typing import Self
 
 from pydantic import Field, model_validator
-from typing_extensions import Self
 
 from ...airflow import create_or_update_pool, get_pool
 from ...core import BaseModel
