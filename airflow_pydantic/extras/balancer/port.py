@@ -1,5 +1,6 @@
+from typing import Self
+
 from pydantic import Field, model_validator
-from typing_extensions import Self
 
 from ...core import BaseModel
 from .host import Host
