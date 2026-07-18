@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: 3.11
       - run: pip install .[laminar]
-      - run: pip install yardang
+      - run: pip install "yardang[llms,themes]>=0.6.1,<0.7"
       - run: yardang build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
