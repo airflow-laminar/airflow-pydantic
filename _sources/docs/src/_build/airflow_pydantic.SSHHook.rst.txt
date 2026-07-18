@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.SSHHook
-=========================
-
-.. currentmodule:: airflow_pydantic
-
-.. autodata:: SSHHook

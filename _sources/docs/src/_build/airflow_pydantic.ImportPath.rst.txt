@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.ImportPath
-============================
-
-.. currentmodule:: airflow_pydantic
-
-.. autodata:: ImportPath

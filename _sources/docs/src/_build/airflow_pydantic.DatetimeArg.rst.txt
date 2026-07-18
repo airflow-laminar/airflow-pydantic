@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.DatetimeArg
-=============================
-
-.. currentmodule:: airflow_pydantic
-
-.. autodata:: DatetimeArg

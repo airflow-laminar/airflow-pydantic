@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.HITLBranchOperatorArgs
-========================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: HITLBranchOperatorArgs

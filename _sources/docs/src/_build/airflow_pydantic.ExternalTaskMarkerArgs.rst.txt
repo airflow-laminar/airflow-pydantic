@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.ExternalTaskMarkerArgs
-========================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: ExternalTaskMarkerArgs

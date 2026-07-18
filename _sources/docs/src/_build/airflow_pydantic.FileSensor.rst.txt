@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.FileSensor
-============================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: FileSensor

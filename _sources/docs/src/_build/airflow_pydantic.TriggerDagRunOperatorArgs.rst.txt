@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.TriggerDagRunOperatorArgs
-===========================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: TriggerDagRunOperatorArgs

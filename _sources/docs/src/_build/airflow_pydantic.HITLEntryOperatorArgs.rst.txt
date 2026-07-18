@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.HITLEntryOperatorArgs
-=======================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: HITLEntryOperatorArgs

@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.BranchPythonOperatorArgs
-==========================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: BranchPythonOperatorArgs

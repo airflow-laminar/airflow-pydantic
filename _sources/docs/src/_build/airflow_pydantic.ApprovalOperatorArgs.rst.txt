@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.ApprovalOperatorArgs
-======================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: ApprovalOperatorArgs

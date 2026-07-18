@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.BranchPythonVirtualenvOperatorArgs
-====================================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: BranchPythonVirtualenvOperatorArgs

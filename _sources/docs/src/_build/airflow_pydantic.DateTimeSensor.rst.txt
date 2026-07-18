@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.DateTimeSensor
-================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: DateTimeSensor

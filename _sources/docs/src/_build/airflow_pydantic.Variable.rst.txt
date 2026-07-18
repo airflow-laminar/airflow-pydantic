@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.Variable
-==========================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: Variable

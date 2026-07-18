@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.ExternalTaskSensor
-====================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: ExternalTaskSensor

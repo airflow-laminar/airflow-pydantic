@@ -1,6 +1,0 @@
-﻿airflow\_pydantic.CronDataIntervalTimetable
-===========================================
-
-.. currentmodule:: airflow_pydantic
-
-.. autopydantic_model:: CronDataIntervalTimetable
