@@ -68,7 +68,7 @@ Bases: `BaseModel`
 #### model_dump(\*\*kwargs)
 
 !!! abstract “Usage Documentation”
-: [model_dump](../concepts/serialization.md#modelmodel_dump)
+: [model_dump](../concepts/serialization.md#python-mode)
 
 Generate a dictionary representation of the model, optionally specifying which fields to include or exclude.
 
@@ -83,24 +83,30 @@ Generate a dictionary representation of the model, optionally specifying which f
   * **exclude_unset** – Whether to exclude fields that have not been explicitly set.
   * **exclude_defaults** – Whether to exclude fields that are set to their default value.
   * **exclude_none** – Whether to exclude fields that have a value of None.
+  * **exclude_computed_fields** – Whether to exclude computed fields.
+    While this can be useful for round-tripping, it is usually recommended to use the dedicated
+    round_trip parameter instead.
   * **round_trip** – If True, dumped values should be valid as input for non-idempotent types such as Json[T].
   * **warnings** – How to handle serialization errors. False/”none” ignores them, True/”warn” logs errors,
     “error” raises a [PydanticSerializationError][pydantic_core.PydanticSerializationError].
   * **fallback** – A function to call when an unknown value is encountered. If not provided,
     a [PydanticSerializationError][pydantic_core.PydanticSerializationError] error is raised.
   * **serialize_as_any** – Whether to serialize fields with duck-typing serialization behavior.
+  * **polymorphic_serialization** – Whether to use model and dataclass polymorphic serialization for this call.
 * **Returns:**
   A dictionary representation of the model.
 
 #### model_dump_json(\*\*kwargs)
 
 !!! abstract “Usage Documentation”
-: [model_dump_json](../concepts/serialization.md#modelmodel_dump_json)
+: [model_dump_json](../concepts/serialization.md#json-mode)
 
 Generates a JSON representation of the model using Pydantic’s to_json method.
 
 * **Parameters:**
   * **indent** – Indentation to use in the JSON output. If None is passed, the output will be compact.
+  * **ensure_ascii** – If True, the output is guaranteed to have all incoming non-ASCII characters escaped.
+    If False (the default), these characters will be output as-is.
   * **include** – Field(s) to include in the JSON output.
   * **exclude** – Field(s) to exclude from the JSON output.
   * **context** – Additional context to pass to the serializer.
@@ -108,12 +114,16 @@ Generates a JSON representation of the model using Pydantic’s to_json method.
   * **exclude_unset** – Whether to exclude fields that have not been explicitly set.
   * **exclude_defaults** – Whether to exclude fields that are set to their default value.
   * **exclude_none** – Whether to exclude fields that have a value of None.
+  * **exclude_computed_fields** – Whether to exclude computed fields.
+    While this can be useful for round-tripping, it is usually recommended to use the dedicated
+    round_trip parameter instead.
   * **round_trip** – If True, dumped values should be valid as input for non-idempotent types such as Json[T].
   * **warnings** – How to handle serialization errors. False/”none” ignores them, True/”warn” logs errors,
     “error” raises a [PydanticSerializationError][pydantic_core.PydanticSerializationError].
   * **fallback** – A function to call when an unknown value is encountered. If not provided,
     a [PydanticSerializationError][pydantic_core.PydanticSerializationError] error is raised.
   * **serialize_as_any** – Whether to serialize fields with duck-typing serialization behavior.
+  * **polymorphic_serialization** – Whether to use model and dataclass polymorphic serialization for this call.
 * **Returns:**
   A JSON string representation of the model.
 
@@ -1609,8 +1619,6 @@ Bases: `str`, `Enum`
 Class with task’s trigger rules.
 
 #### ALL_DONE *= 'all_done'*
-
-#### ALL_DONE_MIN_ONE_SUCCESS *= 'all_done_min_one_success'*
 
 #### ALL_DONE_SETUP_SUCCESS *= 'all_done_setup_success'*
 

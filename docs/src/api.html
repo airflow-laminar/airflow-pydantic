@@ -117,7 +117,7 @@
 <dt class="sig sig-object py" id="airflow_pydantic.core.base.BaseModel.model_dump">
 <span class="sig-name descname"><span class="pre">model_dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/airflow_pydantic/core/base.html#BaseModel.model_dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.core.base.BaseModel.model_dump" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.core.base.BaseModel.model_dump'">¶</a></dt>
 <dd><dl class="simple">
-<dt>!!! abstract “Usage Documentation”</dt><dd><p>[<cite>model_dump</cite>](../concepts/serialization.md#modelmodel_dump)</p>
+<dt>!!! abstract “Usage Documentation”</dt><dd><p>[<cite>model_dump</cite>](../concepts/serialization.md#python-mode)</p>
 </dd>
 </dl>
 <p>Generate a dictionary representation of the model, optionally specifying which fields to include or exclude.</p>
@@ -134,12 +134,16 @@ If mode is ‘python’, the output may contain non-JSON-serializable Python obj
 <li><p><strong>exclude_unset</strong> – Whether to exclude fields that have not been explicitly set.</p></li>
 <li><p><strong>exclude_defaults</strong> – Whether to exclude fields that are set to their default value.</p></li>
 <li><p><strong>exclude_none</strong> – Whether to exclude fields that have a value of <cite>None</cite>.</p></li>
+<li><p><strong>exclude_computed_fields</strong> – Whether to exclude computed fields.
+While this can be useful for round-tripping, it is usually recommended to use the dedicated
+<cite>round_trip</cite> parameter instead.</p></li>
 <li><p><strong>round_trip</strong> – If True, dumped values should be valid as input for non-idempotent types such as Json[T].</p></li>
 <li><p><strong>warnings</strong> – How to handle serialization errors. False/”none” ignores them, True/”warn” logs errors,
 “error” raises a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationError].</p></li>
 <li><p><strong>fallback</strong> – A function to call when an unknown value is encountered. If not provided,
 a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationError] error is raised.</p></li>
 <li><p><strong>serialize_as_any</strong> – Whether to serialize fields with duck-typing serialization behavior.</p></li>
+<li><p><strong>polymorphic_serialization</strong> – Whether to use model and dataclass polymorphic serialization for this call.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -151,7 +155,7 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 <dt class="sig sig-object py" id="airflow_pydantic.core.base.BaseModel.model_dump_json">
 <span class="sig-name descname"><span class="pre">model_dump_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/airflow_pydantic/core/base.html#BaseModel.model_dump_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.core.base.BaseModel.model_dump_json" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.core.base.BaseModel.model_dump_json'">¶</a></dt>
 <dd><dl class="simple">
-<dt>!!! abstract “Usage Documentation”</dt><dd><p>[<cite>model_dump_json</cite>](../concepts/serialization.md#modelmodel_dump_json)</p>
+<dt>!!! abstract “Usage Documentation”</dt><dd><p>[<cite>model_dump_json</cite>](../concepts/serialization.md#json-mode)</p>
 </dd>
 </dl>
 <p>Generates a JSON representation of the model using Pydantic’s <cite>to_json</cite> method.</p>
@@ -159,6 +163,8 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>indent</strong> – Indentation to use in the JSON output. If None is passed, the output will be compact.</p></li>
+<li><p><strong>ensure_ascii</strong> – If <cite>True</cite>, the output is guaranteed to have all incoming non-ASCII characters escaped.
+If <cite>False</cite> (the default), these characters will be output as-is.</p></li>
 <li><p><strong>include</strong> – Field(s) to include in the JSON output.</p></li>
 <li><p><strong>exclude</strong> – Field(s) to exclude from the JSON output.</p></li>
 <li><p><strong>context</strong> – Additional context to pass to the serializer.</p></li>
@@ -166,12 +172,16 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 <li><p><strong>exclude_unset</strong> – Whether to exclude fields that have not been explicitly set.</p></li>
 <li><p><strong>exclude_defaults</strong> – Whether to exclude fields that are set to their default value.</p></li>
 <li><p><strong>exclude_none</strong> – Whether to exclude fields that have a value of <cite>None</cite>.</p></li>
+<li><p><strong>exclude_computed_fields</strong> – Whether to exclude computed fields.
+While this can be useful for round-tripping, it is usually recommended to use the dedicated
+<cite>round_trip</cite> parameter instead.</p></li>
 <li><p><strong>round_trip</strong> – If True, dumped values should be valid as input for non-idempotent types such as Json[T].</p></li>
 <li><p><strong>warnings</strong> – How to handle serialization errors. False/”none” ignores them, True/”warn” logs errors,
 “error” raises a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationError].</p></li>
 <li><p><strong>fallback</strong> – A function to call when an unknown value is encountered. If not provided,
 a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationError] error is raised.</p></li>
 <li><p><strong>serialize_as_any</strong> – Whether to serialize fields with duck-typing serialization behavior.</p></li>
+<li><p><strong>polymorphic_serialization</strong> – Whether to use model and dataclass polymorphic serialization for this call.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -394,7 +404,7 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 </dd></dl>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.core.task.TaskArgs.trigger_rule">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trigger_rule</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule" title="airflow.task.trigger_rule.TriggerRule"><span class="pre">TriggerRule</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.core.task.TaskArgs.trigger_rule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.core.task.TaskArgs.trigger_rule'">¶</a></dt>
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trigger_rule</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule" title="airflow_pydantic.airflow.TriggerRule"><span class="pre">TriggerRule</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.core.task.TaskArgs.trigger_rule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.core.task.TaskArgs.trigger_rule'">¶</a></dt>
 <dd><p>defines the rule by which dependencies are applied for the task to get triggered.</p>
 </dd></dl>
 <dl class="py attribute pydantic_field">
@@ -2054,16 +2064,12 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 </dd></dl>
 <dl class="py class" id="module-airflow_pydantic.utils.common">
 <dt class="sig sig-object py" id="airflow_pydantic.utils.common.TriggerRule">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.utils.common.</span></span><span class="sig-name descname"><span class="pre">TriggerRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/airflow/task/trigger_rule.html#TriggerRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">airflow_pydantic.utils.common.</span></span><span class="sig-name descname"><span class="pre">TriggerRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/airflow_pydantic/airflow.html#TriggerRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>Class with task’s trigger rules.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="airflow_pydantic.utils.common.TriggerRule.ALL_DONE">
 <span class="sig-name descname"><span class="pre">ALL_DONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'all_done'</span></em><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule.ALL_DONE" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule.ALL_DONE'">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="airflow_pydantic.utils.common.TriggerRule.ALL_DONE_MIN_ONE_SUCCESS">
-<span class="sig-name descname"><span class="pre">ALL_DONE_MIN_ONE_SUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'all_done_min_one_success'</span></em><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule.ALL_DONE_MIN_ONE_SUCCESS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule.ALL_DONE_MIN_ONE_SUCCESS'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="airflow_pydantic.utils.common.TriggerRule.ALL_DONE_SETUP_SUCCESS">
@@ -2111,12 +2117,12 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="airflow_pydantic.utils.common.TriggerRule.all_triggers">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_triggers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/airflow/task/trigger_rule.html#TriggerRule.all_triggers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule.all_triggers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule.all_triggers'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_triggers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/airflow_pydantic/airflow.html#TriggerRule.all_triggers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule.all_triggers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule.all_triggers'">¶</a></dt>
 <dd><p>Return all trigger rules.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="airflow_pydantic.utils.common.TriggerRule.is_valid">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trigger_rule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/airflow/task/trigger_rule.html#TriggerRule.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule.is_valid" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule.is_valid'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trigger_rule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/airflow_pydantic/airflow.html#TriggerRule.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.common.TriggerRule.is_valid" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.common.TriggerRule.is_valid'">¶</a></dt>
 <dd><p>Validate a trigger rule.</p>
 </dd></dl>
 </dd></dl>
@@ -2975,7 +2981,6 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.bash.in_bash'" class="reference internal" href="#airflow_pydantic.utils.bash.in_bash"><code class="docutils literal notranslate"><span class="pre">in_bash()</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.common.TriggerRule'" class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule"><code class="docutils literal notranslate"><span class="pre">TriggerRule</span></code></a><ul>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.common.TriggerRule.ALL_DONE'" class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule.ALL_DONE"><code class="docutils literal notranslate"><span class="pre">TriggerRule.ALL_DONE</span></code></a></li>
-<li><a :data-current="activeSection === '#airflow_pydantic.utils.common.TriggerRule.ALL_DONE_MIN_ONE_SUCCESS'" class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule.ALL_DONE_MIN_ONE_SUCCESS"><code class="docutils literal notranslate"><span class="pre">TriggerRule.ALL_DONE_MIN_ONE_SUCCESS</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.common.TriggerRule.ALL_DONE_SETUP_SUCCESS'" class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule.ALL_DONE_SETUP_SUCCESS"><code class="docutils literal notranslate"><span class="pre">TriggerRule.ALL_DONE_SETUP_SUCCESS</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.common.TriggerRule.ALL_FAILED'" class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule.ALL_FAILED"><code class="docutils literal notranslate"><span class="pre">TriggerRule.ALL_FAILED</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.common.TriggerRule.ALL_SKIPPED'" class="reference internal" href="#airflow_pydantic.utils.common.TriggerRule.ALL_SKIPPED"><code class="docutils literal notranslate"><span class="pre">TriggerRule.ALL_SKIPPED</span></code></a></li>
