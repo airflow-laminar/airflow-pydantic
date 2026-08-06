@@ -11,15 +11,12 @@ def pools(return_value=None, side_effect=None):
         patch("airflow_pydantic.airflow.Pool.create_or_update_pool") as pool_create_or_update_pool_mock,
         patch("airflow_pydantic.airflow.get_pool") as get_pool_func_mock,
         patch("airflow_pydantic.airflow.create_or_update_pool") as create_or_update_pool_mock,
-        patch("airflow_pydantic.extras.balancer.balancer.get_pool") as balancer_get_pool_mock,
-        patch("airflow_pydantic.extras.balancer.balancer.create_or_update_pool") as balancer_create_or_update_pool_mock,
         patch("airflow_pydantic.airflow.get_parsing_context") as context_mock,
     ):
-        get_pool_mocks = (get_pool_mock, get_pool_func_mock, balancer_get_pool_mock)
+        get_pool_mocks = (get_pool_mock, get_pool_func_mock)
         create_pool_mocks = (
             pool_create_or_update_pool_mock,
             create_or_update_pool_mock,
-            balancer_create_or_update_pool_mock,
         )
         for pool_mock in get_pool_mocks + create_pool_mocks:
             pool_mock.return_value = return_value

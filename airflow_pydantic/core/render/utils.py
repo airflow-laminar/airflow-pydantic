@@ -40,8 +40,7 @@ def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
-def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[ast.ImportFrom, ast.Call]:
-    imports = []
+def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.AST]:
     if isinstance(pool, Pool):
         # Swap
         pool = pool.model_dump(exclude_unset=True)
@@ -63,77 +62,7 @@ def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[ast.Impo
     else:
         raise TypeError(f"Unsupported type for pool: {type(pool)}. Expected Pool, AirflowPool, or str.")
 
-    # Replace the pool with the Pool class
-    if airflow_major_version == 2:
-        if len(pool.keys()) == 1:
-            imports.append(
-                ast.ImportFrom(
-                    module="airflow.models.pool",
-                    names=[ast.alias(name="Pool")],
-                    level=0,
-                )
-            )
-            # Replace the pool with the Pool class
-            return imports, ast.Attribute(
-                value=ast.Call(
-                    func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="get_pool", ctx=ast.Load()),
-                    args=[ast.Constant(value=pool["pool"])],
-                    keywords=[],
-                ),
-                attr="pool",
-                ctx=ast.Load(),
-            )
-        imports.append(
-            ast.ImportFrom(
-                module="airflow.models.pool",
-                names=[ast.alias(name="Pool")],
-                level=0,
-            )
-        )
-        return imports, ast.Attribute(
-            value=ast.Call(
-                func=ast.Attribute(value=ast.Name(id="Pool", ctx=ast.Load()), attr="create_or_update_pool", ctx=ast.Load()),
-                args=[],
-                keywords=[
-                    ast.keyword(arg="name", value=ast.Constant(value=pool["pool"])),
-                    ast.keyword(arg="slots", value=ast.Constant(value=pool.get("slots", 128))),
-                    ast.keyword(arg="description", value=ast.Constant(value=pool.get("description", ""))),
-                    ast.keyword(arg="include_deferred", value=ast.Constant(value=pool.get("include_deferred", False))),
-                ],
-            ),
-            attr="pool",
-            ctx=ast.Load(),
-        )
-    # TODO just use it as a string literal in airflow 3 for now
     return [], ast.Constant(value=pool["pool"])
-    # imports.append(
-    #     ast.ImportFrom(
-    #         module="subprocess",
-    #         names=[ast.alias(name="check_call")],
-    #         level=0,
-    #     )
-    # )
-    # return imports, ast.Attribute(
-    #     value=ast.Call(
-    #         func=ast.Name(id="check_call", ctx=ast.Load()),
-    #         args=[
-    #             ast.List(
-    #                 elts=[
-    #                     ast.Constant(value="airflow"),
-    #                     ast.Constant(value="pools"),
-    #                     ast.Constant(value="set"),
-    #                     ast.Constant(value=pool["pool"]),
-    #                     ast.Constant(value=str(pool.get("slots", 128))),
-    #                     ast.Constant(value=pool.get("description", "")),
-    #                 ],
-    #                 ctx=ast.Load(),
-    #             )
-    #         ],
-    #         keywords=[],
-    #     ),
-    #     attr="pool",
-    #     ctx=ast.Load(),
-    # )
 
 
 def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.Call]:
