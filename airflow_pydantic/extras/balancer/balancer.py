@@ -6,10 +6,10 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
-from ...airflow import create_or_update_pool, get_pool
 from ...core import BaseModel
 from ...utils import Pool, Variable
 from .host import Host
+from .pool_manager import PoolManagerConfiguration
 from .port import Port
 
 __all__ = ("BalancerConfiguration", "load_config")
@@ -47,6 +47,9 @@ class BalancerConfiguration(BaseModel):
     # create connection object in airflow for host
     create_connection: bool = False
 
+    # centrally reconcile pools from a generated task
+    pool_manager: PoolManagerConfiguration = Field(default_factory=PoolManagerConfiguration)
+
     @property
     def all_hosts(self):
         return sorted(set(self.hosts))
@@ -55,10 +58,15 @@ class BalancerConfiguration(BaseModel):
     def all_ports(self):
         return sorted(set(self.ports))
 
+    def managed_dags(self):
+        dag = self.pool_manager.build_dag(self)
+        return [] if dag is None else [dag]
+
+    def generated_files(self):
+        return self.pool_manager.generated_files(self)
+
     @model_validator(mode="after")
     def _validate(self) -> Self:
-        from airflow_pydantic.airflow import Pool as AirflowPool, PoolNotFound, get_parsing_context
-
         # Validate no duplicate hosts
         seen_hostnames = set()
         for host in self.hosts:
@@ -76,47 +84,6 @@ class BalancerConfiguration(BaseModel):
                     slots=host.size,
                     description=f"Balancer pool for host({host.name})",
                 )
-
-            if get_parsing_context().dag_id is not None:
-                # check airflow first
-                try:
-                    if isinstance(host.pool, (Pool, AirflowPool)):
-                        pool_name = host.pool.pool
-                    elif isinstance(host.pool, dict):
-                        pool_name = host.pool.get("pool")
-                    elif isinstance(host.pool, str):
-                        pool_name = host.pool
-
-                    res = get_pool(pool_name)
-
-                    # airflow return value differs version-to-version
-                    if res is None:
-                        raise PoolNotFound
-                    elif res.slots != host.size:
-                        if self.override_pool_size:
-                            create_or_update_pool(
-                                name=pool_name,
-                                slots=host.size,
-                                description=host.pool.description,
-                                include_deferred=False,
-                            )
-                        else:
-                            host.size = res.slots
-                except PoolNotFound:
-                    try:
-                        # else set to default
-                        create_or_update_pool(
-                            name=host.name,
-                            slots=host.size,
-                            description=f"Balancer pool for host({host.name})",
-                            include_deferred=False,
-                        )
-                    except Exception:  # noqa: BLE001, S110
-                        # If the database is not available, we cannot create the pool
-                        pass
-                except RuntimeError:
-                    # If the database is not available, we cannot create the pool
-                    pass
 
             if not host.username and self.default_username:
                 host.username = self.default_username
@@ -139,18 +106,6 @@ class BalancerConfiguration(BaseModel):
             if (port.host.name, port.port) in _used_ports:
                 raise ValueError(f"Duplicate port usage for host: {port.host.name}:{port.port}")
             _used_ports.add((port.host.name, port.port))
-
-            # Create pools
-            try:
-                create_or_update_pool(
-                    name=port.pool,
-                    slots=1,
-                    description=f"Balancer pool for host({port.port}) port({port.port})",
-                    include_deferred=True,
-                )
-            except Exception:  # noqa: BLE001, S110
-                # If the database is not available, we cannot create the pool
-                pass
 
         # sort hosts by name, sort ports by host name then port number
         # NOTE: since we're in a validator and we have validate_on_assignment, bypass here

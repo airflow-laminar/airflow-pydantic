@@ -1,12 +1,7 @@
-from unittest.mock import patch
-
 from airflow_pydantic import Dag
-from airflow_pydantic.airflow import Pool
-from airflow_pydantic.testing import pools
 
 try:
     from airflow import DAG  # noqa: F401
-    from airflow.models.pool import Pool
 
     _HAVE_AIRFLOW = True
 except ImportError:
@@ -25,13 +20,12 @@ class TestRender:
         imports, globals_, task = ssh_operator.render()
         assert imports == [
             "from airflow.providers.ssh.operators.ssh import SSHOperator",
-            "from airflow.models.pool import Pool",
             "from airflow.providers.ssh.hooks.ssh import SSHHook",
         ]
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.get_pool('blerg').pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command=\"bash -lc 'set -ex\\ntest1\\ntest2'\", cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool='blerg', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test', username='test'), ssh_conn_id='test', command=\"bash -lc 'set -ex\\ntest1\\ntest2'\", cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_airflow_3(self, ssh_operator):
@@ -50,14 +44,13 @@ class TestRender:
         imports, globals_, task = ssh_operator_balancer.render()
         assert imports == [
             "from airflow.providers.ssh.operators.ssh import SSHOperator",
-            "from airflow.models.pool import Pool",
             "from airflow.providers.ssh.hooks.ssh import SSHHook",
             "from airflow.models.variable import Variable as AirflowVariable",
         ]
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool='test_host', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_host_variable_airflow_3(self, ssh_operator_balancer):
@@ -77,14 +70,13 @@ class TestRender:
         imports, globals_, task = ssh_operator_balancer_template.render()
         assert imports == [
             "from airflow.providers.ssh.operators.ssh import SSHOperator",
-            "from airflow.models.pool import Pool",
             "from airflow.providers.ssh.hooks.ssh import SSHHook",
             "from airflow.models.variable import Variable as AirflowVariable",
         ]
         assert globals_ == []
         assert (
             task
-            == "SSHOperator(pool=Pool.create_or_update_pool(name='test_host', slots=8, description='Balancer pool for host(test_host)', include_deferred=False).pool, do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
+            == "SSHOperator(pool='test_host', do_xcom_push=True, ssh_hook=SSHHook(remote_host='test_host.local', username='test_user', password=AirflowVariable.get('VAR', deserialize_json=True)['password']), ssh_conn_id='test', command='bash -lc \\'export var=\"{{ ti.blerg }}\"\\ncd /tmp\\nset -ex\\ntest1\\ntest2\\'', cmd_timeout=10, environment={'test': 'test'}, get_pty=True, task_id='test-ssh-operator')"
         )
 
     def test_render_operator_ssh_host_filter(self, ssh_operator_balancer_filter):
@@ -113,7 +105,6 @@ class TestRender:
 from datetime import datetime, time, timedelta
 
 from airflow.models import DAG
-from airflow.models.pool import Pool
 from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.providers.standard.operators.bash import BashOperator
@@ -156,7 +147,7 @@ with DAG(
     },
 ) as dag:
     task1 = PythonOperator(
-        pool=Pool.get_pool("test-pool-model").pool,
+        pool="test-pool-model",
         python_callable=foo,
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -167,7 +158,7 @@ with DAG(
         dag=dag,
     )
     task2 = BashOperator(
-        pool=Pool.create_or_update_pool(name="test", slots=5, description="", include_deferred=False).pool,
+        pool="test",
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -179,7 +170,7 @@ with DAG(
         dag=dag,
     )
     task3 = SSHOperator(
-        pool=Pool.get_pool("blerg").pool,
+        pool="blerg",
         do_xcom_push=True,
         ssh_hook=SSHHook(remote_host="test", username="test"),
         ssh_conn_id="test",
@@ -198,10 +189,8 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW_SSH:
-            with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
-                mock_get_pool.return_value = Pool()
-                dag.instantiate()
-                exec(dag.render())  # noqa: S102
+            dag.instantiate()
+            exec(dag.render())  # noqa: S102
 
     def test_render_with_dependencies(self, dag):
         dag.tasks["task1"].dependencies = []
@@ -214,7 +203,6 @@ with DAG(
 from datetime import datetime, time, timedelta
 
 from airflow.models import DAG
-from airflow.models.pool import Pool
 from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.providers.standard.operators.bash import BashOperator
@@ -257,7 +245,7 @@ with DAG(
     },
 ) as dag:
     task1 = PythonOperator(
-        pool=Pool.get_pool("test-pool-model").pool,
+        pool="test-pool-model",
         python_callable=foo,
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -268,7 +256,7 @@ with DAG(
         dag=dag,
     )
     task2 = BashOperator(
-        pool=Pool.create_or_update_pool(name="test", slots=5, description="", include_deferred=False).pool,
+        pool="test",
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -280,7 +268,7 @@ with DAG(
         dag=dag,
     )
     task3 = SSHOperator(
-        pool=Pool.get_pool("blerg").pool,
+        pool="blerg",
         do_xcom_push=True,
         ssh_hook=SSHHook(remote_host="test", username="test"),
         ssh_conn_id="test",
@@ -302,10 +290,8 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW_SSH:
-            with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
-                mock_get_pool.return_value = Pool()
-                dag.instantiate()
-                exec(dag.render())  # noqa: S102
+            dag.instantiate()
+            exec(dag.render())  # noqa: S102
 
     def test_render_with_externals(self, dag_with_external):
         assert isinstance(dag_with_external, Dag)
@@ -315,7 +301,6 @@ with DAG(
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
-from airflow.models.pool import Pool
 from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.providers.standard.operators.python import PythonOperator
@@ -353,7 +338,7 @@ with DAG(
     },
 ) as dag:
     task1 = PythonOperator(
-        pool=Pool.get_pool("test-pool-model").pool,
+        pool="test-pool-model",
         python_callable=foo,
         op_args=["test"],
         op_kwargs={"test": "test"},
@@ -364,7 +349,7 @@ with DAG(
         dag=dag,
     )
     task2 = BashOperator(
-        pool=Pool.create_or_update_pool(name="test", slots=5, description="", include_deferred=False).pool,
+        pool="test",
         bash_command="test",
         env={"test": "test"},
         append_env=True,
@@ -376,7 +361,7 @@ with DAG(
         dag=dag,
     )
     task3 = SSHOperator(
-        pool=Pool.get_pool("blerg").pool,
+        pool="blerg",
         do_xcom_push=True,
         ssh_hook=hook(),
         ssh_conn_id="test",
@@ -391,10 +376,8 @@ with DAG(
 """
         )
         if _HAVE_AIRFLOW_SSH:
-            with pools(Pool()), patch("airflow.models.pool.Pool.get_pool") as mock_get_pool:
-                mock_get_pool.return_value = Pool()
-                dag_with_external.instantiate()
-                exec(dag_with_external.render())  # noqa: S102
+            dag_with_external.instantiate()
+            exec(dag_with_external.render())  # noqa: S102
 
     def test_render_with_external_supervisor_config(self, dag_with_supervisor):
         assert isinstance(dag_with_supervisor, Dag)
