@@ -4,4 +4,4 @@ from .operators import *
 from .sensors import *
 from .utils import *
 
-__version__ = "1.5.10"
+__version__ = "1.6.0"
