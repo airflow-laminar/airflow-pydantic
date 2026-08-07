@@ -17,9 +17,8 @@ if TYPE_CHECKING:
 __all__ = ("PoolManagerConfiguration", "configured_pools")
 
 DEFAULT_DAG_ID = "airflow_laminar_pool_manager"
-GENERATED_RUNTIME_MODULE = "_airflow_laminar_pool_runtime"
 RUNTIME_IMPORT = "from airflow_pydantic.extras.balancer._pool_runtime import reconcile_pools"
-GENERATED_RUNTIME_IMPORT = f"from {GENERATED_RUNTIME_MODULE} import reconcile_pools"
+FUTURE_ANNOTATIONS_IMPORT = "from __future__ import annotations\n\n"
 
 
 def _default_dag() -> Dag:
@@ -110,11 +109,9 @@ class PoolManagerConfiguration(BaseModel):
         dag = self.build_dag(config)
         if dag is None:
             return {}
-        rendered = dag.render().replace(RUNTIME_IMPORT, GENERATED_RUNTIME_IMPORT)
-        return {
-            f"{GENERATED_RUNTIME_MODULE}.py": files("airflow_pydantic.extras.balancer").joinpath("_pool_runtime.py").read_text(),
-            f"{dag.dag_id}.py": rendered,
-        }
+        runtime = files("airflow_pydantic.extras.balancer").joinpath("_pool_runtime.py").read_text()
+        rendered = dag.render().replace(RUNTIME_IMPORT, runtime.removeprefix(FUTURE_ANNOTATIONS_IMPORT).rstrip())
+        return {f"{dag.dag_id}.py": rendered}
 
 
 def configured_pools(config: BalancerConfiguration) -> list[Pool]:

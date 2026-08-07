@@ -1,4 +1,5 @@
 import sys
+from importlib.util import module_from_spec, spec_from_file_location
 from types import ModuleType
 from unittest.mock import MagicMock, patch
 
@@ -47,12 +48,32 @@ def test_configured_pools_and_generated_files_are_runtime_independent():
     ]
 
     generated = config.generated_files()
-    assert set(generated) == {"_airflow_laminar_pool_runtime.py", "custom-pools.py"}
+    assert set(generated) == {"custom-pools.py"}
     assert all("airflow_pydantic" not in source for source in generated.values())
+    assert "sys.path" not in generated["custom-pools.py"]
+    assert "def reconcile_pools(" in generated["custom-pools.py"]
     assert '"name": "host-pool"' in generated["custom-pools.py"]
     assert '"mwaa_environment_name": "environment"' in generated["custom-pools.py"]
     for filename, source in generated.items():
         compile(source, filename, "exec")
+
+
+def test_generated_pool_dag_loads_from_nested_directory(tmp_path):
+    config = BalancerConfiguration(
+        hosts=[Host(name="host")],
+        pool_manager={"dag": {"dag_id": "custom-pools"}},
+    )
+    generated_dir = tmp_path / "nested"
+    generated_dir.mkdir()
+    for filename, source in config.generated_files().items():
+        (generated_dir / filename).write_text(source)
+
+    spec = spec_from_file_location("custom_pools", generated_dir / "custom-pools.py")
+    assert spec is not None and spec.loader is not None
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.dag.dag_id == "custom-pools"
 
 
 def test_configuration_does_not_access_airflow_pools():
