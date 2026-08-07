@@ -1,7 +1,9 @@
 import sys
-from importlib.util import module_from_spec, spec_from_file_location
+from importlib.util import find_spec, module_from_spec, spec_from_file_location
 from types import ModuleType
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from airflow_pydantic import BalancerConfiguration, Dag, Host, Pool, PoolManagerConfiguration, Port, TaskArgs
 from airflow_pydantic.extras.balancer._pool_runtime import (
@@ -58,6 +60,7 @@ def test_configured_pools_and_generated_files_are_runtime_independent():
         compile(source, filename, "exec")
 
 
+@pytest.mark.skipif(find_spec("airflow") is None, reason="Airflow is not installed")
 def test_generated_pool_dag_loads_from_nested_directory(tmp_path):
     config = BalancerConfiguration(
         hosts=[Host(name="host")],
