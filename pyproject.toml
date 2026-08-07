@@ -68,11 +68,11 @@ airflow3 = [
 ]
 laminar = [
     # Laminar
-    "airflow-balancer",
-    "airflow-config",
-    "airflow-common-operators",
-    "airflow-ha",
-    "airflow-supervisor>=1.9",
+    "airflow-balancer>=0.7.8",
+    "airflow-config>=1.12",
+    "airflow-common>=0.7.9",
+    "airflow-ha>=1.6.3",
+    "airflow-supervisor>=1.10.3",
     "supervisor-pydantic",
     # Airflow
     "apache-airflow>=2.8,<3.4",
