@@ -1,3 +1,5 @@
+import sys
+from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 from airflow_pydantic import BalancerConfiguration, Dag, Host, Pool, PoolManagerConfiguration, Port, TaskArgs
@@ -93,16 +95,19 @@ def test_api_reconciliation_creates_updates_and_preserves_slots():
 def test_airflow2_reconciliation_runs_from_the_task():
     current = MagicMock(slots=10, description="Old", include_deferred=True)
     desired = {"name": "pool", "slots": 4, "description": "Configured", "include_deferred": False}
+    pool = MagicMock()
+    pool.get_pool.return_value = current
+    airflow = ModuleType("airflow")
+    models = ModuleType("airflow.models")
+    pool_module = ModuleType("airflow.models.pool")
+    pool_module.Pool = pool
 
-    with (
-        patch("airflow.models.pool.Pool.get_pool", return_value=current) as get_pool,
-        patch("airflow.models.pool.Pool.create_or_update_pool") as create_or_update_pool,
-    ):
+    with patch.dict(sys.modules, {"airflow": airflow, "airflow.models": models, "airflow.models.pool": pool_module}):
         actions = _reconcile_airflow2([desired], {"override_pool_size": False})
 
     assert actions == ["updated pool: description, include_deferred"]
-    get_pool.assert_called_once_with("pool")
-    create_or_update_pool.assert_called_once_with("pool", 10, "Configured", False)
+    pool.get_pool.assert_called_once_with("pool")
+    pool.create_or_update_pool.assert_called_once_with("pool", 10, "Configured", False)
 
 
 def test_airflow3_backend_uses_task_sdk_connection():
@@ -114,15 +119,20 @@ def test_airflow3_backend_uses_task_sdk_connection():
     )
     response = MagicMock()
     response.__enter__.return_value.read.return_value = b'{"name": "pool"}'
+    connection_api = MagicMock()
+    connection_api.get.return_value = connection
+    airflow = ModuleType("airflow")
+    sdk = ModuleType("airflow.sdk")
+    sdk.Connection = connection_api
 
     with (
-        patch("airflow.sdk.Connection.get", return_value=connection) as get_connection,
+        patch.dict(sys.modules, {"airflow": airflow, "airflow.sdk": sdk}),
         patch("airflow_pydantic.extras.balancer._pool_runtime.urlopen", return_value=response) as open_url,
     ):
         request = _airflow3_request({"connection_id": "pool-api"})
         assert request("GET", "/pools/pool") == {"name": "pool"}
 
-    get_connection.assert_called_once_with("pool-api")
+    connection_api.get.assert_called_once_with("pool-api")
     api_request = open_url.call_args.args[0]
     assert api_request.full_url == "http://airflow-api:8080/api/v2/pools/pool"
     assert api_request.headers["Authorization"] == "Bearer token"
@@ -131,10 +141,12 @@ def test_airflow3_backend_uses_task_sdk_connection():
 def test_mwaa_backend_uses_iam_rest_api():
     boto_client = MagicMock()
     boto_client.invoke_rest_api.return_value = {"RestApiStatusCode": 200, "RestApiResponse": {"name": "pool"}}
+    boto3 = ModuleType("boto3")
+    boto3.client = MagicMock(return_value=boto_client)
 
-    with patch("boto3.client", return_value=boto_client) as boto_client_factory:
+    with patch.dict(sys.modules, {"boto3": boto3}):
         request = _mwaa_request({"mwaa_environment_name": "environment", "mwaa_region_name": "us-east-1"})
         assert request("GET", "/pools/pool") == {"name": "pool"}
 
-    boto_client_factory.assert_called_once_with("mwaa", region_name="us-east-1")
+    boto3.client.assert_called_once_with("mwaa", region_name="us-east-1")
     boto_client.invoke_rest_api.assert_called_once_with(Name="environment", Path="/pools/pool", Method="GET")
