@@ -2,17 +2,14 @@
 
 > Pydantic models for Apache Airflow DAGs, tasks, sensors, and utilities
 
-
-the airflow-pydantic authors
-
 ## Pages
 
-- [airflow-pydantic](index.html.md): Typed, serializable models for Apache Airflow DAGs, tasks, sensors, schedules,
+- [airflow-pydantic](index.html.md): Typed, serializable models for Apache Airflow DAGs, tasks, sensors, schedules, and runtime resources.
+- [Tutorial: build a declarative DAG](docs/src/tutorial.html.md): In this tutorial, we will describe an extract-and-report workflow in YAML, load it through airflow-config, and inspect the resulting DAG models.
+- [How-to guides](docs/src/how-to.html.md): These guides cover common model construction, rendering, scheduling, resource, and serialization tasks.
+- [Why model Airflow configuration](docs/src/explanation.html.md): Airflow DAG files are executable Python, but most of their content is data: schedules, retry policies, operator arguments, dependencies, pools, and connectio...
 - [API reference](docs/src/api.html.md): This reference is generated from public model signatures and docstrings.
-- [Why model Airflow configuration](docs/src/explanation.html.md): Airflow DAG files are executable Python, but most of their content is data:
-- [How-to guides](docs/src/how-to.html.md): These guides cover common model construction, rendering, scheduling, resource,
-- [Tutorial: build a declarative DAG](docs/src/tutorial.html.md): In this tutorial, we will describe an extract-and-report workflow in YAML,
 
----
+## Full documentation
 
-For more comprehensive documentation, see [llms-full.txt](llms-full.txt)
+- [llms-full.txt](llms-full.txt): All pages in one document.

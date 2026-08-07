@@ -30,10 +30,10 @@ objects. `airflow-config` is the recommended YAML entry point.
 
 ## Documentation
 
-- [Tutorial: build a declarative DAG](docs/src/tutorial.md)
-- [How-to guides](docs/src/how-to.md)
-- [Why model Airflow configuration](docs/src/explanation.md)
-- [API reference](docs/src/api.md)
+- [Tutorial: build a declarative DAG](docs/src/tutorial.html.md)
+- [How-to guides](docs/src/how-to.html.md)
+- [Why model Airflow configuration](docs/src/explanation.html.md)
+- [API reference](docs/src/api.html.md)
 
 Published documentation is available at
 [airflow-laminar.github.io/airflow-pydantic](https://airflow-laminar.github.io/airflow-pydantic/).

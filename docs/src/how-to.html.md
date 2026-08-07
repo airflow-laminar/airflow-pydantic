@@ -81,7 +81,7 @@ dag.tasks.update(
 )
 ```
 
-Refer to the [API reference](api.md) for every operator and sensor model.
+Refer to the [API reference](api.html.md) for every operator and sensor model.
 
 ## How to use custom timetables
 

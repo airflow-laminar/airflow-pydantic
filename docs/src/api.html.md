@@ -4,11 +4,11 @@ This reference is generated from public model signatures and docstrings.
 
 ## Core models
 
-### *pydantic model* airflow_pydantic.core.base.BaseModel
+### *pydantic model* airflow_pydantic.core.base.BaseModel[[source]](../../_modules/airflow_pydantic/core/base.html.md#BaseModel)
 
 Bases: `BaseModel`
 
-#### model_dump(\*\*kwargs)
+#### model_dump(\*\*kwargs)[[source]](../../_modules/airflow_pydantic/core/base.html.md#BaseModel.model_dump)
 
 !!! abstract “Usage Documentation”
 : [model_dump](../concepts/serialization.md#python-mode)
@@ -39,7 +39,7 @@ Generate a dictionary representation of the model, optionally specifying which f
 * **Returns:**
   A dictionary representation of the model.
 
-#### model_dump_json(\*\*kwargs)
+#### model_dump_json(\*\*kwargs)[[source]](../../_modules/airflow_pydantic/core/base.html.md#BaseModel.model_dump_json)
 
 !!! abstract “Usage Documentation”
 : [model_dump_json](../concepts/serialization.md#json-mode)
@@ -72,7 +72,7 @@ Generates a JSON representation of the model using Pydantic’s to_json method.
 
 <a id="module-airflow_pydantic.core.dag"></a>
 
-### *pydantic model* airflow_pydantic.core.dag.Dag
+### *pydantic model* airflow_pydantic.core.dag.Dag[[source]](../../_modules/airflow_pydantic/core/dag.html.md#Dag)
 
 Bases: [`DagArgs`](#airflow_pydantic.core.dag.DagArgs), `DagRenderMixin`, `DagInstantiateMixin`
 
@@ -84,7 +84,7 @@ The id of the DAG; must consist exclusively of alphanumeric characters, dashes, 
 
 List of tasks in the DAG
 
-### *pydantic model* airflow_pydantic.core.dag.DagArgs
+### *pydantic model* airflow_pydantic.core.dag.DagArgs[[source]](../../_modules/airflow_pydantic/core/dag.html.md#DagArgs)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -158,7 +158,7 @@ alias of [`Dag`](#airflow_pydantic.core.dag.Dag)
 
 <a id="module-airflow_pydantic.core.task"></a>
 
-### *pydantic model* airflow_pydantic.core.task.Task
+### *pydantic model* airflow_pydantic.core.task.Task[[source]](../../_modules/airflow_pydantic/core/task.html.md#Task)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs), `TaskRenderMixin`, `TaskInstantiateMixin`
 
@@ -174,11 +174,11 @@ airflow operator path
 
 dependencies
 
-#### set_upstream(other: [Task](#airflow_pydantic.core.task.Task) | list[[Task](#airflow_pydantic.core.task.Task)])
+#### set_upstream(other: [Task](#airflow_pydantic.core.task.Task) | list[[Task](#airflow_pydantic.core.task.Task)])[[source]](../../_modules/airflow_pydantic/core/task.html.md#Task.set_upstream)
 
-#### set_downstream(other: [Task](#airflow_pydantic.core.task.Task) | list[[Task](#airflow_pydantic.core.task.Task)])
+#### set_downstream(other: [Task](#airflow_pydantic.core.task.Task) | list[[Task](#airflow_pydantic.core.task.Task)])[[source]](../../_modules/airflow_pydantic/core/task.html.md#Task.set_downstream)
 
-### *pydantic model* airflow_pydantic.core.task.TaskArgs
+### *pydantic model* airflow_pydantic.core.task.TaskArgs[[source]](../../_modules/airflow_pydantic/core/task.html.md#TaskArgs)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -300,7 +300,7 @@ alias of [`BashTask`](#airflow_pydantic.operators.bash.BashTask)
 
 alias of [`BashTaskArgs`](#airflow_pydantic.operators.bash.BashTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.bash.BashTask
+### *pydantic model* airflow_pydantic.operators.bash.BashTask[[source]](../../_modules/airflow_pydantic/operators/bash.html.md#BashTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BashTaskArgs`](#airflow_pydantic.operators.bash.BashTaskArgs)
 
@@ -308,7 +308,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BashTaskArgs`](#airflow_pyd
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.bash.BashTaskArgs
+### *pydantic model* airflow_pydantic.operators.bash.BashTaskArgs[[source]](../../_modules/airflow_pydantic/operators/bash.html.md#BashTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -344,7 +344,7 @@ alias of [`BranchDateTimeTask`](#airflow_pydantic.operators.datetime.BranchDateT
 
 alias of [`BranchDateTimeTaskArgs`](#airflow_pydantic.operators.datetime.BranchDateTimeTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.datetime.BranchDateTimeTask
+### *pydantic model* airflow_pydantic.operators.datetime.BranchDateTimeTask[[source]](../../_modules/airflow_pydantic/operators/datetime.html.md#BranchDateTimeTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchDateTimeTaskArgs`](#airflow_pydantic.operators.datetime.BranchDateTimeTaskArgs)
 
@@ -352,7 +352,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchDateTimeTaskArgs`](#a
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.datetime.BranchDateTimeTaskArgs
+### *pydantic model* airflow_pydantic.operators.datetime.BranchDateTimeTaskArgs[[source]](../../_modules/airflow_pydantic/operators/datetime.html.md#BranchDateTimeTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -390,7 +390,7 @@ alias of [`EmailTask`](#airflow_pydantic.operators.email.EmailTask)
 
 alias of [`EmailTaskArgs`](#airflow_pydantic.operators.email.EmailTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.email.EmailTask
+### *pydantic model* airflow_pydantic.operators.email.EmailTask[[source]](../../_modules/airflow_pydantic/operators/email.html.md#EmailTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`EmailTaskArgs`](#airflow_pydantic.operators.email.EmailTaskArgs)
 
@@ -398,7 +398,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`EmailTaskArgs`](#airflow_py
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.email.EmailTaskArgs
+### *pydantic model* airflow_pydantic.operators.email.EmailTaskArgs[[source]](../../_modules/airflow_pydantic/operators/email.html.md#EmailTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -452,7 +452,7 @@ alias of [`EmptyTask`](#airflow_pydantic.operators.empty.EmptyTask)
 
 alias of `EmptyTaskArgs`
 
-### *pydantic model* airflow_pydantic.operators.empty.EmptyTask
+### *pydantic model* airflow_pydantic.operators.empty.EmptyTask[[source]](../../_modules/airflow_pydantic/operators/empty.html.md#EmptyTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), `EmptyTaskArgs`
 
@@ -462,7 +462,7 @@ airflow operator path
 
 <a id="module-airflow_pydantic.operators.external_task"></a>
 
-### *pydantic model* airflow_pydantic.operators.external_task.ExternalTaskMarker
+### *pydantic model* airflow_pydantic.operators.external_task.ExternalTaskMarker[[source]](../../_modules/airflow_pydantic/operators/external_task.html.md#ExternalTaskMarker)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ExternalTaskMarkerArgs`](#airflow_pydantic.operators.external_task.ExternalTaskMarkerArgs)
 
@@ -470,7 +470,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ExternalTaskMarkerArgs`](#a
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.external_task.ExternalTaskMarkerArgs
+### *pydantic model* airflow_pydantic.operators.external_task.ExternalTaskMarkerArgs[[source]](../../_modules/airflow_pydantic/operators/external_task.html.md#ExternalTaskMarkerArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -484,7 +484,7 @@ alias of [`ApprovalTask`](#airflow_pydantic.operators.hitl.ApprovalTask)
 
 alias of [`ApprovalTaskArgs`](#airflow_pydantic.operators.hitl.ApprovalTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.hitl.ApprovalTask
+### *pydantic model* airflow_pydantic.operators.hitl.ApprovalTask[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#ApprovalTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ApprovalTaskArgs`](#airflow_pydantic.operators.hitl.ApprovalTaskArgs)
 
@@ -492,7 +492,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ApprovalTaskArgs`](#airflow
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.hitl.ApprovalTaskArgs
+### *pydantic model* airflow_pydantic.operators.hitl.ApprovalTaskArgs[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#ApprovalTaskArgs)
 
 Bases: [`HITLTaskArgs`](#airflow_pydantic.operators.hitl.HITLTaskArgs)
 
@@ -504,7 +504,7 @@ alias of [`HITLBranchTask`](#airflow_pydantic.operators.hitl.HITLBranchTask)
 
 alias of [`HITLBranchTaskArgs`](#airflow_pydantic.operators.hitl.HITLBranchTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.hitl.HITLBranchTask
+### *pydantic model* airflow_pydantic.operators.hitl.HITLBranchTask[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#HITLBranchTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`HITLBranchTaskArgs`](#airflow_pydantic.operators.hitl.HITLBranchTaskArgs)
 
@@ -512,7 +512,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`HITLBranchTaskArgs`](#airfl
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.hitl.HITLBranchTaskArgs
+### *pydantic model* airflow_pydantic.operators.hitl.HITLBranchTaskArgs[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#HITLBranchTaskArgs)
 
 Bases: [`HITLTaskArgs`](#airflow_pydantic.operators.hitl.HITLTaskArgs)
 
@@ -524,7 +524,7 @@ alias of [`HITLEntryTask`](#airflow_pydantic.operators.hitl.HITLEntryTask)
 
 alias of [`HITLEntryTaskArgs`](#airflow_pydantic.operators.hitl.HITLEntryTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.hitl.HITLEntryTask
+### *pydantic model* airflow_pydantic.operators.hitl.HITLEntryTask[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#HITLEntryTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`HITLEntryTaskArgs`](#airflow_pydantic.operators.hitl.HITLEntryTaskArgs)
 
@@ -532,7 +532,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`HITLEntryTaskArgs`](#airflo
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.hitl.HITLEntryTaskArgs
+### *pydantic model* airflow_pydantic.operators.hitl.HITLEntryTaskArgs[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#HITLEntryTaskArgs)
 
 Bases: [`HITLTaskArgs`](#airflow_pydantic.operators.hitl.HITLTaskArgs)
 
@@ -544,7 +544,7 @@ alias of [`HITLTask`](#airflow_pydantic.operators.hitl.HITLTask)
 
 alias of [`HITLTaskArgs`](#airflow_pydantic.operators.hitl.HITLTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.hitl.HITLTask
+### *pydantic model* airflow_pydantic.operators.hitl.HITLTask[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#HITLTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`HITLTaskArgs`](#airflow_pydantic.operators.hitl.HITLTaskArgs)
 
@@ -552,7 +552,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`HITLTaskArgs`](#airflow_pyd
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.hitl.HITLTaskArgs
+### *pydantic model* airflow_pydantic.operators.hitl.HITLTaskArgs[[source]](../../_modules/airflow_pydantic/operators/hitl.html.md#HITLTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -592,7 +592,7 @@ alias of [`BranchExternalPythonTask`](#airflow_pydantic.operators.python.BranchE
 
 alias of [`BranchExternalPythonTaskArgs`](#airflow_pydantic.operators.python.BranchExternalPythonTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.BranchExternalPythonTask
+### *pydantic model* airflow_pydantic.operators.python.BranchExternalPythonTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#BranchExternalPythonTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchExternalPythonTaskArgs`](#airflow_pydantic.operators.python.BranchExternalPythonTaskArgs)
 
@@ -600,7 +600,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchExternalPythonTaskArg
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.BranchExternalPythonTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.BranchExternalPythonTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#BranchExternalPythonTaskArgs)
 
 Bases: [`ExternalPythonTaskArgs`](#airflow_pydantic.operators.python.ExternalPythonTaskArgs)
 
@@ -612,7 +612,7 @@ alias of [`BranchPythonTask`](#airflow_pydantic.operators.python.BranchPythonTas
 
 alias of [`BranchPythonTaskArgs`](#airflow_pydantic.operators.python.BranchPythonTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.BranchPythonTask
+### *pydantic model* airflow_pydantic.operators.python.BranchPythonTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#BranchPythonTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchPythonTaskArgs`](#airflow_pydantic.operators.python.BranchPythonTaskArgs)
 
@@ -620,7 +620,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchPythonTaskArgs`](#air
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.BranchPythonTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.BranchPythonTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#BranchPythonTaskArgs)
 
 Bases: [`PythonTaskArgs`](#airflow_pydantic.operators.python.PythonTaskArgs)
 
@@ -632,7 +632,7 @@ alias of [`BranchPythonVirtualenvTask`](#airflow_pydantic.operators.python.Branc
 
 alias of [`BranchPythonVirtualenvTaskArgs`](#airflow_pydantic.operators.python.BranchPythonVirtualenvTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.BranchPythonVirtualenvTask
+### *pydantic model* airflow_pydantic.operators.python.BranchPythonVirtualenvTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#BranchPythonVirtualenvTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchPythonVirtualenvTaskArgs`](#airflow_pydantic.operators.python.BranchPythonVirtualenvTaskArgs)
 
@@ -640,7 +640,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchPythonVirtualenvTaskA
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.BranchPythonVirtualenvTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.BranchPythonVirtualenvTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#BranchPythonVirtualenvTaskArgs)
 
 Bases: [`PythonVirtualenvTaskArgs`](#airflow_pydantic.operators.python.PythonVirtualenvTaskArgs)
 
@@ -652,7 +652,7 @@ alias of [`ExternalPythonTask`](#airflow_pydantic.operators.python.ExternalPytho
 
 alias of [`ExternalPythonTaskArgs`](#airflow_pydantic.operators.python.ExternalPythonTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.ExternalPythonTask
+### *pydantic model* airflow_pydantic.operators.python.ExternalPythonTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#ExternalPythonTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ExternalPythonTaskArgs`](#airflow_pydantic.operators.python.ExternalPythonTaskArgs)
 
@@ -660,7 +660,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ExternalPythonTaskArgs`](#a
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.ExternalPythonTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.ExternalPythonTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#ExternalPythonTaskArgs)
 
 Bases: [`PythonTaskArgs`](#airflow_pydantic.operators.python.PythonTaskArgs)
 
@@ -720,7 +720,7 @@ alias of [`PythonTask`](#airflow_pydantic.operators.python.PythonTask)
 
 alias of [`PythonTaskArgs`](#airflow_pydantic.operators.python.PythonTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.PythonTask
+### *pydantic model* airflow_pydantic.operators.python.PythonTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#PythonTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`PythonTaskArgs`](#airflow_pydantic.operators.python.PythonTaskArgs)
 
@@ -728,7 +728,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`PythonTaskArgs`](#airflow_p
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.PythonTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.PythonTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#PythonTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -764,7 +764,7 @@ alias of [`PythonVirtualenvTask`](#airflow_pydantic.operators.python.PythonVirtu
 
 alias of [`PythonVirtualenvTaskArgs`](#airflow_pydantic.operators.python.PythonVirtualenvTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.PythonVirtualenvTask
+### *pydantic model* airflow_pydantic.operators.python.PythonVirtualenvTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#PythonVirtualenvTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`PythonVirtualenvTaskArgs`](#airflow_pydantic.operators.python.PythonVirtualenvTaskArgs)
 
@@ -772,7 +772,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`PythonVirtualenvTaskArgs`](
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.PythonVirtualenvTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.PythonVirtualenvTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#PythonVirtualenvTaskArgs)
 
 Bases: [`PythonTaskArgs`](#airflow_pydantic.operators.python.PythonTaskArgs)
 
@@ -856,7 +856,7 @@ alias of [`ShortCircuitTask`](#airflow_pydantic.operators.python.ShortCircuitTas
 
 alias of [`ShortCircuitTaskArgs`](#airflow_pydantic.operators.python.ShortCircuitTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.python.ShortCircuitTask
+### *pydantic model* airflow_pydantic.operators.python.ShortCircuitTask[[source]](../../_modules/airflow_pydantic/operators/python.html.md#ShortCircuitTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ShortCircuitTaskArgs`](#airflow_pydantic.operators.python.ShortCircuitTaskArgs)
 
@@ -864,7 +864,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ShortCircuitTaskArgs`](#air
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.python.ShortCircuitTaskArgs
+### *pydantic model* airflow_pydantic.operators.python.ShortCircuitTaskArgs[[source]](../../_modules/airflow_pydantic/operators/python.html.md#ShortCircuitTaskArgs)
 
 Bases: [`PythonTaskArgs`](#airflow_pydantic.operators.python.PythonTaskArgs)
 
@@ -884,7 +884,7 @@ alias of [`SSHTask`](#airflow_pydantic.operators.ssh.SSHTask)
 
 alias of [`SSHTaskArgs`](#airflow_pydantic.operators.ssh.SSHTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.ssh.SSHTask
+### *pydantic model* airflow_pydantic.operators.ssh.SSHTask[[source]](../../_modules/airflow_pydantic/operators/ssh.html.md#SSHTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`SSHTaskArgs`](#airflow_pydantic.operators.ssh.SSHTaskArgs)
 
@@ -892,11 +892,11 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`SSHTaskArgs`](#airflow_pyda
 
 airflow operator path
 
-#### instantiate(\*\*kwargs)
+#### instantiate(\*\*kwargs)[[source]](../../_modules/airflow_pydantic/operators/ssh.html.md#SSHTask.instantiate)
 
-#### render(raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, \*\*kwargs)
+#### render(raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, \*\*kwargs)[[source]](../../_modules/airflow_pydantic/operators/ssh.html.md#SSHTask.render)
 
-### *pydantic model* airflow_pydantic.operators.ssh.SSHTaskArgs
+### *pydantic model* airflow_pydantic.operators.ssh.SSHTaskArgs[[source]](../../_modules/airflow_pydantic/operators/ssh.html.md#SSHTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -960,7 +960,7 @@ alias of [`TriggerDagRunTask`](#airflow_pydantic.operators.trigger.TriggerDagRun
 
 alias of [`TriggerDagRunTaskArgs`](#airflow_pydantic.operators.trigger.TriggerDagRunTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.trigger.TriggerDagRunTask
+### *pydantic model* airflow_pydantic.operators.trigger.TriggerDagRunTask[[source]](../../_modules/airflow_pydantic/operators/trigger.html.md#TriggerDagRunTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`TriggerDagRunTaskArgs`](#airflow_pydantic.operators.trigger.TriggerDagRunTaskArgs)
 
@@ -968,7 +968,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`TriggerDagRunTaskArgs`](#ai
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.trigger.TriggerDagRunTaskArgs
+### *pydantic model* airflow_pydantic.operators.trigger.TriggerDagRunTaskArgs[[source]](../../_modules/airflow_pydantic/operators/trigger.html.md#TriggerDagRunTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -1026,7 +1026,7 @@ alias of [`BranchDayOfWeekTask`](#airflow_pydantic.operators.weekday.BranchDayOf
 
 alias of [`BranchDayOfWeekTaskArgs`](#airflow_pydantic.operators.weekday.BranchDayOfWeekTaskArgs)
 
-### *pydantic model* airflow_pydantic.operators.weekday.BranchDayOfWeekTask
+### *pydantic model* airflow_pydantic.operators.weekday.BranchDayOfWeekTask[[source]](../../_modules/airflow_pydantic/operators/weekday.html.md#BranchDayOfWeekTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchDayOfWeekTaskArgs`](#airflow_pydantic.operators.weekday.BranchDayOfWeekTaskArgs)
 
@@ -1034,7 +1034,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BranchDayOfWeekTaskArgs`](#
 
 airflow operator path
 
-### *pydantic model* airflow_pydantic.operators.weekday.BranchDayOfWeekTaskArgs
+### *pydantic model* airflow_pydantic.operators.weekday.BranchDayOfWeekTaskArgs[[source]](../../_modules/airflow_pydantic/operators/weekday.html.md#BranchDayOfWeekTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -1064,7 +1064,7 @@ If True, uses the task’s execution date for comparison; otherwise, uses the cu
 
 ## Sensors
 
-### *pydantic model* airflow_pydantic.sensors.base.BaseSensorArgs
+### *pydantic model* airflow_pydantic.sensors.base.BaseSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/base.html.md#BaseSensorArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -1086,7 +1086,7 @@ Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
 <a id="module-airflow_pydantic.sensors.bash"></a>
 
-### *pydantic model* airflow_pydantic.sensors.bash.BashSensor
+### *pydantic model* airflow_pydantic.sensors.bash.BashSensor[[source]](../../_modules/airflow_pydantic/sensors/bash.html.md#BashSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BashSensorArgs`](#airflow_pydantic.sensors.bash.BashSensorArgs)
 
@@ -1094,7 +1094,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`BashSensorArgs`](#airflow_p
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.bash.BashSensorArgs
+### *pydantic model* airflow_pydantic.sensors.bash.BashSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/bash.html.md#BashSensorArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -1112,7 +1112,7 @@ Output encoding for the command, default is ‘utf-8’
 
 <a id="module-airflow_pydantic.sensors.datetime"></a>
 
-### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensor
+### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensor[[source]](../../_modules/airflow_pydantic/sensors/datetime.html.md#DateTimeSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DateTimeSensorArgs`](#airflow_pydantic.sensors.datetime.DateTimeSensorArgs)
 
@@ -1120,7 +1120,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DateTimeSensorArgs`](#airfl
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensorArgs
+### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/datetime.html.md#DateTimeSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1128,7 +1128,7 @@ Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
 The target date and time to wait for
 
-### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensorAsync
+### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensorAsync[[source]](../../_modules/airflow_pydantic/sensors/datetime.html.md#DateTimeSensorAsync)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DateTimeSensorAsyncArgs`](#airflow_pydantic.sensors.datetime.DateTimeSensorAsyncArgs)
 
@@ -1136,7 +1136,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DateTimeSensorAsyncArgs`](#
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensorAsyncArgs
+### *pydantic model* airflow_pydantic.sensors.datetime.DateTimeSensorAsyncArgs[[source]](../../_modules/airflow_pydantic/sensors/datetime.html.md#DateTimeSensorAsyncArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1158,7 +1158,7 @@ If True, the sensor will end from the trigger state when used in deferrable mode
 
 <a id="module-airflow_pydantic.sensors.external_task"></a>
 
-### *pydantic model* airflow_pydantic.sensors.external_task.ExternalTaskSensor
+### *pydantic model* airflow_pydantic.sensors.external_task.ExternalTaskSensor[[source]](../../_modules/airflow_pydantic/sensors/external_task.html.md#ExternalTaskSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ExternalTaskSensorArgs`](#airflow_pydantic.sensors.external_task.ExternalTaskSensorArgs)
 
@@ -1166,7 +1166,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`ExternalTaskSensorArgs`](#a
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.external_task.ExternalTaskSensorArgs
+### *pydantic model* airflow_pydantic.sensors.external_task.ExternalTaskSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/external_task.html.md#ExternalTaskSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1220,7 +1220,7 @@ Set to True to enable deferrable mode for this operator
 
 <a id="module-airflow_pydantic.sensors.filesystem"></a>
 
-### *pydantic model* airflow_pydantic.sensors.filesystem.FileSensor
+### *pydantic model* airflow_pydantic.sensors.filesystem.FileSensor[[source]](../../_modules/airflow_pydantic/sensors/filesystem.html.md#FileSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`FileSensorArgs`](#airflow_pydantic.sensors.filesystem.FileSensorArgs)
 
@@ -1228,7 +1228,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`FileSensorArgs`](#airflow_p
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.filesystem.FileSensorArgs
+### *pydantic model* airflow_pydantic.sensors.filesystem.FileSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/filesystem.html.md#FileSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1258,7 +1258,7 @@ Additional keyword arguments to pass to the trigger when in deferrable mode
 
 <a id="module-airflow_pydantic.sensors.python"></a>
 
-### *pydantic model* airflow_pydantic.sensors.python.PythonSensor
+### *pydantic model* airflow_pydantic.sensors.python.PythonSensor[[source]](../../_modules/airflow_pydantic/sensors/python.html.md#PythonSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`PythonSensorArgs`](#airflow_pydantic.sensors.python.PythonSensorArgs)
 
@@ -1266,7 +1266,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`PythonSensorArgs`](#airflow
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.python.PythonSensorArgs
+### *pydantic model* airflow_pydantic.sensors.python.PythonSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/python.html.md#PythonSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1288,7 +1288,7 @@ a dictionary where the values are templates that will get templated by the Airfl
 
 <a id="module-airflow_pydantic.sensors.time"></a>
 
-### *pydantic model* airflow_pydantic.sensors.time.TimeSensor
+### *pydantic model* airflow_pydantic.sensors.time.TimeSensor[[source]](../../_modules/airflow_pydantic/sensors/time.html.md#TimeSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`TimeSensorArgs`](#airflow_pydantic.sensors.time.TimeSensorArgs)
 
@@ -1296,7 +1296,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`TimeSensorArgs`](#airflow_p
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.time.TimeSensorArgs
+### *pydantic model* airflow_pydantic.sensors.time.TimeSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/time.html.md#TimeSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1310,7 +1310,7 @@ If True, the sensor will operate in deferrable mode
 
 <a id="module-airflow_pydantic.sensors.timedelta"></a>
 
-### *pydantic model* airflow_pydantic.sensors.timedelta.TimeDeltaSensor
+### *pydantic model* airflow_pydantic.sensors.timedelta.TimeDeltaSensor[[source]](../../_modules/airflow_pydantic/sensors/timedelta.html.md#TimeDeltaSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`TimeDeltaSensorArgs`](#airflow_pydantic.sensors.timedelta.TimeDeltaSensorArgs)
 
@@ -1318,7 +1318,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`TimeDeltaSensorArgs`](#airf
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.timedelta.TimeDeltaSensorArgs
+### *pydantic model* airflow_pydantic.sensors.timedelta.TimeDeltaSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/timedelta.html.md#TimeDeltaSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1330,7 +1330,7 @@ Time to wait before succeeding.
 
 If True, the sensor will operate in deferrable mode
 
-### *pydantic model* airflow_pydantic.sensors.timedelta.WaitSensor
+### *pydantic model* airflow_pydantic.sensors.timedelta.WaitSensor[[source]](../../_modules/airflow_pydantic/sensors/timedelta.html.md#WaitSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`WaitSensorArgs`](#airflow_pydantic.sensors.timedelta.WaitSensorArgs)
 
@@ -1338,7 +1338,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`WaitSensorArgs`](#airflow_p
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.timedelta.WaitSensorArgs
+### *pydantic model* airflow_pydantic.sensors.timedelta.WaitSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/timedelta.html.md#WaitSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1352,7 +1352,7 @@ If True, the sensor will operate in deferrable mode
 
 <a id="module-airflow_pydantic.sensors.weekday"></a>
 
-### *pydantic model* airflow_pydantic.sensors.weekday.DayOfWeekSensor
+### *pydantic model* airflow_pydantic.sensors.weekday.DayOfWeekSensor[[source]](../../_modules/airflow_pydantic/sensors/weekday.html.md#DayOfWeekSensor)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DayOfWeekSensorArgs`](#airflow_pydantic.sensors.weekday.DayOfWeekSensorArgs)
 
@@ -1360,7 +1360,7 @@ Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DayOfWeekSensorArgs`](#airf
 
 airflow sensor path
 
-### *pydantic model* airflow_pydantic.sensors.weekday.DayOfWeekSensorArgs
+### *pydantic model* airflow_pydantic.sensors.weekday.DayOfWeekSensorArgs[[source]](../../_modules/airflow_pydantic/sensors/weekday.html.md#DayOfWeekSensorArgs)
 
 Bases: [`BaseSensorArgs`](#airflow_pydantic.sensors.base.BaseSensorArgs)
 
@@ -1376,7 +1376,7 @@ If True, uses task’s logical date to compare with week_day. Execution Date is 
 
 <a id="module-airflow_pydantic.utils.timetables"></a>
 
-### *pydantic model* airflow_pydantic.utils.timetables.CronDataIntervalTimetable
+### *pydantic model* airflow_pydantic.utils.timetables.CronDataIntervalTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#CronDataIntervalTimetable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1384,9 +1384,9 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* timezone *: str | TimeZoneName | timedelta | None* *= None*
 
-#### instance() → CronDataIntervalTimetable
+#### instance() → CronDataIntervalTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#CronDataIntervalTimetable.instance)
 
-### *pydantic model* airflow_pydantic.utils.timetables.CronTriggerTimetable
+### *pydantic model* airflow_pydantic.utils.timetables.CronTriggerTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#CronTriggerTimetable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1398,17 +1398,17 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* run_immediately *: bool | timedelta | None* *= None*
 
-#### instance() → CronTriggerTimetable
+#### instance() → CronTriggerTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#CronTriggerTimetable.instance)
 
-### *pydantic model* airflow_pydantic.utils.timetables.DeltaDataIntervalTimetable
+### *pydantic model* airflow_pydantic.utils.timetables.DeltaDataIntervalTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#DeltaDataIntervalTimetable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* delta *: timedelta | Annotated[relativedelta, RelativeDeltaType]* *[Required]*
 
-#### instance() → DeltaDataIntervalTimetable
+#### instance() → DeltaDataIntervalTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#DeltaDataIntervalTimetable.instance)
 
-### *pydantic model* airflow_pydantic.utils.timetables.DeltaTriggerTimetable
+### *pydantic model* airflow_pydantic.utils.timetables.DeltaTriggerTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#DeltaTriggerTimetable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1416,9 +1416,9 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* interval *: timedelta | Annotated[relativedelta, RelativeDeltaType] | None* *= None*
 
-#### instance() → DeltaTriggerTimetable
+#### instance() → DeltaTriggerTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#DeltaTriggerTimetable.instance)
 
-### *pydantic model* airflow_pydantic.utils.timetables.EventsTimetable
+### *pydantic model* airflow_pydantic.utils.timetables.EventsTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#EventsTimetable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1430,13 +1430,13 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* description *: str | None* *= None*
 
-#### instance() → EventsTimetable
+#### instance() → EventsTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#EventsTimetable.instance)
 
 ### airflow_pydantic.utils.timetables.FixedTimezone
 
 alias of `timedelta`
 
-### *pydantic model* airflow_pydantic.utils.timetables.MultipleCronTriggerTimetable
+### *pydantic model* airflow_pydantic.utils.timetables.MultipleCronTriggerTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#MultipleCronTriggerTimetable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1448,7 +1448,7 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* run_immediately *: bool | timedelta | None* *= None*
 
-#### instance() → MultipleCronTriggerTimetable
+#### instance() → MultipleCronTriggerTimetable[[source]](../../_modules/airflow_pydantic/utils/timetables.html.md#MultipleCronTriggerTimetable.instance)
 
 ### airflow_pydantic.utils.timetables.Timezone
 
@@ -1456,7 +1456,7 @@ alias of `TimeZoneName`
 
 <a id="module-airflow_pydantic.utils.param"></a>
 
-### *class* airflow_pydantic.utils.param.ParamType
+### *class* airflow_pydantic.utils.param.ParamType[[source]](../../_modules/airflow_pydantic/utils/param.html.md#ParamType)
 
 Bases: `object`
 
@@ -1470,7 +1470,7 @@ Bases: `object`
 
 <a id="module-airflow_pydantic.utils.pool"></a>
 
-### *pydantic model* airflow_pydantic.utils.pool.Pool
+### *pydantic model* airflow_pydantic.utils.pool.Pool[[source]](../../_modules/airflow_pydantic/utils/pool.html.md#Pool)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1492,7 +1492,7 @@ Whether to include deferred tasks in the pool
 
 <a id="module-airflow_pydantic.utils.variable"></a>
 
-### *pydantic model* airflow_pydantic.utils.variable.Variable
+### *pydantic model* airflow_pydantic.utils.variable.Variable[[source]](../../_modules/airflow_pydantic/utils/variable.html.md#Variable)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1516,13 +1516,13 @@ Whether the variable is encrypted
 
 Whether to deserialize JSON
 
-#### get()
+#### get()[[source]](../../_modules/airflow_pydantic/utils/variable.html.md#Variable.get)
 
 <a id="module-airflow_pydantic.utils.ssh_hook"></a>
 
 <a id="module-airflow_pydantic.utils.bash"></a>
 
-### *pydantic model* airflow_pydantic.utils.bash.BashCommands
+### *pydantic model* airflow_pydantic.utils.bash.BashCommands[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#BashCommands)
 
 Bases: `BaseModel`
 
@@ -1538,7 +1538,7 @@ Bases: `BaseModel`
 
 #### *field* env *: dict[str, str] | None* *= None*
 
-### airflow_pydantic.utils.bash.in_bash(command: str, quote: str | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str
+### airflow_pydantic.utils.bash.in_bash(command: str, quote: str | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#in_bash)
 
 Run command inside bash.
 
@@ -1555,7 +1555,7 @@ Run command inside bash.
 
 <a id="module-airflow_pydantic.utils.common"></a>
 
-### *class* airflow_pydantic.utils.common.TriggerRule(value)
+### *class* airflow_pydantic.utils.common.TriggerRule(value)[[source]](../../_modules/airflow_pydantic/airflow.html.md#TriggerRule)
 
 Bases: `str`, `Enum`
 
@@ -1585,17 +1585,17 @@ Class with task’s trigger rules.
 
 #### ONE_SUCCESS *= 'one_success'*
 
-#### *classmethod* all_triggers() → set[str]
+#### *classmethod* all_triggers() → set[str][[source]](../../_modules/airflow_pydantic/airflow.html.md#TriggerRule.all_triggers)
 
 Return all trigger rules.
 
-#### *classmethod* is_valid(trigger_rule: str) → bool
+#### *classmethod* is_valid(trigger_rule: str) → bool[[source]](../../_modules/airflow_pydantic/airflow.html.md#TriggerRule.is_valid)
 
 Validate a trigger rule.
 
 <a id="module-airflow_pydantic.utils.env"></a>
 
-### airflow_pydantic.utils.env.in_bash(command: str, quote: str | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str
+### airflow_pydantic.utils.env.in_bash(command: str, quote: str | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#in_bash)
 
 Run command inside bash.
 
@@ -1610,13 +1610,13 @@ Run command inside bash.
 * **Return type:**
   str
 
-### airflow_pydantic.utils.env.in_conda(env: str, command: str, tool: str = 'micromamba') → str
+### airflow_pydantic.utils.env.in_conda(env: str, command: str, tool: str = 'micromamba') → str[[source]](../../_modules/airflow_pydantic/utils/env.html.md#in_conda)
 
-### airflow_pydantic.utils.env.in_virtualenv(env: str, command: str) → str
+### airflow_pydantic.utils.env.in_virtualenv(env: str, command: str) → str[[source]](../../_modules/airflow_pydantic/utils/env.html.md#in_virtualenv)
 
 <a id="module-airflow_pydantic.utils.path"></a>
 
-### airflow_pydantic.utils.path.link(source, target, unlink: bool = True)
+### airflow_pydantic.utils.path.link(source, target, unlink: bool = True)[[source]](../../_modules/airflow_pydantic/utils/path.html.md#link)
 
 Link a file or directory to another location.
 
@@ -1633,11 +1633,11 @@ Link a file or directory to another location.
 
 ## Host and balancer models
 
-### airflow_pydantic.utils.host.ping(host, , local=True) → Callable
+### airflow_pydantic.utils.host.ping(host, , local=True) → Callable[[source]](../../_modules/airflow_pydantic/utils/host.html.md#ping)
 
 <a id="module-airflow_pydantic.extras.balancer.host"></a>
 
-### *pydantic model* airflow_pydantic.extras.balancer.host.Host
+### *pydantic model* airflow_pydantic.extras.balancer.host.Host[[source]](../../_modules/airflow_pydantic/extras/balancer/host.html.md#Host)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1659,13 +1659,13 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* tags *: list[str]* *[Optional]*
 
-#### override(\*\*kwargs) → [Host](#airflow_pydantic.extras.balancer.host.Host)
+#### override(\*\*kwargs) → [Host](#airflow_pydantic.extras.balancer.host.Host)[[source]](../../_modules/airflow_pydantic/extras/balancer/host.html.md#Host.override)
 
-#### hook(username: str | None = None, use_local: bool = True, \*\*hook_kwargs) → SSHHook
+#### hook(username: str | None = None, use_local: bool = True, \*\*hook_kwargs) → SSHHook[[source]](../../_modules/airflow_pydantic/extras/balancer/host.html.md#Host.hook)
 
 <a id="module-airflow_pydantic.extras.balancer.port"></a>
 
-### *pydantic model* airflow_pydantic.extras.balancer.port.Port
+### *pydantic model* airflow_pydantic.extras.balancer.port.Port[[source]](../../_modules/airflow_pydantic/extras/balancer/port.html.md#Port)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1685,7 +1685,7 @@ Port number
 
 <a id="module-airflow_pydantic.extras.balancer.query"></a>
 
-### *pydantic model* airflow_pydantic.extras.balancer.query.BalancerHostQueryConfiguration
+### *pydantic model* airflow_pydantic.extras.balancer.query.BalancerHostQueryConfiguration[[source]](../../_modules/airflow_pydantic/extras/balancer/query.html.md#BalancerHostQueryConfiguration)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1705,11 +1705,11 @@ Kind of query to perform, either ‘filter’ to return a list of matching hosts
 
 #### *field* custom *: Callable | Annotated[object, BeforeValidator(func=get_import_path, json_schema_input_type=PydanticUndefined), PlainSerializer(func=serialize_path_as_string, return_type=str, when_used=json)] | None* *= None*
 
-#### execute() → list[[Host](#airflow_pydantic.extras.balancer.host.Host)] | [Host](#airflow_pydantic.extras.balancer.host.Host)
+#### execute() → list[[Host](#airflow_pydantic.extras.balancer.host.Host)] | [Host](#airflow_pydantic.extras.balancer.host.Host)[[source]](../../_modules/airflow_pydantic/extras/balancer/query.html.md#BalancerHostQueryConfiguration.execute)
 
 Execute the query against the provided hosts and ports.
 
-### *pydantic model* airflow_pydantic.extras.balancer.query.BalancerPortQueryConfiguration
+### *pydantic model* airflow_pydantic.extras.balancer.query.BalancerPortQueryConfiguration[[source]](../../_modules/airflow_pydantic/extras/balancer/query.html.md#BalancerPortQueryConfiguration)
 
 Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
@@ -1725,7 +1725,7 @@ Kind of query to perform, either ‘filter’ to return a list of matching hosts
 
 #### *field* custom *: Callable | Annotated[object, BeforeValidator(func=get_import_path, json_schema_input_type=PydanticUndefined), PlainSerializer(func=serialize_path_as_string, return_type=str, when_used=json)] | None* *= None*
 
-#### execute() → list[[Host](#airflow_pydantic.extras.balancer.host.Host)] | [Host](#airflow_pydantic.extras.balancer.host.Host)
+#### execute() → list[[Host](#airflow_pydantic.extras.balancer.host.Host)] | [Host](#airflow_pydantic.extras.balancer.host.Host)[[source]](../../_modules/airflow_pydantic/extras/balancer/query.html.md#BalancerPortQueryConfiguration.execute)
 
 Execute the query against the provided hosts and ports.
 
@@ -1739,19 +1739,19 @@ alias of [`BalancerPortQueryConfiguration`](#airflow_pydantic.extras.balancer.qu
 
 ## Common extensions
 
-### airflow_pydantic.extras.common.airflow_functions.clean_dag_runs(session, delete_successful, delete_failed, mark_failed_as_successful, max_dagruns, days_to_keep)
+### airflow_pydantic.extras.common.airflow_functions.clean_dag_runs(session, delete_successful, delete_failed, mark_failed_as_successful, max_dagruns, days_to_keep)[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#clean_dag_runs)
 
-### airflow_pydantic.extras.common.airflow_functions.clean_dags(session, \*\*context)
+### airflow_pydantic.extras.common.airflow_functions.clean_dags(session, \*\*context)[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#clean_dags)
 
-### airflow_pydantic.extras.common.airflow_functions.fail()
+### airflow_pydantic.extras.common.airflow_functions.fail()[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#fail)
 
-### airflow_pydantic.extras.common.airflow_functions.pass_()
+### airflow_pydantic.extras.common.airflow_functions.pass_()[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#pass_)
 
-### airflow_pydantic.extras.common.airflow_functions.skip()
+### airflow_pydantic.extras.common.airflow_functions.skip()[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#skip)
 
 <a id="module-airflow_pydantic.extras.common.clean"></a>
 
-### *class* airflow_pydantic.extras.common.clean.DagClean(\*\*kwargs)
+### *class* airflow_pydantic.extras.common.clean.DagClean(\*\*kwargs)[[source]](../../_modules/airflow_pydantic/extras/common/clean.html.md#DagClean)
 
 Bases: `PythonOperator`
 
@@ -1763,13 +1763,13 @@ alias of [`DagCleanTask`](#airflow_pydantic.extras.common.clean.DagCleanTask)
 
 alias of [`DagCleanTaskArgs`](#airflow_pydantic.extras.common.clean.DagCleanTaskArgs)
 
-### *pydantic model* airflow_pydantic.extras.common.clean.DagCleanTask
+### *pydantic model* airflow_pydantic.extras.common.clean.DagCleanTask[[source]](../../_modules/airflow_pydantic/extras/common/clean.html.md#DagCleanTask)
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DagCleanTaskArgs`](#airflow_pydantic.extras.common.clean.DagCleanTaskArgs)
 
 #### *field* operator *: Annotated[object, BeforeValidator(func=get_import_path, json_schema_input_type=PydanticUndefined), PlainSerializer(func=serialize_path_as_string, return_type=str, when_used=json)]* *= 'airflow_pydantic.extras.common.clean.DagClean'*
 
-### *pydantic model* airflow_pydantic.extras.common.clean.DagCleanTaskArgs
+### *pydantic model* airflow_pydantic.extras.common.clean.DagCleanTaskArgs[[source]](../../_modules/airflow_pydantic/extras/common/clean.html.md#DagCleanTaskArgs)
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
@@ -1783,7 +1783,7 @@ Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
 #### *field* days_to_keep *: int | None* *= 10*
 
-### *class* airflow_pydantic.extras.common.clean.DagRunClean(\*\*kwargs)
+### *class* airflow_pydantic.extras.common.clean.DagRunClean(\*\*kwargs)[[source]](../../_modules/airflow_pydantic/extras/common/clean.html.md#DagRunClean)
 
 Bases: `PythonOperator`
 
