@@ -174,14 +174,14 @@
 </span><span id="line-15"><span class="kn">from</span><span class="w"> </span><span class="nn">.relativedelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelativeDelta</span>
 </span><span id="line-16">
 </span><span id="line-17"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-18">    <span class="s2">&quot;CronDataIntervalTimetable&quot;</span><span class="p">,</span>
-</span><span id="line-19">    <span class="s2">&quot;CronTriggerTimetable&quot;</span><span class="p">,</span>
-</span><span id="line-20">    <span class="s2">&quot;DeltaDataIntervalTimetable&quot;</span><span class="p">,</span>
-</span><span id="line-21">    <span class="s2">&quot;DeltaTriggerTimetable&quot;</span><span class="p">,</span>
-</span><span id="line-22">    <span class="s2">&quot;EventsTimetable&quot;</span><span class="p">,</span>
-</span><span id="line-23">    <span class="s2">&quot;FixedTimezone&quot;</span><span class="p">,</span>
-</span><span id="line-24">    <span class="s2">&quot;MultipleCronTriggerTimetable&quot;</span><span class="p">,</span>
-</span><span id="line-25">    <span class="s2">&quot;Timezone&quot;</span><span class="p">,</span>
+</span><span id="line-18">    <span class="s2">"CronDataIntervalTimetable"</span><span class="p">,</span>
+</span><span id="line-19">    <span class="s2">"CronTriggerTimetable"</span><span class="p">,</span>
+</span><span id="line-20">    <span class="s2">"DeltaDataIntervalTimetable"</span><span class="p">,</span>
+</span><span id="line-21">    <span class="s2">"DeltaTriggerTimetable"</span><span class="p">,</span>
+</span><span id="line-22">    <span class="s2">"EventsTimetable"</span><span class="p">,</span>
+</span><span id="line-23">    <span class="s2">"FixedTimezone"</span><span class="p">,</span>
+</span><span id="line-24">    <span class="s2">"MultipleCronTriggerTimetable"</span><span class="p">,</span>
+</span><span id="line-25">    <span class="s2">"Timezone"</span><span class="p">,</span>
 </span><span id="line-26"><span class="p">)</span>
 </span><span id="line-27">
 </span><span id="line-28"><span class="n">Timezone</span> <span class="o">=</span> <span class="n">TimeZoneName</span>
@@ -215,7 +215,7 @@
 <div class="viewcode-block" id="MultipleCronTriggerTimetable.instance">
 <a class="viewcode-back" href="../../../docs/src/api.html#airflow_pydantic.utils.timetables.MultipleCronTriggerTimetable.instance">[docs]</a>
 </span><span id="line-48">    <span class="k">def</span><span class="w"> </span><span class="nf">instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseMultipleCronTriggerTimetable</span><span class="p">:</span>
-</span><span id="line-49">        <span class="k">return</span> <span class="n">BaseMultipleCronTriggerTimetable</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">crons</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;crons&quot;</span><span class="p">]))</span></div>
+</span><span id="line-49">        <span class="k">return</span> <span class="n">BaseMultipleCronTriggerTimetable</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">crons</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">"crons"</span><span class="p">]))</span></div>
 </div>
 
 </span><span id="line-50">

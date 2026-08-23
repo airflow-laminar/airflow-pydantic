@@ -171,10 +171,10 @@
 </span><span id="line-12"><span class="kn">from</span><span class="w"> </span><span class="nn">.host</span><span class="w"> </span><span class="kn">import</span> <span class="n">Host</span>
 </span><span id="line-13">
 </span><span id="line-14"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-15">    <span class="s2">&quot;BalancerHostQueryConfiguration&quot;</span><span class="p">,</span>
-</span><span id="line-16">    <span class="s2">&quot;BalancerPortQueryConfiguration&quot;</span><span class="p">,</span>
-</span><span id="line-17">    <span class="s2">&quot;HostQuery&quot;</span><span class="p">,</span>
-</span><span id="line-18">    <span class="s2">&quot;PortQuery&quot;</span><span class="p">,</span>
+</span><span id="line-15">    <span class="s2">"BalancerHostQueryConfiguration"</span><span class="p">,</span>
+</span><span id="line-16">    <span class="s2">"BalancerPortQueryConfiguration"</span><span class="p">,</span>
+</span><span id="line-17">    <span class="s2">"HostQuery"</span><span class="p">,</span>
+</span><span id="line-18">    <span class="s2">"PortQuery"</span><span class="p">,</span>
 </span><span id="line-19"><span class="p">)</span>
 </span><span id="line-20">
 </span><span id="line-21"><span class="n">_log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -183,9 +183,9 @@
 <div class="viewcode-block" id="BalancerHostQueryConfiguration">
 <a class="viewcode-back" href="../../../../docs/src/api.html#airflow_pydantic.extras.balancer.query.BalancerHostQueryConfiguration">[docs]</a>
 </span><span id="line-24"><span class="k">class</span><span class="w"> </span><span class="nc">BalancerHostQueryConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="line-25">    <span class="n">kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">,</span> <span class="s2">&quot;select&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-26">        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;select&quot;</span><span class="p">,</span>
-</span><span id="line-27">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Kind of query to perform, either &#39;filter&#39; to return a list of matching hosts or &#39;select&#39; to return a single host.&quot;</span><span class="p">,</span>
+</span><span id="line-25">    <span class="n">kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"filter"</span><span class="p">,</span> <span class="s2">"select"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-26">        <span class="n">default</span><span class="o">=</span><span class="s2">"select"</span><span class="p">,</span>
+</span><span id="line-27">        <span class="n">description</span><span class="o">=</span><span class="s2">"Kind of query to perform, either 'filter' to return a list of matching hosts or 'select' to return a single host."</span><span class="p">,</span>
 </span><span id="line-28">    <span class="p">)</span>
 </span><span id="line-29">    <span class="n">balancer</span><span class="p">:</span> <span class="n">BalancerConfiguration</span>
 </span><span id="line-30">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -199,9 +199,9 @@
 </span><span id="line-36">    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
 </span><span id="line-37">        <span class="bp">self</span><span class="p">,</span>
 </span><span id="line-38">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Host</span><span class="p">]</span> <span class="o">|</span> <span class="n">Host</span><span class="p">:</span>
-</span><span id="line-39"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-39"><span class="w">        </span><span class="sd">"""</span>
 </span><span id="line-40"><span class="sd">        Execute the query against the provided hosts and ports.</span>
-</span><span id="line-41"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="line-41"><span class="sd">        """</span>
 </span><span id="line-42">        <span class="n">hosts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">balancer</span><span class="o">.</span><span class="n">all_hosts</span>
 </span><span id="line-43">        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="p">[]</span>
 </span><span id="line-44">        <span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="ow">or</span> <span class="p">[]</span>
@@ -227,14 +227,14 @@
 </span><span id="line-64">        <span class="p">]</span>
 </span><span id="line-65">
 </span><span id="line-66">        <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
-</span><span id="line-67">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No host found for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">queue</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">os</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-67">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No host found for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">queue</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">os</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-68">
-</span><span id="line-69">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;filter&quot;</span><span class="p">:</span>
-</span><span id="line-70">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filtered hosts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span><span class="si">}</span><span class="s2"> found&quot;</span><span class="p">)</span>
+</span><span id="line-69">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"filter"</span><span class="p">:</span>
+</span><span id="line-70">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Filtered hosts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span><span class="si">}</span><span class="s2"> found"</span><span class="p">)</span>
 </span><span id="line-71">            <span class="k">return</span> <span class="n">candidates</span>
 </span><span id="line-72">        <span class="c1"># TODO more schemes, interrogate usage</span>
 </span><span id="line-73">        <span class="n">ret</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
-</span><span id="line-74">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected host: </span><span class="si">{</span><span class="n">ret</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">ret</span><span class="o">.</span><span class="n">os</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span><span id="line-74">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Selected host: </span><span class="si">{</span><span class="n">ret</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">ret</span><span class="o">.</span><span class="n">os</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 </span><span id="line-75">        <span class="k">return</span> <span class="n">ret</span></div>
 </div>
 
@@ -247,9 +247,9 @@
 <div class="viewcode-block" id="BalancerPortQueryConfiguration">
 <a class="viewcode-back" href="../../../../docs/src/api.html#airflow_pydantic.extras.balancer.query.BalancerPortQueryConfiguration">[docs]</a>
 </span><span id="line-82"><span class="k">class</span><span class="w"> </span><span class="nc">BalancerPortQueryConfiguration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="line-83">    <span class="n">kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">,</span> <span class="s2">&quot;select&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-84">        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;select&quot;</span><span class="p">,</span>
-</span><span id="line-85">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Kind of query to perform, either &#39;filter&#39; to return a list of matching hosts or &#39;select&#39; to return a single host.&quot;</span><span class="p">,</span>
+</span><span id="line-83">    <span class="n">kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"filter"</span><span class="p">,</span> <span class="s2">"select"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-84">        <span class="n">default</span><span class="o">=</span><span class="s2">"select"</span><span class="p">,</span>
+</span><span id="line-85">        <span class="n">description</span><span class="o">=</span><span class="s2">"Kind of query to perform, either 'filter' to return a list of matching hosts or 'select' to return a single host."</span><span class="p">,</span>
 </span><span id="line-86">    <span class="p">)</span>
 </span><span id="line-87">    <span class="n">balancer</span><span class="p">:</span> <span class="n">BalancerConfiguration</span>
 </span><span id="line-88">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -261,9 +261,9 @@
 </span><span id="line-92">    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
 </span><span id="line-93">        <span class="bp">self</span><span class="p">,</span>
 </span><span id="line-94">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Host</span><span class="p">]</span> <span class="o">|</span> <span class="n">Host</span><span class="p">:</span>
-</span><span id="line-95"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-95"><span class="w">        </span><span class="sd">"""</span>
 </span><span id="line-96"><span class="sd">        Execute the query against the provided hosts and ports.</span>
-</span><span id="line-97"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="line-97"><span class="sd">        """</span>
 </span><span id="line-98">        <span class="n">ports</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">balancer</span><span class="o">.</span><span class="n">all_ports</span>
 </span><span id="line-99">        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="p">[]</span>
 </span><span id="line-100">        <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="ow">or</span> <span class="p">[]</span>
@@ -281,14 +281,14 @@
 </span><span id="line-112">        <span class="p">]</span>
 </span><span id="line-113">
 </span><span id="line-114">        <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
-</span><span id="line-115">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No port found for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-115">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No port found for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-116">
-</span><span id="line-117">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;filter&quot;</span><span class="p">:</span>
-</span><span id="line-118">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filtered ports: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span><span class="si">}</span><span class="s2"> found&quot;</span><span class="p">)</span>
+</span><span id="line-117">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"filter"</span><span class="p">:</span>
+</span><span id="line-118">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Filtered ports: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span><span class="si">}</span><span class="s2"> found"</span><span class="p">)</span>
 </span><span id="line-119">            <span class="k">return</span> <span class="n">candidates</span>
 </span><span id="line-120">        <span class="c1"># TODO more schemes, interrogate usage</span>
 </span><span id="line-121">        <span class="n">ret</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
-</span><span id="line-122">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected port: </span><span class="si">{</span><span class="n">ret</span><span class="o">.</span><span class="n">_calc_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-122">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Selected port: </span><span class="si">{</span><span class="n">ret</span><span class="o">.</span><span class="n">_calc_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-123">        <span class="k">return</span> <span class="n">ret</span></div>
 </div>
 

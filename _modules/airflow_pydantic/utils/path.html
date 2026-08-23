@@ -157,13 +157,13 @@
 
     <div id="content" role="main">
       <h1>Source code for airflow_pydantic.utils.path</h1><div class="highlight"><pre>
-<span></span><code><span id="line-1"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;link&quot;</span><span class="p">,)</span>
+<span></span><code><span id="line-1"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"link"</span><span class="p">,)</span>
 </span><span id="line-2">
 </span><span id="line-3">
 <div class="viewcode-block" id="link">
 <a class="viewcode-back" href="../../../docs/src/api.html#airflow_pydantic.utils.path.link">[docs]</a>
 </span><span id="line-4"><span class="k">def</span><span class="w"> </span><span class="nf">link</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">unlink</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-</span><span id="line-5"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Link a file or directory to another location.</span>
+</span><span id="line-5"><span class="w">    </span><span class="sd">"""Link a file or directory to another location.</span>
 </span><span id="line-6">
 </span><span id="line-7"><span class="sd">    Args:</span>
 </span><span id="line-8"><span class="sd">        source (str): Source file or directory.</span>
@@ -172,11 +172,11 @@
 </span><span id="line-11">
 </span><span id="line-12"><span class="sd">    Returns:</span>
 </span><span id="line-13"><span class="sd">        str: Command to run.</span>
-</span><span id="line-14"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="line-14"><span class="sd">    """</span>
 </span><span id="line-15">    <span class="k">if</span> <span class="n">unlink</span><span class="p">:</span>
-</span><span id="line-16">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ln -sfn </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="line-16">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"ln -sfn </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span>
 </span><span id="line-17">    <span class="k">else</span><span class="p">:</span>
-</span><span id="line-18">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ln -s </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span></div>
+</span><span id="line-18">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"ln -s </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span></div>
 
 </span></code></pre></div>
     </div></div>

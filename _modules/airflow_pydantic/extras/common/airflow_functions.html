@@ -166,11 +166,11 @@
 </span><span id="line-7"><span class="kn">from</span><span class="w"> </span><span class="nn">...airflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirflowFailException</span><span class="p">,</span> <span class="n">AirflowSkipException</span>
 </span><span id="line-8">
 </span><span id="line-9"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-10">    <span class="s2">&quot;clean_dag_runs&quot;</span><span class="p">,</span>
-</span><span id="line-11">    <span class="s2">&quot;clean_dags&quot;</span><span class="p">,</span>
-</span><span id="line-12">    <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-</span><span id="line-13">    <span class="s2">&quot;pass_&quot;</span><span class="p">,</span>
-</span><span id="line-14">    <span class="s2">&quot;skip&quot;</span><span class="p">,</span>
+</span><span id="line-10">    <span class="s2">"clean_dag_runs"</span><span class="p">,</span>
+</span><span id="line-11">    <span class="s2">"clean_dags"</span><span class="p">,</span>
+</span><span id="line-12">    <span class="s2">"fail"</span><span class="p">,</span>
+</span><span id="line-13">    <span class="s2">"pass_"</span><span class="p">,</span>
+</span><span id="line-14">    <span class="s2">"skip"</span><span class="p">,</span>
 </span><span id="line-15"><span class="p">)</span>
 </span><span id="line-16">
 </span><span id="line-17"><span class="n">_log</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -179,7 +179,7 @@
 <div class="viewcode-block" id="skip">
 <a class="viewcode-back" href="../../../../docs/src/api.html#airflow_pydantic.extras.common.airflow_functions.skip">[docs]</a>
 </span><span id="line-20"><span class="k">def</span><span class="w"> </span><span class="nf">skip</span><span class="p">():</span>
-</span><span id="line-21">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping task execution&quot;</span><span class="p">)</span>
+</span><span id="line-21">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Skipping task execution"</span><span class="p">)</span>
 </span><span id="line-22">    <span class="k">raise</span> <span class="n">AirflowSkipException</span></div>
 
 </span><span id="line-23">
@@ -187,7 +187,7 @@
 <div class="viewcode-block" id="fail">
 <a class="viewcode-back" href="../../../../docs/src/api.html#airflow_pydantic.extras.common.airflow_functions.fail">[docs]</a>
 </span><span id="line-25"><span class="k">def</span><span class="w"> </span><span class="nf">fail</span><span class="p">():</span>
-</span><span id="line-26">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Failing task execution&quot;</span><span class="p">)</span>
+</span><span id="line-26">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Failing task execution"</span><span class="p">)</span>
 </span><span id="line-27">    <span class="k">raise</span> <span class="n">AirflowFailException</span></div>
 
 </span><span id="line-28">
@@ -195,7 +195,7 @@
 <div class="viewcode-block" id="pass_">
 <a class="viewcode-back" href="../../../../docs/src/api.html#airflow_pydantic.extras.common.airflow_functions.pass_">[docs]</a>
 </span><span id="line-30"><span class="k">def</span><span class="w"> </span><span class="nf">pass_</span><span class="p">():</span>
-</span><span id="line-31">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Passing task execution&quot;</span><span class="p">)</span></div>
+</span><span id="line-31">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Passing task execution"</span><span class="p">)</span></div>
 
 </span><span id="line-32">
 </span><span id="line-33">
@@ -208,35 +208,35 @@
 </span><span id="line-38">    <span class="c1"># Make cutoff_date timezone-aware (UTC)</span>
 </span><span id="line-39">    <span class="n">utc_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">UTC</span><span class="p">)</span>
 </span><span id="line-40">    <span class="n">cutoff_date</span> <span class="o">=</span> <span class="n">utc_now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">days_to_keep</span><span class="p">)</span>
-</span><span id="line-41">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cutoff date for clean: </span><span class="si">{</span><span class="n">cutoff_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-41">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cutoff date for clean: </span><span class="si">{</span><span class="n">cutoff_date</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-42">
 </span><span id="line-43">    <span class="c1"># Fetch all DAGs from the DagBag</span>
 </span><span id="line-44">    <span class="n">dag_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">dag_id</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">DagModel</span><span class="o">.</span><span class="n">dag_id</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="n">DagModel</span><span class="o">.</span><span class="n">dag_id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
-</span><span id="line-45">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found DAGs to clean up: </span><span class="si">{</span><span class="n">dag_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-45">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found DAGs to clean up: </span><span class="si">{</span><span class="n">dag_ids</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-46">
 </span><span id="line-47">    <span class="n">deleted</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="line-48">
 </span><span id="line-49">    <span class="k">for</span> <span class="n">dag_id</span> <span class="ow">in</span> <span class="n">dag_ids</span><span class="p">:</span>
-</span><span id="line-50">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaning up DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-50">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cleaning up DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-51">
 </span><span id="line-52">        <span class="c1"># Query for DAG runs of each DAG</span>
 </span><span id="line-53">        <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">DagRun</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">DagRun</span><span class="o">.</span><span class="n">dag_id</span> <span class="o">==</span> <span class="n">dag_id</span><span class="p">)</span>
 </span><span id="line-54">
 </span><span id="line-55">        <span class="k">if</span> <span class="n">delete_successful</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span><span id="line-56">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not deleting successful DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-56">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not deleting successful DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-57">            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">DagRun</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">State</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">)</span>
 </span><span id="line-58">        <span class="k">if</span> <span class="n">delete_failed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span><span id="line-59">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not deleting failed DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-59">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not deleting failed DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-60">            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">DagRun</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">State</span><span class="o">.</span><span class="n">FAILED</span><span class="p">)</span>
 </span><span id="line-61">
 </span><span id="line-62">        <span class="n">dagruns</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">DagRun</span><span class="o">.</span><span class="n">execution_date</span><span class="o">.</span><span class="n">asc</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 </span><span id="line-63">        <span class="n">total_runs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dagruns</span><span class="p">)</span>
-</span><span id="line-64">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">total_runs</span><span class="si">}</span><span class="s2"> DAG runs to clean up for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-64">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="n">total_runs</span><span class="si">}</span><span class="s2"> DAG runs to clean up for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-65">
 </span><span id="line-66">        <span class="k">for</span> <span class="n">dr</span> <span class="ow">in</span> <span class="n">dagruns</span><span class="p">:</span>
 </span><span id="line-67">            <span class="c1"># Compare execution_date (offset-aware) with cutoff_date (now offset-aware)</span>
 </span><span id="line-68">            <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">execution_date</span> <span class="o">&lt;</span> <span class="n">cutoff_date</span> <span class="ow">or</span> <span class="n">total_runs</span> <span class="o">&gt;</span> <span class="n">max_dagruns</span><span class="p">:</span>
-</span><span id="line-69">                <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleting DAG run: </span><span class="si">{</span><span class="n">dr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-69">                <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting DAG run: </span><span class="si">{</span><span class="n">dr</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-70">                <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">dr</span><span class="p">)</span>
 </span><span id="line-71">                <span class="n">deleted</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span id="line-72">                <span class="n">total_runs</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># Adjust count since we deleted one</span>
@@ -244,15 +244,15 @@
 </span><span id="line-74">                <span class="c1"># Need to iterate through all remaining</span>
 </span><span id="line-75">                <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">State</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
 </span><span id="line-76">                    <span class="c1"># Mark failed runs as successful</span>
-</span><span id="line-77">                    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Marking failed DAG run as successful: </span><span class="si">{</span><span class="n">dr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-77">                    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Marking failed DAG run as successful: </span><span class="si">{</span><span class="n">dr</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-78">                    <span class="n">dr</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">SUCCESS</span>
 </span><span id="line-79">                    <span class="n">session</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dr</span><span class="p">)</span>
 </span><span id="line-80">            <span class="k">elif</span> <span class="ow">not</span> <span class="n">mark_failed_as_successful</span><span class="p">:</span>
 </span><span id="line-81">                <span class="k">break</span>  <span class="c1"># Since they are ordered, no more to delete</span>
 </span><span id="line-82">
-</span><span id="line-83">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Committing DAG run deletions&quot;</span><span class="p">)</span>
+</span><span id="line-83">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Committing DAG run deletions"</span><span class="p">)</span>
 </span><span id="line-84">    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</span><span id="line-85">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total DAG runs deleted: </span><span class="si">{</span><span class="n">deleted</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</span><span id="line-85">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total DAG runs deleted: </span><span class="si">{</span><span class="n">deleted</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 </span><span id="line-86">
 </span><span id="line-87">
@@ -261,38 +261,38 @@
 </span><span id="line-88"><span class="k">def</span><span class="w"> </span><span class="nf">clean_dags</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="o">**</span><span class="n">context</span><span class="p">):</span>
 </span><span id="line-89">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DagModel</span>
 </span><span id="line-90">
-</span><span id="line-91">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting to run Clear Process&quot;</span><span class="p">)</span>
+</span><span id="line-91">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Starting to run Clear Process"</span><span class="p">)</span>
 </span><span id="line-92">
 </span><span id="line-93">    <span class="n">dags</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">DagModel</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 </span><span id="line-94">    <span class="n">entries_to_delete</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="line-95">
-</span><span id="line-96">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found DAGs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-96">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found DAGs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dags</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-97">
 </span><span id="line-98">    <span class="k">for</span> <span class="n">dag</span> <span class="ow">in</span> <span class="n">dags</span><span class="p">:</span>
 </span><span id="line-99">        <span class="c1"># Check if it is a zip-file</span>
-</span><span id="line-100">        <span class="k">if</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;.zip/&quot;</span> <span class="ow">in</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span><span class="p">:</span>
-</span><span id="line-101">            <span class="n">index</span> <span class="o">=</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;.zip/&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
+</span><span id="line-100">        <span class="k">if</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">".zip/"</span> <span class="ow">in</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span><span class="p">:</span>
+</span><span id="line-101">            <span class="n">index</span> <span class="o">=</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">".zip/"</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s2">".zip"</span><span class="p">)</span>
 </span><span id="line-102">            <span class="n">fileloc</span> <span class="o">=</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">index</span><span class="p">]</span>
 </span><span id="line-103">        <span class="k">else</span><span class="p">:</span>
 </span><span id="line-104">            <span class="n">fileloc</span> <span class="o">=</span> <span class="n">dag</span><span class="o">.</span><span class="n">fileloc</span>
 </span><span id="line-105">
 </span><span id="line-106">        <span class="k">if</span> <span class="n">fileloc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-107">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding to delete - `fileloc` None for DAG: </span><span class="si">{</span><span class="n">dag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-107">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Adding to delete - `fileloc` None for DAG: </span><span class="si">{</span><span class="n">dag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-108">            <span class="n">entries_to_delete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dag</span><span class="p">)</span>
 </span><span id="line-109">        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fileloc</span><span class="p">):</span>
-</span><span id="line-110">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding to delete - file does not exist for DAG: </span><span class="si">{</span><span class="n">dag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-110">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Adding to delete - file does not exist for DAG: </span><span class="si">{</span><span class="n">dag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-111">            <span class="n">entries_to_delete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dag</span><span class="p">)</span>
 </span><span id="line-112">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-113">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found valid file for DAG: </span><span class="si">{</span><span class="n">dag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-113">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found valid file for DAG: </span><span class="si">{</span><span class="n">dag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-114">
-</span><span id="line-115">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleting dags:</span><span class="se">\n</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">entries_to_delete</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-115">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting dags:</span><span class="se">\n</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">entries_to_delete</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-116">
 </span><span id="line-117">    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries_to_delete</span><span class="p">:</span>
 </span><span id="line-118">        <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
 </span><span id="line-119">
-</span><span id="line-120">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Committing DAG deletions&quot;</span><span class="p">)</span>
+</span><span id="line-120">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Committing DAG deletions"</span><span class="p">)</span>
 </span><span id="line-121">    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</span><span id="line-122">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total DAGs deleted: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">entries_to_delete</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</span><span id="line-122">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total DAGs deleted: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">entries_to_delete</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>

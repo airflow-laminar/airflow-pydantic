@@ -161,27 +161,27 @@
 </span><span id="line-2">
 </span><span id="line-3"><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">model_validator</span>
 </span><span id="line-4">
-</span><span id="line-5"><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AIRFLOW_PYDANTIC_ENABLE_CCFLOW&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="line-5"><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AIRFLOW_PYDANTIC_ENABLE_CCFLOW"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">:</span>
 </span><span id="line-6">    <span class="kn">from</span><span class="w"> </span><span class="nn">ccflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span> <span class="k">as</span> <span class="n">PydanticBaseModel</span>
 </span><span id="line-7"><span class="k">else</span><span class="p">:</span>
 </span><span id="line-8">    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span> <span class="k">as</span> <span class="n">PydanticBaseModel</span>
 </span><span id="line-9">
-</span><span id="line-10"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;BaseModel&quot;</span><span class="p">,)</span>
+</span><span id="line-10"><span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"BaseModel"</span><span class="p">,)</span>
 </span><span id="line-11">
 </span><span id="line-12">
 <div class="viewcode-block" id="BaseModel">
 <a class="viewcode-back" href="../../../docs/src/api.html#airflow_pydantic.core.base.BaseModel">[docs]</a>
 </span><span id="line-13"><span class="k">class</span><span class="w"> </span><span class="nc">BaseModel</span><span class="p">(</span><span class="n">PydanticBaseModel</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="line-14">    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+</span><span id="line-14">    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
 </span><span id="line-15">    <span class="nd">@classmethod</span>
 </span><span id="line-16">    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_template</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
 </span><span id="line-17">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="line-18">            <span class="c1"># Ignore and leave to pydantic</span>
 </span><span id="line-19">            <span class="k">return</span> <span class="n">values</span>
-</span><span id="line-20">        <span class="k">if</span> <span class="s2">&quot;template&quot;</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
-</span><span id="line-21">            <span class="n">template</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;template&quot;</span><span class="p">)</span>
+</span><span id="line-20">        <span class="k">if</span> <span class="s2">"template"</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+</span><span id="line-21">            <span class="n">template</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"template"</span><span class="p">)</span>
 </span><span id="line-22">            <span class="c1"># Do field-by-field for larger types</span>
-</span><span id="line-23">            <span class="c1"># NOTE: don&#39;t use model_dump here as some basemodel fields might be excluded</span>
+</span><span id="line-23">            <span class="c1"># NOTE: don't use model_dump here as some basemodel fields might be excluded</span>
 </span><span id="line-24">            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">model_fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 </span><span id="line-25">                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">model_fields_set</span><span class="p">:</span>
 </span><span id="line-26">                    <span class="c1"># see note above</span>
@@ -201,18 +201,18 @@
 <div class="viewcode-block" id="BaseModel.model_dump">
 <a class="viewcode-back" href="../../../docs/src/api.html#airflow_pydantic.core.base.BaseModel.model_dump">[docs]</a>
 </span><span id="line-40">    <span class="k">def</span><span class="w"> </span><span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-41">        <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exclude&quot;</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
-</span><span id="line-42">        <span class="k">if</span> <span class="s2">&quot;type_&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
-</span><span id="line-43">            <span class="n">exclude</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;type_&quot;</span><span class="p">)</span>
+</span><span id="line-41">        <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"exclude"</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
+</span><span id="line-42">        <span class="k">if</span> <span class="s2">"type_"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+</span><span id="line-43">            <span class="n">exclude</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"type_"</span><span class="p">)</span>
 </span><span id="line-44">        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </span><span id="line-45">
 <div class="viewcode-block" id="BaseModel.model_dump_json">
 <a class="viewcode-back" href="../../../docs/src/api.html#airflow_pydantic.core.base.BaseModel.model_dump_json">[docs]</a>
 </span><span id="line-46">    <span class="k">def</span><span class="w"> </span><span class="nf">model_dump_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-47">        <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exclude&quot;</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
-</span><span id="line-48">        <span class="k">if</span> <span class="s2">&quot;type_&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
-</span><span id="line-49">            <span class="n">exclude</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;type_&quot;</span><span class="p">)</span>
+</span><span id="line-47">        <span class="n">exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"exclude"</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
+</span><span id="line-48">        <span class="k">if</span> <span class="s2">"type_"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+</span><span id="line-49">            <span class="n">exclude</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"type_"</span><span class="p">)</span>
 </span><span id="line-50">        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </div>
 
