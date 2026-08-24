@@ -2212,7 +2212,18 @@ alias of [`BalancerPortQueryConfiguration`](#airflow_pydantic.extras.balancer.qu
 
 ### airflow_pydantic.extras.common.airflow_functions.clean_dag_runs(session, delete_successful, delete_failed, mark_failed_as_successful, max_dagruns, days_to_keep)[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#clean_dag_runs)
 
+### airflow_pydantic.extras.common.airflow_functions.clean_dag_runs_api(delete_successful, delete_failed, mark_failed_as_successful, max_dagruns, days_to_keep, backend=None)[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#clean_dag_runs_api)
+
+REST API implementation of clean_dag_runs, for Airflow 3 where tasks have no database access.
+
 ### airflow_pydantic.extras.common.airflow_functions.clean_dags(session, \*\*context)[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#clean_dags)
+
+### airflow_pydantic.extras.common.airflow_functions.clean_dags_api(backend=None)[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#clean_dags_api)
+
+REST API implementation of clean_dags, for Airflow 3 where tasks have no database access.
+
+Instead of checking file existence locally (meaningless on a worker), deletes DAGs the
+dag processor has marked stale (their file or bundle no longer exists).
 
 ### airflow_pydantic.extras.common.airflow_functions.fail()[[source]](../../_modules/airflow_pydantic/extras/common/airflow_functions.html.md#fail)
 
@@ -2253,6 +2264,22 @@ Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 #### *field* max_dagruns *: int | None* *= 10*
 
 #### *field* days_to_keep *: int | None* *= 10*
+
+#### *field* backend *: Literal['auto', 'airflow3', 'mwaa'] | None* *= 'auto'*
+
+API backend used on Airflow 3
+
+#### *field* connection_id *: str | None* *= 'airflow_laminar_api'*
+
+Airflow connection with API credentials for the airflow3 backend
+
+#### *field* mwaa_environment_name *: str | None* *= None*
+
+MWAA environment name for the mwaa backend
+
+#### *field* mwaa_region_name *: str | None* *= None*
+
+AWS region of the MWAA environment
 
 ### *class* airflow_pydantic.extras.common.clean.DagRunClean(\*\*kwargs)[[source]](../../_modules/airflow_pydantic/extras/common/clean.html.md#DagRunClean)
 
