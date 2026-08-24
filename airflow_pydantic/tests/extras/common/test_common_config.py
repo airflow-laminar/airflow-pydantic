@@ -36,6 +36,17 @@ with DAG(
         "mark_failed_as_successful": Param(False, title="Mark Failed As Successful", description=None, type="boolean"),
         "max_dagruns": Param(10, title="Max Dagruns", description=None, type="integer"),
         "days_to_keep": Param(10, title="Days To Keep", description=None, type="integer"),
+        "backend": Param("auto", title="Backend", description="API backend used on Airflow 3", type="string"),
+        "connection_id": Param(
+            "airflow_laminar_api",
+            title="Connection Id",
+            description="Airflow connection with API credentials for the airflow3 backend",
+            type="string",
+        ),
+        "mwaa_environment_name": Param(
+            None, title="Mwaa Environment Name", description="MWAA environment name for the mwaa backend", type=["null", "string"]
+        ),
+        "mwaa_region_name": Param(None, title="Mwaa Region Name", description="AWS region of the MWAA environment", type=["null", "string"]),
     },
     dag_id="test_clean",
     default_args={},
@@ -80,6 +91,17 @@ with DAG(
         "mark_failed_as_successful": Param(False, title="Mark Failed As Successful", description=None, type="boolean"),
         "max_dagruns": Param(100, title="Max Dagruns", description=None, type="integer"),
         "days_to_keep": Param(60, title="Days To Keep", description=None, type="integer"),
+        "backend": Param("auto", title="Backend", description="API backend used on Airflow 3", type="string"),
+        "connection_id": Param(
+            "airflow_laminar_api",
+            title="Connection Id",
+            description="Airflow connection with API credentials for the airflow3 backend",
+            type="string",
+        ),
+        "mwaa_environment_name": Param(
+            None, title="Mwaa Environment Name", description="MWAA environment name for the mwaa backend", type=["null", "string"]
+        ),
+        "mwaa_region_name": Param(None, title="Mwaa Region Name", description="AWS region of the MWAA environment", type=["null", "string"]),
     },
     dag_id="test_clean",
     default_args={},
@@ -113,6 +135,17 @@ with DAG(
         "mark_failed_as_successful": Param(False, title="Mark Failed As Successful", description=None, type="boolean"),
         "max_dagruns": Param(50, title="Max Dagruns", description=None, type="integer"),
         "days_to_keep": Param(30, title="Days To Keep", description=None, type="integer"),
+        "backend": Param("auto", title="Backend", description="API backend used on Airflow 3", type="string"),
+        "connection_id": Param(
+            "airflow_laminar_api",
+            title="Connection Id",
+            description="Airflow connection with API credentials for the airflow3 backend",
+            type="string",
+        ),
+        "mwaa_environment_name": Param(
+            None, title="Mwaa Environment Name", description="MWAA environment name for the mwaa backend", type=["null", "string"]
+        ),
+        "mwaa_region_name": Param(None, title="Mwaa Region Name", description="AWS region of the MWAA environment", type=["null", "string"]),
     },
     dag_id="test_clean",
     default_args={},

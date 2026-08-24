@@ -183,3 +183,33 @@ def test_mwaa_backend_uses_iam_rest_api():
 
     boto3.client.assert_called_once_with("mwaa", region_name="us-east-1")
     boto_client.invoke_rest_api.assert_called_once_with(Name="environment", Path="/pools/pool", Method="GET")
+
+
+def test_mwaa_backend_passes_query_parameters_and_detects_environment(monkeypatch):
+    monkeypatch.setenv("AIRFLOW_ENV_NAME", "detected-environment")
+    boto_client = MagicMock()
+    boto_client.invoke_rest_api.return_value = {"RestApiStatusCode": 204}
+    boto3 = ModuleType("boto3")
+    boto3.client = MagicMock(return_value=boto_client)
+
+    with patch.dict(sys.modules, {"boto3": boto3}):
+        request = _mwaa_request({})
+        assert request("GET", "/dags", query={"limit": 100, "offset": 0}) is None
+
+    boto_client.invoke_rest_api.assert_called_once_with(
+        Name="detected-environment", Path="/dags", Method="GET", QueryParameters={"limit": 100, "offset": 0}
+    )
+
+
+def test_http_request_query_and_empty_response():
+    from airflow_pydantic.extras.balancer._pool_runtime import _http_request
+
+    response = MagicMock()
+    response.__enter__.return_value.read.return_value = b""
+
+    with patch("airflow_pydantic.extras.balancer._pool_runtime.urlopen", return_value=response) as open_url:
+        assert _http_request("http://api:8080", "DELETE", "/api/v2/dags/d1", query={"limit": 1}) is None
+
+    api_request = open_url.call_args.args[0]
+    assert api_request.full_url == "http://api:8080/api/v2/dags/d1?limit=1"
+    assert api_request.get_method() == "DELETE"
