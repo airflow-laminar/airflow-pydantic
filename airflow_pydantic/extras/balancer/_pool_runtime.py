@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 from importlib.metadata import version
 from typing import Any
 from urllib.error import HTTPError
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 POOL_RUNTIME_VERSION = 0
@@ -149,8 +150,8 @@ def _airflow3_request(backend: dict[str, Any]):
         )
         token = response["access_token"]
 
-    def request(method: str, path: str, body=None, missing_ok: bool = False):
-        return _http_request(base_url, method, f"/api/v2{path}", body=body, token=token, missing_ok=missing_ok)
+    def request(method: str, path: str, query=None, body=None, missing_ok: bool = False):
+        return _http_request(base_url, method, f"/api/v2{path}", query=query, body=body, token=token, missing_ok=missing_ok)
 
     return request
 
@@ -159,6 +160,7 @@ def _http_request(
     base_url: str,
     method: str,
     path: str,
+    query: dict[str, Any] | None = None,
     body: dict[str, Any] | None = None,
     token: str | None = None,
     missing_ok: bool = False,
@@ -166,15 +168,19 @@ def _http_request(
     headers = {"Content-Type": "application/json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
+    url = f"{base_url.rstrip('/')}{path}"
+    if query:
+        url = f"{url}?{urlencode(query)}"
     request = Request(
-        f"{base_url.rstrip('/')}{path}",
+        url,
         data=json.dumps(body).encode() if body is not None else None,
         headers=headers,
         method=method,
     )
     try:
         with urlopen(request, timeout=10) as response:
-            return json.loads(response.read())
+            payload = response.read()
+        return json.loads(payload) if payload else None
     except HTTPError as error:
         if missing_ok and error.code == 404:
             return None
@@ -184,13 +190,15 @@ def _http_request(
 def _mwaa_request(backend: dict[str, Any]):
     import boto3
 
-    environment_name = backend.get("mwaa_environment_name")
+    environment_name = backend.get("mwaa_environment_name") or os.environ.get("AIRFLOW_ENV_NAME")
     if not environment_name:
-        raise ValueError("mwaa_environment_name is required for the MWAA pool manager backend")
+        raise ValueError("mwaa_environment_name is required for the MWAA backend")
     client = boto3.client("mwaa", region_name=backend.get("mwaa_region_name"))
 
-    def request(method: str, path: str, body=None, missing_ok: bool = False):
+    def request(method: str, path: str, query=None, body=None, missing_ok: bool = False):
         kwargs = {"Name": environment_name, "Path": path, "Method": method}
+        if query:
+            kwargs["QueryParameters"] = query
         if body is not None:
             kwargs["Body"] = body
         try:
