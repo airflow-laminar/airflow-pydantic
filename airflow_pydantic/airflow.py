@@ -3,7 +3,7 @@ import os
 import subprocess
 import tempfile
 from datetime import timedelta
-from enum import Enum
+from enum import StrEnum
 from getpass import getuser
 from importlib.metadata import version
 from importlib.util import find_spec
@@ -419,7 +419,7 @@ else:
     class AirflowSkipException(Exception):
         """Exception raised when a task is skipped in Airflow."""
 
-    class TriggerRule(str, Enum):
+    class TriggerRule(StrEnum):
         """Class with task's trigger rules."""
 
         ALL_SUCCESS = "all_success"
