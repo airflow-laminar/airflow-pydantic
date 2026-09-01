@@ -104,7 +104,7 @@ class TestDag:
     def test_dag_convert_params(self, bash_sensor_args):
         d = Dag(
             dag_id="a-dag",
-            start_date=datetime(2020, 1, 1),  # noqa: DTZ001
+            start_date=datetime(2020, 1, 1),
             schedule=None,
             default_args={},
             params=bash_sensor_args,
@@ -141,7 +141,7 @@ with DAG(
         )
         if _airflow_3() is not None:
             d.instantiate()
-            exec(d.render())  # noqa: S102
+            exec(d.render())
 
     def test_dag_convert_params_regressions(self):
         class MyParams(BaseModel):
@@ -150,7 +150,7 @@ with DAG(
 
         d = Dag(
             dag_id="a-dag",
-            start_date=datetime(2020, 1, 1),  # noqa: DTZ001
+            start_date=datetime(2020, 1, 1),
             schedule=None,
             default_args={},
             params=MyParams,
@@ -179,7 +179,7 @@ with DAG(
         )
         if _airflow_3() is not None:
             d.instantiate()
-            exec(d.render())  # noqa: S102
+            exec(d.render())
 
     def test_dag_with_attribute_dependencies(self, dag_with_attribute_dependencies):
         d = dag_with_attribute_dependencies.instantiate()

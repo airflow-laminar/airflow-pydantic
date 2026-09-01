@@ -55,7 +55,7 @@ with DAG(
 """
         )
 
-        exec(conf.dags["test_clean"].render())  # noqa: S102
+        exec(conf.dags["test_clean"].render())
 
     def test_clean_task_param_override(self, load_config):
         conf = load_config("config", "config_with_params")
@@ -110,7 +110,7 @@ with DAG(
 """
         )
 
-        exec(conf.dags["test_clean"].render())  # noqa: S102
+        exec(conf.dags["test_clean"].render())
 
     def test_clean_render_param_from_task(self, load_config):
         conf = load_config("config", "config_with_params_from_task")
@@ -154,4 +154,4 @@ with DAG(
 """
         )
 
-        exec(conf.dags["test_clean"].render())  # noqa: S102
+        exec(conf.dags["test_clean"].render())

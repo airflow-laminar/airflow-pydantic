@@ -11,7 +11,7 @@ class TestModels:
         except ImportError:
             return pytest.skip("Airflow not installed")
 
-        d = DAG(dag_id="test_dag_clean")
+        d = DAG(dag_id="test_dag_clean", schedule=None)
         DagClean(task_id="test_clean_dags", dag=d)
 
     @pytest.mark.skipif(not _airflow_3(), reason="Airflow 3 only")

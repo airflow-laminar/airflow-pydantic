@@ -155,4 +155,4 @@ class TestConfig:
             # Skip, not available on airflow 2
             return
 
-        exec(conf.dags[dag_id].render())  # noqa: S102
+        exec(conf.dags[dag_id].render())

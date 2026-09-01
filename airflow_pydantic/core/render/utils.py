@@ -262,12 +262,12 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
             imports.append(ast.ImportFrom(module=import_module, names=[ast.alias(name=name)], level=0))
 
             # Now swap the value in the args with the name
-            if key in ("ssh_hook",):
+            if key == "ssh_hook":
                 # For python_callable and output_processor, we need to use the name directly
                 return imports, ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=[], keywords=[])
             return imports, ast.Name(id=name, ctx=ast.Load())
 
-    if key in ("pool",):
+    if key == "pool":
         return _build_pool_callable(value, airflow_major_version=airflow_major_version)
 
     if isinstance(value, Host):
