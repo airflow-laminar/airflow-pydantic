@@ -1557,7 +1557,7 @@ Run command inside bash.
 
 ### *class* airflow_pydantic.utils.common.TriggerRule(value)[[source]](../../_modules/airflow_pydantic/airflow.html.md#TriggerRule)
 
-Bases: `str`, `Enum`
+Bases: `StrEnum`
 
 Class with task’s trigger rules.
 

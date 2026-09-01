@@ -162,7 +162,7 @@
 </span><span id="line-3"><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 </span><span id="line-4"><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 </span><span id="line-5"><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
-</span><span id="line-6"><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+</span><span id="line-6"><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrEnum</span>
 </span><span id="line-7"><span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getuser</span>
 </span><span id="line-8"><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
 </span><span id="line-9"><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_spec</span>
@@ -580,7 +580,7 @@
 </span><span id="line-421">
 <div class="viewcode-block" id="TriggerRule">
 <a class="viewcode-back" href="../../docs/src/api.html#airflow_pydantic.utils.common.TriggerRule">[docs]</a>
-</span><span id="line-422">    <span class="k">class</span><span class="w"> </span><span class="nc">TriggerRule</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+</span><span id="line-422">    <span class="k">class</span><span class="w"> </span><span class="nc">TriggerRule</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
 </span><span id="line-423"><span class="w">        </span><span class="sd">"""Class with task's trigger rules."""</span>
 </span><span id="line-424">
 </span><span id="line-425">        <span class="n">ALL_SUCCESS</span> <span class="o">=</span> <span class="s2">"all_success"</span>
