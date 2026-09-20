@@ -25,12 +25,11 @@ permissions:
 
 jobs:
   build:
-<<<<<<< before updating
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         python-version: ["3.11"]
         airflow: ["2", "3", ""]
         laminar: ["laminar", "no-laminar"]
@@ -42,9 +41,6 @@ jobs:
           # Skip laminar checks with ccflow
           - laminar: "laminar"
             ccflow: "ccflow"
-=======
-    runs-on: ubuntu-24.04
->>>>>>> after updating
 
     steps:
       - name: Checkout
