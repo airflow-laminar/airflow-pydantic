@@ -381,7 +381,12 @@ elif _airflow_3() is False:
     from airflow.timetables.interval import CronDataIntervalTimetable, DeltaDataIntervalTimetable
     from airflow.timetables.trigger import CronTriggerTimetable
 
-    # NOTE: No MultipleCronTriggerTimetable, DeltaTriggerTimetable
+    try:
+        from airflow.timetables.trigger import DeltaTriggerTimetable
+    except ImportError:
+        pass
+
+    # NOTE: No MultipleCronTriggerTimetable
     from airflow.utils.dag_parsing_context import get_parsing_context
     from airflow.utils.session import NEW_SESSION, provide_session
     from airflow.utils.trigger_rule import TriggerRule
@@ -651,12 +656,14 @@ if _airflow_3() in (False, None):
     class HITLBranchOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.hitl.HITLBranchOperator"
 
-    class DeltaTriggerTimetable(_AirflowPydanticMarker):
-        _original = "airflow.timetables.trigger.DeltaTriggerTimetable"
+    if "DeltaTriggerTimetable" not in globals():
 
-        def __init__(self, delta, *, interval=timedelta()) -> None:
-            self.delta = delta
-            self.interval = interval
+        class DeltaTriggerTimetable(_AirflowPydanticMarker):
+            _original = "airflow.timetables.trigger.DeltaTriggerTimetable"
+
+            def __init__(self, delta, *, interval=timedelta()) -> None:
+                self.delta = delta
+                self.interval = interval
 
     class MultipleCronTriggerTimetable(_AirflowPydanticMarker):
         _original = "airflow.timetables.trigger.MultipleCronTriggerTimetable"
