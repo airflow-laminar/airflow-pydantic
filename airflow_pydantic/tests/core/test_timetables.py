@@ -151,8 +151,15 @@ class TestConfig:
             # Skip
             return
 
-        if _airflow_3() is False and dag_id in ("test_four", "test_six"):
-            # Skip, not available on airflow 2
+        if _airflow_3() is False and dag_id == "test_four":
+            # MultipleCronTriggerTimetable is not available on Airflow 2.
             return
+
+        if _airflow_3() is False and dag_id == "test_six":
+            try:
+                from airflow.timetables.trigger import DeltaTriggerTimetable  # noqa: F401
+            except ImportError:
+                # DeltaTriggerTimetable was added in Airflow 2.11.
+                return
 
         exec(conf.dags[dag_id].render())

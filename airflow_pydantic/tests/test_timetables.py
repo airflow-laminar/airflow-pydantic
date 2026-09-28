@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 
+from airflow_pydantic.airflow import _AirflowPydanticMarker
 from airflow_pydantic.utils.timetables import (
     CronDataIntervalTimetable,
     CronTriggerTimetable,
@@ -144,6 +145,20 @@ class TestDeltaTriggerTimetable:
         dumped = tt.model_dump(exclude_unset=True)
         restored = DeltaTriggerTimetable.model_validate(dumped)
         assert tt.delta == restored.delta
+
+    def test_delta_trigger_timetable_uses_native_class_when_available(self):
+        """Test that Airflow 2.11 and later use Airflow's timetable implementation."""
+        from airflow_pydantic.airflow import DeltaTriggerTimetable as BaseDeltaTriggerTimetable
+
+        instance = DeltaTriggerTimetable(delta=timedelta(hours=4)).instance()
+
+        try:
+            from airflow.timetables.trigger import DeltaTriggerTimetable as AirflowDeltaTriggerTimetable
+        except ImportError:
+            assert isinstance(instance, _AirflowPydanticMarker)
+        else:
+            assert BaseDeltaTriggerTimetable is AirflowDeltaTriggerTimetable
+            assert isinstance(instance, AirflowDeltaTriggerTimetable)
 
 
 class TestEventsTimetable:
