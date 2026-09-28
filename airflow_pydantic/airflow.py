@@ -66,7 +66,6 @@ class _AirflowPydanticMarker: ...
 
 if _airflow_3():
     _log.info("Using Airflow 3.x imports")
-    from airflow.api.client import get_current_api_client
     from airflow.exceptions import AirflowFailException, AirflowSkipException
     from airflow.models.dag import DAG
     from airflow.models.param import Param
@@ -120,6 +119,11 @@ if _airflow_3():
     from airflow.timetables.trigger import CronTriggerTimetable, DeltaTriggerTimetable, MultipleCronTriggerTimetable
     from airflow.utils.session import NEW_SESSION, provide_session
     from airflow.utils.trigger_rule import TriggerRule
+
+    def get_current_api_client():
+        from airflow.api.client import get_current_api_client as factory
+
+        return factory()
 
     def _is_database_available() -> bool:
         """
