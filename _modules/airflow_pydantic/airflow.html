@@ -545,300 +545,307 @@
 </span><span id="line-385">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.timetables.interval</span><span class="w"> </span><span class="kn">import</span> <span class="n">CronDataIntervalTimetable</span><span class="p">,</span> <span class="n">DeltaDataIntervalTimetable</span>
 </span><span id="line-386">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.timetables.trigger</span><span class="w"> </span><span class="kn">import</span> <span class="n">CronTriggerTimetable</span>
 </span><span id="line-387">
-</span><span id="line-388">    <span class="c1"># NOTE: No MultipleCronTriggerTimetable, DeltaTriggerTimetable</span>
-</span><span id="line-389">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.dag_parsing_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_parsing_context</span>
-</span><span id="line-390">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEW_SESSION</span><span class="p">,</span> <span class="n">provide_session</span>
-</span><span id="line-391">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.trigger_rule</span><span class="w"> </span><span class="kn">import</span> <span class="n">TriggerRule</span>
+</span><span id="line-388">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-389">        <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.timetables.trigger</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeltaTriggerTimetable</span>
+</span><span id="line-390">    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span id="line-391">        <span class="k">pass</span>
 </span><span id="line-392">
-</span><span id="line-393">    <span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_pool</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-394">        <span class="n">Pool</span><span class="o">.</span><span class="n">create_or_update_pool</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="line-395">
-</span><span id="line-396">    <span class="k">def</span><span class="w"> </span><span class="nf">get_pool</span><span class="p">(</span><span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pool</span><span class="p">:</span>
-</span><span id="line-397">        <span class="k">return</span> <span class="n">Pool</span><span class="o">.</span><span class="n">get_pool</span><span class="p">(</span><span class="n">pool_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="line-398">
-</span><span id="line-399"><span class="k">else</span><span class="p">:</span>
-</span><span id="line-400">    <span class="c1"># NOTE: Airflow 3 Only</span>
-</span><span id="line-401">    <span class="n">__all__</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-</span><span id="line-402">        <span class="p">[</span>
-</span><span id="line-403">            <span class="s2">"ApprovalOperator"</span><span class="p">,</span>
-</span><span id="line-404">            <span class="s2">"HITLBranchOperator"</span><span class="p">,</span>
-</span><span id="line-405">            <span class="s2">"HITLOperator"</span><span class="p">,</span>
-</span><span id="line-406">        <span class="p">]</span>
-</span><span id="line-407">    <span class="p">)</span>
-</span><span id="line-408">
-</span><span id="line-409">    <span class="k">class</span><span class="w"> </span><span class="nc">DAG</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-410">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-411">            <span class="bp">self</span><span class="o">.</span><span class="n">dag_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dag_id"</span><span class="p">,</span> <span class="s2">"default_dag_id"</span><span class="p">)</span>
-</span><span id="line-412">            <span class="bp">self</span><span class="o">.</span><span class="n">default_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default_args"</span><span class="p">,</span> <span class="p">{})</span>
+</span><span id="line-393">    <span class="c1"># NOTE: No MultipleCronTriggerTimetable</span>
+</span><span id="line-394">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.dag_parsing_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_parsing_context</span>
+</span><span id="line-395">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEW_SESSION</span><span class="p">,</span> <span class="n">provide_session</span>
+</span><span id="line-396">    <span class="kn">from</span><span class="w"> </span><span class="nn">airflow.utils.trigger_rule</span><span class="w"> </span><span class="kn">import</span> <span class="n">TriggerRule</span>
+</span><span id="line-397">
+</span><span id="line-398">    <span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_pool</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-399">        <span class="n">Pool</span><span class="o">.</span><span class="n">create_or_update_pool</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">slots</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="line-400">
+</span><span id="line-401">    <span class="k">def</span><span class="w"> </span><span class="nf">get_pool</span><span class="p">(</span><span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pool</span><span class="p">:</span>
+</span><span id="line-402">        <span class="k">return</span> <span class="n">Pool</span><span class="o">.</span><span class="n">get_pool</span><span class="p">(</span><span class="n">pool_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="line-403">
+</span><span id="line-404"><span class="k">else</span><span class="p">:</span>
+</span><span id="line-405">    <span class="c1"># NOTE: Airflow 3 Only</span>
+</span><span id="line-406">    <span class="n">__all__</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+</span><span id="line-407">        <span class="p">[</span>
+</span><span id="line-408">            <span class="s2">"ApprovalOperator"</span><span class="p">,</span>
+</span><span id="line-409">            <span class="s2">"HITLBranchOperator"</span><span class="p">,</span>
+</span><span id="line-410">            <span class="s2">"HITLOperator"</span><span class="p">,</span>
+</span><span id="line-411">        <span class="p">]</span>
+</span><span id="line-412">    <span class="p">)</span>
 </span><span id="line-413">
-</span><span id="line-414">        <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="line-415">            <span class="k">return</span> <span class="bp">self</span>
-</span><span id="line-416">
-</span><span id="line-417">        <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-</span><span id="line-418">            <span class="k">pass</span>
-</span><span id="line-419">
-</span><span id="line-420">    <span class="k">class</span><span class="w"> </span><span class="nc">AirflowFailException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="line-421"><span class="w">        </span><span class="sd">"""Exception raised when a task fails in Airflow."""</span>
-</span><span id="line-422">
-</span><span id="line-423">    <span class="k">class</span><span class="w"> </span><span class="nc">AirflowSkipException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="line-424"><span class="w">        </span><span class="sd">"""Exception raised when a task is skipped in Airflow."""</span>
-</span><span id="line-425">
+</span><span id="line-414">    <span class="k">class</span><span class="w"> </span><span class="nc">DAG</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-415">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-416">            <span class="bp">self</span><span class="o">.</span><span class="n">dag_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dag_id"</span><span class="p">,</span> <span class="s2">"default_dag_id"</span><span class="p">)</span>
+</span><span id="line-417">            <span class="bp">self</span><span class="o">.</span><span class="n">default_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default_args"</span><span class="p">,</span> <span class="p">{})</span>
+</span><span id="line-418">
+</span><span id="line-419">        <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="line-420">            <span class="k">return</span> <span class="bp">self</span>
+</span><span id="line-421">
+</span><span id="line-422">        <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+</span><span id="line-423">            <span class="k">pass</span>
+</span><span id="line-424">
+</span><span id="line-425">    <span class="k">class</span><span class="w"> </span><span class="nc">AirflowFailException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="line-426"><span class="w">        </span><span class="sd">"""Exception raised when a task fails in Airflow."""</span>
+</span><span id="line-427">
+</span><span id="line-428">    <span class="k">class</span><span class="w"> </span><span class="nc">AirflowSkipException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="line-429"><span class="w">        </span><span class="sd">"""Exception raised when a task is skipped in Airflow."""</span>
+</span><span id="line-430">
 <div class="viewcode-block" id="TriggerRule">
 <a class="viewcode-back" href="../../docs/src/api.html#airflow_pydantic.utils.common.TriggerRule">[docs]</a>
-</span><span id="line-426">    <span class="k">class</span><span class="w"> </span><span class="nc">TriggerRule</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
-</span><span id="line-427"><span class="w">        </span><span class="sd">"""Class with task's trigger rules."""</span>
-</span><span id="line-428">
-</span><span id="line-429">        <span class="n">ALL_SUCCESS</span> <span class="o">=</span> <span class="s2">"all_success"</span>
-</span><span id="line-430">        <span class="n">ALL_FAILED</span> <span class="o">=</span> <span class="s2">"all_failed"</span>
-</span><span id="line-431">        <span class="n">ALL_DONE</span> <span class="o">=</span> <span class="s2">"all_done"</span>
-</span><span id="line-432">        <span class="n">ALL_DONE_SETUP_SUCCESS</span> <span class="o">=</span> <span class="s2">"all_done_setup_success"</span>
-</span><span id="line-433">        <span class="n">ONE_SUCCESS</span> <span class="o">=</span> <span class="s2">"one_success"</span>
-</span><span id="line-434">        <span class="n">ONE_FAILED</span> <span class="o">=</span> <span class="s2">"one_failed"</span>
-</span><span id="line-435">        <span class="n">ONE_DONE</span> <span class="o">=</span> <span class="s2">"one_done"</span>
-</span><span id="line-436">        <span class="n">NONE_FAILED</span> <span class="o">=</span> <span class="s2">"none_failed"</span>
-</span><span id="line-437">        <span class="n">NONE_SKIPPED</span> <span class="o">=</span> <span class="s2">"none_skipped"</span>
-</span><span id="line-438">        <span class="n">ALWAYS</span> <span class="o">=</span> <span class="s2">"always"</span>
-</span><span id="line-439">        <span class="n">NONE_FAILED_MIN_ONE_SUCCESS</span> <span class="o">=</span> <span class="s2">"none_failed_min_one_success"</span>
-</span><span id="line-440">        <span class="n">ALL_SKIPPED</span> <span class="o">=</span> <span class="s2">"all_skipped"</span>
-</span><span id="line-441">
+</span><span id="line-431">    <span class="k">class</span><span class="w"> </span><span class="nc">TriggerRule</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+</span><span id="line-432"><span class="w">        </span><span class="sd">"""Class with task's trigger rules."""</span>
+</span><span id="line-433">
+</span><span id="line-434">        <span class="n">ALL_SUCCESS</span> <span class="o">=</span> <span class="s2">"all_success"</span>
+</span><span id="line-435">        <span class="n">ALL_FAILED</span> <span class="o">=</span> <span class="s2">"all_failed"</span>
+</span><span id="line-436">        <span class="n">ALL_DONE</span> <span class="o">=</span> <span class="s2">"all_done"</span>
+</span><span id="line-437">        <span class="n">ALL_DONE_SETUP_SUCCESS</span> <span class="o">=</span> <span class="s2">"all_done_setup_success"</span>
+</span><span id="line-438">        <span class="n">ONE_SUCCESS</span> <span class="o">=</span> <span class="s2">"one_success"</span>
+</span><span id="line-439">        <span class="n">ONE_FAILED</span> <span class="o">=</span> <span class="s2">"one_failed"</span>
+</span><span id="line-440">        <span class="n">ONE_DONE</span> <span class="o">=</span> <span class="s2">"one_done"</span>
+</span><span id="line-441">        <span class="n">NONE_FAILED</span> <span class="o">=</span> <span class="s2">"none_failed"</span>
+</span><span id="line-442">        <span class="n">NONE_SKIPPED</span> <span class="o">=</span> <span class="s2">"none_skipped"</span>
+</span><span id="line-443">        <span class="n">ALWAYS</span> <span class="o">=</span> <span class="s2">"always"</span>
+</span><span id="line-444">        <span class="n">NONE_FAILED_MIN_ONE_SUCCESS</span> <span class="o">=</span> <span class="s2">"none_failed_min_one_success"</span>
+</span><span id="line-445">        <span class="n">ALL_SKIPPED</span> <span class="o">=</span> <span class="s2">"all_skipped"</span>
+</span><span id="line-446">
 <div class="viewcode-block" id="TriggerRule.is_valid">
 <a class="viewcode-back" href="../../docs/src/api.html#airflow_pydantic.utils.common.TriggerRule.is_valid">[docs]</a>
-</span><span id="line-442">        <span class="nd">@classmethod</span>
-</span><span id="line-443">        <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trigger_rule</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-444"><span class="w">            </span><span class="sd">"""Validate a trigger rule."""</span>
-</span><span id="line-445">            <span class="k">return</span> <span class="n">trigger_rule</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">all_triggers</span><span class="p">()</span></div>
-
-</span><span id="line-446">
-<div class="viewcode-block" id="TriggerRule.all_triggers">
-<a class="viewcode-back" href="../../docs/src/api.html#airflow_pydantic.utils.common.TriggerRule.all_triggers">[docs]</a>
 </span><span id="line-447">        <span class="nd">@classmethod</span>
-</span><span id="line-448">        <span class="k">def</span><span class="w"> </span><span class="nf">all_triggers</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-449"><span class="w">            </span><span class="sd">"""Return all trigger rules."""</span>
-</span><span id="line-450">            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+</span><span id="line-448">        <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trigger_rule</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-449"><span class="w">            </span><span class="sd">"""Validate a trigger rule."""</span>
+</span><span id="line-450">            <span class="k">return</span> <span class="n">trigger_rule</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">all_triggers</span><span class="p">()</span></div>
 
 </span><span id="line-451">
-</span><span id="line-452">        <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-453">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+<div class="viewcode-block" id="TriggerRule.all_triggers">
+<a class="viewcode-back" href="../../docs/src/api.html#airflow_pydantic.utils.common.TriggerRule.all_triggers">[docs]</a>
+</span><span id="line-452">        <span class="nd">@classmethod</span>
+</span><span id="line-453">        <span class="k">def</span><span class="w"> </span><span class="nf">all_triggers</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-454"><span class="w">            </span><span class="sd">"""Return all trigger rules."""</span>
+</span><span id="line-455">            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
-</span><span id="line-454">
-</span><span id="line-455">    <span class="k">class</span><span class="w"> </span><span class="nc">Param</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-456">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-457">            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="line-458">                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Param expected at most 1 positional argument, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-459">            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"value"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-460">            <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-461">            <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-462">            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-463">
-</span><span id="line-464">            <span class="nb">type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">)</span>
-</span><span id="line-465">            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-</span><span id="line-466">                <span class="nb">type</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">]</span>
-</span><span id="line-467">
-</span><span id="line-468">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"null"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">:</span>
-</span><span id="line-469">                <span class="nb">type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"null"</span><span class="p">)</span>
-</span><span id="line-470">
-</span><span id="line-471">            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
-</span><span id="line-472">            <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
-</span><span id="line-473">                <span class="s2">"schema"</span><span class="p">,</span>
-</span><span id="line-474">                <span class="p">{</span>
-</span><span id="line-475">                    <span class="s2">"value"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-</span><span id="line-476">                    <span class="s2">"title"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-</span><span id="line-477">                    <span class="s2">"description"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-</span><span id="line-478">                    <span class="s2">"type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-</span><span id="line-479">                <span class="p">},</span>
-</span><span id="line-480">            <span class="p">)</span>
-</span><span id="line-481">
-</span><span id="line-482">        <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="line-483">            <span class="k">return</span> <span class="p">{</span><span class="s2">"value"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="s2">"schema"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">}</span>
-</span><span id="line-484">
-</span><span id="line-485">    <span class="k">class</span><span class="w"> </span><span class="nc">Pool</span><span class="p">:</span>
-</span><span id="line-486">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-</span><span id="line-487">            <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span>
-</span><span id="line-488">            <span class="bp">self</span><span class="o">.</span><span class="n">slots</span> <span class="o">=</span> <span class="n">slots</span>
-</span><span id="line-489">            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
-</span><span id="line-490">            <span class="bp">self</span><span class="o">.</span><span class="n">include_deferred</span> <span class="o">=</span> <span class="n">include_deferred</span>
-</span><span id="line-491">
-</span><span id="line-492">        <span class="nd">@classmethod</span>
-</span><span id="line-493">        <span class="k">def</span><span class="w"> </span><span class="nf">get_pool</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Pool"</span><span class="p">:</span>
-</span><span id="line-494">            <span class="c1"># Simulate getting a pool from Airflow</span>
-</span><span id="line-495">            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="n">pool_name</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Test pool"</span><span class="p">)</span>
+</span><span id="line-456">
+</span><span id="line-457">        <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-458">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+
+</span><span id="line-459">
+</span><span id="line-460">    <span class="k">class</span><span class="w"> </span><span class="nc">Param</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-461">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-462">            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="line-463">                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Param expected at most 1 positional argument, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-464">            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"value"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-465">            <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-466">            <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-467">            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-468">
+</span><span id="line-469">            <span class="nb">type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">)</span>
+</span><span id="line-470">            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+</span><span id="line-471">                <span class="nb">type</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">]</span>
+</span><span id="line-472">
+</span><span id="line-473">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"null"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">:</span>
+</span><span id="line-474">                <span class="nb">type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"null"</span><span class="p">)</span>
+</span><span id="line-475">
+</span><span id="line-476">            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+</span><span id="line-477">            <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+</span><span id="line-478">                <span class="s2">"schema"</span><span class="p">,</span>
+</span><span id="line-479">                <span class="p">{</span>
+</span><span id="line-480">                    <span class="s2">"value"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span id="line-481">                    <span class="s2">"title"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+</span><span id="line-482">                    <span class="s2">"description"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+</span><span id="line-483">                    <span class="s2">"type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+</span><span id="line-484">                <span class="p">},</span>
+</span><span id="line-485">            <span class="p">)</span>
+</span><span id="line-486">
+</span><span id="line-487">        <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-488">            <span class="k">return</span> <span class="p">{</span><span class="s2">"value"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="s2">"schema"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">}</span>
+</span><span id="line-489">
+</span><span id="line-490">    <span class="k">class</span><span class="w"> </span><span class="nc">Pool</span><span class="p">:</span>
+</span><span id="line-491">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+</span><span id="line-492">            <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span>
+</span><span id="line-493">            <span class="bp">self</span><span class="o">.</span><span class="n">slots</span> <span class="o">=</span> <span class="n">slots</span>
+</span><span id="line-494">            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+</span><span id="line-495">            <span class="bp">self</span><span class="o">.</span><span class="n">include_deferred</span> <span class="o">=</span> <span class="n">include_deferred</span>
 </span><span id="line-496">
 </span><span id="line-497">        <span class="nd">@classmethod</span>
-</span><span id="line-498">        <span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_pool</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-499">            <span class="c1"># Simulate creating or updating a pool in Airflow</span>
-</span><span id="line-500">            <span class="k">pass</span>
+</span><span id="line-498">        <span class="k">def</span><span class="w"> </span><span class="nf">get_pool</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Pool"</span><span class="p">:</span>
+</span><span id="line-499">            <span class="c1"># Simulate getting a pool from Airflow</span>
+</span><span id="line-500">            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="n">pool_name</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Test pool"</span><span class="p">)</span>
 </span><span id="line-501">
-</span><span id="line-502">    <span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_pool</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-503">        <span class="c1"># Simulate creating or updating a pool in Airflow</span>
-</span><span id="line-504">        <span class="k">pass</span>
-</span><span id="line-505">
-</span><span id="line-506">    <span class="k">def</span><span class="w"> </span><span class="nf">get_pool</span><span class="p">(</span><span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pool</span><span class="p">:</span>
-</span><span id="line-507">        <span class="c1"># Simulate getting a pool from Airflow</span>
-</span><span id="line-508">        <span class="k">return</span> <span class="n">Pool</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="n">pool_name</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Test pool"</span><span class="p">)</span>
-</span><span id="line-509">
-</span><span id="line-510">    <span class="k">class</span><span class="w"> </span><span class="nc">PoolNotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="line-511">        <span class="k">pass</span>
-</span><span id="line-512">
-</span><span id="line-513">    <span class="k">class</span><span class="w"> </span><span class="nc">Variable</span><span class="p">:</span>
-</span><span id="line-514">        <span class="nd">@staticmethod</span>
-</span><span id="line-515">        <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deserialize_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-</span><span id="line-516">            <span class="c1"># Simulate getting a variable from Airflow</span>
-</span><span id="line-517">            <span class="k">if</span> <span class="n">deserialize_json</span><span class="p">:</span>
-</span><span id="line-518">                <span class="k">return</span> <span class="p">{</span><span class="s2">"key"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">}</span>
-</span><span id="line-519">            <span class="k">return</span> <span class="s2">"value"</span>
-</span><span id="line-520">
-</span><span id="line-521">    <span class="k">class</span><span class="w"> </span><span class="nc">_ParsingContext</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-522">        <span class="n">dag_id</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-523">
-</span><span id="line-524">    <span class="k">def</span><span class="w"> </span><span class="nf">get_parsing_context</span><span class="p">():</span>
-</span><span id="line-525">        <span class="c1"># Airflow not installed, so no parsing context</span>
-</span><span id="line-526">        <span class="k">return</span> <span class="n">_ParsingContext</span><span class="p">()</span>
-</span><span id="line-527">
-</span><span id="line-528">    <span class="k">class</span><span class="w"> </span><span class="nc">BashOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-529">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.bash.BashOperator"</span>
-</span><span id="line-530">
-</span><span id="line-531">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchDateTimeOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-532">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.datetime.BranchDateTimeOperator"</span>
-</span><span id="line-533">
-</span><span id="line-534">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchExternalPythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-535">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.BranchExternalPythonOperator"</span>
-</span><span id="line-536">
-</span><span id="line-537">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-538">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.BranchPythonOperator"</span>
-</span><span id="line-539">
-</span><span id="line-540">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonVirtualenvOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-541">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.BranchPythonVirtualenvOperator"</span>
-</span><span id="line-542">
-</span><span id="line-543">    <span class="k">class</span><span class="w"> </span><span class="nc">EmailOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-544">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.smtp.operators.smtp.EmailOperator"</span>
-</span><span id="line-545">
-</span><span id="line-546">    <span class="k">class</span><span class="w"> </span><span class="nc">EmptyOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-547">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.empty.EmptyOperator"</span>
-</span><span id="line-548">
-</span><span id="line-549">    <span class="k">class</span><span class="w"> </span><span class="nc">ExternalPythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-550">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.ExternalPythonOperator"</span>
-</span><span id="line-551">
-</span><span id="line-552">    <span class="k">class</span><span class="w"> </span><span class="nc">PythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-553">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.PythonOperator"</span>
-</span><span id="line-554">
-</span><span id="line-555">    <span class="k">class</span><span class="w"> </span><span class="nc">PythonVirtualenvOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-556">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.PythonVirtualenvOperator"</span>
-</span><span id="line-557">
-</span><span id="line-558">    <span class="k">class</span><span class="w"> </span><span class="nc">ShortCircuitOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-559">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.ShortCircuitOperator"</span>
-</span><span id="line-560">
-</span><span id="line-561">    <span class="k">class</span><span class="w"> </span><span class="nc">TriggerDagRunOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-562">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.trigger_dagrun.TriggerDagRunOperator"</span>
-</span><span id="line-563">
-</span><span id="line-564">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchDayOfWeekOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-565">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.weekday.BranchDayOfWeekOperator"</span>
-</span><span id="line-566">
-</span><span id="line-567">    <span class="k">class</span><span class="w"> </span><span class="nc">BashSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-568">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.bash.BashSensor"</span>
-</span><span id="line-569">
-</span><span id="line-570">    <span class="k">class</span><span class="w"> </span><span class="nc">DateTimeSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-571">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.date_time.DateTimeSensor"</span>
-</span><span id="line-572">
-</span><span id="line-573">    <span class="k">class</span><span class="w"> </span><span class="nc">DateTimeSensorAsync</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-574">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.date_time.DateTimeSensorAsync"</span>
-</span><span id="line-575">
-</span><span id="line-576">    <span class="k">class</span><span class="w"> </span><span class="nc">DayOfWeekSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-577">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.weekday.DayOfWeekSensor"</span>
-</span><span id="line-578">
-</span><span id="line-579">    <span class="k">class</span><span class="w"> </span><span class="nc">ExternalTaskSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-580">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.external_task.ExternalTaskSensor"</span>
-</span><span id="line-581">
-</span><span id="line-582">    <span class="k">class</span><span class="w"> </span><span class="nc">FileSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-583">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.filesystem.FileSensor"</span>
-</span><span id="line-584">
-</span><span id="line-585">    <span class="k">class</span><span class="w"> </span><span class="nc">PythonSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-586">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.python.PythonSensor"</span>
-</span><span id="line-587">
-</span><span id="line-588">    <span class="k">class</span><span class="w"> </span><span class="nc">TimeSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-589">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.time.TimeSensor"</span>
-</span><span id="line-590">
-</span><span id="line-591">    <span class="k">class</span><span class="w"> </span><span class="nc">TimeDeltaSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-592">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.time_delta.TimeDeltaSensor"</span>
-</span><span id="line-593">
-</span><span id="line-594">    <span class="k">class</span><span class="w"> </span><span class="nc">WaitSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-595">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.time_delta.WaitSensor"</span>
-</span><span id="line-596">
-</span><span id="line-597">    <span class="k">class</span><span class="w"> </span><span class="nc">SSHHook</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-598">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-599">            <span class="bp">self</span><span class="o">.</span><span class="n">remote_host</span> <span class="o">=</span> <span class="n">remote_host</span>
-</span><span id="line-600">            <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span> <span class="ow">or</span> <span class="n">getuser</span><span class="p">()</span>
-</span><span id="line-601">            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
-</span><span id="line-602">            <span class="bp">self</span><span class="o">.</span><span class="n">key_file</span> <span class="o">=</span> <span class="n">key_file</span>
-</span><span id="line-603">            <span class="bp">self</span><span class="o">.</span><span class="n">ssh_conn_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"ssh_conn_id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-604">            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"port"</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
-</span><span id="line-605">            <span class="bp">self</span><span class="o">.</span><span class="n">conn_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"conn_timeout"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-606">            <span class="bp">self</span><span class="o">.</span><span class="n">cmd_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"cmd_timeout"</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-</span><span id="line-607">            <span class="bp">self</span><span class="o">.</span><span class="n">keepalive_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"keepalive_interval"</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-</span><span id="line-608">            <span class="bp">self</span><span class="o">.</span><span class="n">banner_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"banner_timeout"</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
-</span><span id="line-609">            <span class="bp">self</span><span class="o">.</span><span class="n">auth_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"auth_timeout"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-610">
-</span><span id="line-611">    <span class="k">class</span><span class="w"> </span><span class="nc">SSHOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-612">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.ssh.operators.ssh.SSHOperator"</span>
-</span><span id="line-613">
-</span><span id="line-614">    <span class="k">class</span><span class="w"> </span><span class="nc">EventsTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-615">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.events.EventsTimetable"</span>
-</span><span id="line-616">
-</span><span id="line-617">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_dates</span><span class="p">,</span> <span class="n">restrict_to_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">presorted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="line-618">            <span class="bp">self</span><span class="o">.</span><span class="n">event_dates</span> <span class="o">=</span> <span class="n">event_dates</span>
-</span><span id="line-619">            <span class="bp">self</span><span class="o">.</span><span class="n">restrict_to_events</span> <span class="o">=</span> <span class="n">restrict_to_events</span>
-</span><span id="line-620">            <span class="bp">self</span><span class="o">.</span><span class="n">presorted</span> <span class="o">=</span> <span class="n">presorted</span>
-</span><span id="line-621">            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
-</span><span id="line-622">
-</span><span id="line-623">    <span class="k">class</span><span class="w"> </span><span class="nc">CronDataIntervalTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-624">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.interval.CronDataIntervalTimetable"</span>
-</span><span id="line-625">
-</span><span id="line-626">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cron</span><span class="p">,</span> <span class="n">timezone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-627">            <span class="bp">self</span><span class="o">.</span><span class="n">cron</span> <span class="o">=</span> <span class="n">cron</span>
-</span><span id="line-628">            <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
-</span><span id="line-629">
-</span><span id="line-630">    <span class="k">class</span><span class="w"> </span><span class="nc">DeltaDataIntervalTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-631">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.interval.DeltaDataIntervalTimetable"</span>
-</span><span id="line-632">
-</span><span id="line-633">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-634">            <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span> <span class="o">=</span> <span class="n">delta</span>
-</span><span id="line-635">
-</span><span id="line-636">    <span class="k">class</span><span class="w"> </span><span class="nc">CronTriggerTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-637">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.trigger.CronTriggerTimetable"</span>
-</span><span id="line-638">
-</span><span id="line-639">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cron</span><span class="p">,</span> <span class="n">timezone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-640">            <span class="bp">self</span><span class="o">.</span><span class="n">cron</span> <span class="o">=</span> <span class="n">cron</span>
-</span><span id="line-641">            <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
-</span><span id="line-642">
-</span><span id="line-643">    <span class="n">NEW_SESSION</span> <span class="o">=</span> <span class="n">Any</span>
-</span><span id="line-644">    <span class="n">provide_session</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span>
-</span><span id="line-645">
-</span><span id="line-646">
-</span><span id="line-647"><span class="k">if</span> <span class="n">_airflow_3</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="line-648">
-</span><span id="line-649">    <span class="k">class</span><span class="w"> </span><span class="nc">ApprovalOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-650">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.hitl.ApprovalOperator"</span>
+</span><span id="line-502">        <span class="nd">@classmethod</span>
+</span><span id="line-503">        <span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_pool</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-504">            <span class="c1"># Simulate creating or updating a pool in Airflow</span>
+</span><span id="line-505">            <span class="k">pass</span>
+</span><span id="line-506">
+</span><span id="line-507">    <span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_pool</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">slots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">include_deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-508">        <span class="c1"># Simulate creating or updating a pool in Airflow</span>
+</span><span id="line-509">        <span class="k">pass</span>
+</span><span id="line-510">
+</span><span id="line-511">    <span class="k">def</span><span class="w"> </span><span class="nf">get_pool</span><span class="p">(</span><span class="n">pool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pool</span><span class="p">:</span>
+</span><span id="line-512">        <span class="c1"># Simulate getting a pool from Airflow</span>
+</span><span id="line-513">        <span class="k">return</span> <span class="n">Pool</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="n">pool_name</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Test pool"</span><span class="p">)</span>
+</span><span id="line-514">
+</span><span id="line-515">    <span class="k">class</span><span class="w"> </span><span class="nc">PoolNotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="line-516">        <span class="k">pass</span>
+</span><span id="line-517">
+</span><span id="line-518">    <span class="k">class</span><span class="w"> </span><span class="nc">Variable</span><span class="p">:</span>
+</span><span id="line-519">        <span class="nd">@staticmethod</span>
+</span><span id="line-520">        <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deserialize_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+</span><span id="line-521">            <span class="c1"># Simulate getting a variable from Airflow</span>
+</span><span id="line-522">            <span class="k">if</span> <span class="n">deserialize_json</span><span class="p">:</span>
+</span><span id="line-523">                <span class="k">return</span> <span class="p">{</span><span class="s2">"key"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">}</span>
+</span><span id="line-524">            <span class="k">return</span> <span class="s2">"value"</span>
+</span><span id="line-525">
+</span><span id="line-526">    <span class="k">class</span><span class="w"> </span><span class="nc">_ParsingContext</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-527">        <span class="n">dag_id</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-528">
+</span><span id="line-529">    <span class="k">def</span><span class="w"> </span><span class="nf">get_parsing_context</span><span class="p">():</span>
+</span><span id="line-530">        <span class="c1"># Airflow not installed, so no parsing context</span>
+</span><span id="line-531">        <span class="k">return</span> <span class="n">_ParsingContext</span><span class="p">()</span>
+</span><span id="line-532">
+</span><span id="line-533">    <span class="k">class</span><span class="w"> </span><span class="nc">BashOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-534">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.bash.BashOperator"</span>
+</span><span id="line-535">
+</span><span id="line-536">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchDateTimeOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-537">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.datetime.BranchDateTimeOperator"</span>
+</span><span id="line-538">
+</span><span id="line-539">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchExternalPythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-540">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.BranchExternalPythonOperator"</span>
+</span><span id="line-541">
+</span><span id="line-542">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-543">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.BranchPythonOperator"</span>
+</span><span id="line-544">
+</span><span id="line-545">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchPythonVirtualenvOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-546">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.BranchPythonVirtualenvOperator"</span>
+</span><span id="line-547">
+</span><span id="line-548">    <span class="k">class</span><span class="w"> </span><span class="nc">EmailOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-549">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.smtp.operators.smtp.EmailOperator"</span>
+</span><span id="line-550">
+</span><span id="line-551">    <span class="k">class</span><span class="w"> </span><span class="nc">EmptyOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-552">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.empty.EmptyOperator"</span>
+</span><span id="line-553">
+</span><span id="line-554">    <span class="k">class</span><span class="w"> </span><span class="nc">ExternalPythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-555">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.ExternalPythonOperator"</span>
+</span><span id="line-556">
+</span><span id="line-557">    <span class="k">class</span><span class="w"> </span><span class="nc">PythonOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-558">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.PythonOperator"</span>
+</span><span id="line-559">
+</span><span id="line-560">    <span class="k">class</span><span class="w"> </span><span class="nc">PythonVirtualenvOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-561">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.PythonVirtualenvOperator"</span>
+</span><span id="line-562">
+</span><span id="line-563">    <span class="k">class</span><span class="w"> </span><span class="nc">ShortCircuitOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-564">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.python.ShortCircuitOperator"</span>
+</span><span id="line-565">
+</span><span id="line-566">    <span class="k">class</span><span class="w"> </span><span class="nc">TriggerDagRunOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-567">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.trigger_dagrun.TriggerDagRunOperator"</span>
+</span><span id="line-568">
+</span><span id="line-569">    <span class="k">class</span><span class="w"> </span><span class="nc">BranchDayOfWeekOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-570">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.weekday.BranchDayOfWeekOperator"</span>
+</span><span id="line-571">
+</span><span id="line-572">    <span class="k">class</span><span class="w"> </span><span class="nc">BashSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-573">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.bash.BashSensor"</span>
+</span><span id="line-574">
+</span><span id="line-575">    <span class="k">class</span><span class="w"> </span><span class="nc">DateTimeSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-576">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.date_time.DateTimeSensor"</span>
+</span><span id="line-577">
+</span><span id="line-578">    <span class="k">class</span><span class="w"> </span><span class="nc">DateTimeSensorAsync</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-579">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.date_time.DateTimeSensorAsync"</span>
+</span><span id="line-580">
+</span><span id="line-581">    <span class="k">class</span><span class="w"> </span><span class="nc">DayOfWeekSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-582">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.weekday.DayOfWeekSensor"</span>
+</span><span id="line-583">
+</span><span id="line-584">    <span class="k">class</span><span class="w"> </span><span class="nc">ExternalTaskSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-585">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.external_task.ExternalTaskSensor"</span>
+</span><span id="line-586">
+</span><span id="line-587">    <span class="k">class</span><span class="w"> </span><span class="nc">FileSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-588">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.filesystem.FileSensor"</span>
+</span><span id="line-589">
+</span><span id="line-590">    <span class="k">class</span><span class="w"> </span><span class="nc">PythonSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-591">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.python.PythonSensor"</span>
+</span><span id="line-592">
+</span><span id="line-593">    <span class="k">class</span><span class="w"> </span><span class="nc">TimeSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-594">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.time.TimeSensor"</span>
+</span><span id="line-595">
+</span><span id="line-596">    <span class="k">class</span><span class="w"> </span><span class="nc">TimeDeltaSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-597">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.time_delta.TimeDeltaSensor"</span>
+</span><span id="line-598">
+</span><span id="line-599">    <span class="k">class</span><span class="w"> </span><span class="nc">WaitSensor</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-600">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.sensors.time_delta.WaitSensor"</span>
+</span><span id="line-601">
+</span><span id="line-602">    <span class="k">class</span><span class="w"> </span><span class="nc">SSHHook</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-603">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-604">            <span class="bp">self</span><span class="o">.</span><span class="n">remote_host</span> <span class="o">=</span> <span class="n">remote_host</span>
+</span><span id="line-605">            <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span> <span class="ow">or</span> <span class="n">getuser</span><span class="p">()</span>
+</span><span id="line-606">            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+</span><span id="line-607">            <span class="bp">self</span><span class="o">.</span><span class="n">key_file</span> <span class="o">=</span> <span class="n">key_file</span>
+</span><span id="line-608">            <span class="bp">self</span><span class="o">.</span><span class="n">ssh_conn_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"ssh_conn_id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-609">            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"port"</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+</span><span id="line-610">            <span class="bp">self</span><span class="o">.</span><span class="n">conn_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"conn_timeout"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-611">            <span class="bp">self</span><span class="o">.</span><span class="n">cmd_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"cmd_timeout"</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</span><span id="line-612">            <span class="bp">self</span><span class="o">.</span><span class="n">keepalive_interval</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"keepalive_interval"</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</span><span id="line-613">            <span class="bp">self</span><span class="o">.</span><span class="n">banner_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"banner_timeout"</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
+</span><span id="line-614">            <span class="bp">self</span><span class="o">.</span><span class="n">auth_timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"auth_timeout"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-615">
+</span><span id="line-616">    <span class="k">class</span><span class="w"> </span><span class="nc">SSHOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-617">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.ssh.operators.ssh.SSHOperator"</span>
+</span><span id="line-618">
+</span><span id="line-619">    <span class="k">class</span><span class="w"> </span><span class="nc">EventsTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-620">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.events.EventsTimetable"</span>
+</span><span id="line-621">
+</span><span id="line-622">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_dates</span><span class="p">,</span> <span class="n">restrict_to_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">presorted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="line-623">            <span class="bp">self</span><span class="o">.</span><span class="n">event_dates</span> <span class="o">=</span> <span class="n">event_dates</span>
+</span><span id="line-624">            <span class="bp">self</span><span class="o">.</span><span class="n">restrict_to_events</span> <span class="o">=</span> <span class="n">restrict_to_events</span>
+</span><span id="line-625">            <span class="bp">self</span><span class="o">.</span><span class="n">presorted</span> <span class="o">=</span> <span class="n">presorted</span>
+</span><span id="line-626">            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+</span><span id="line-627">
+</span><span id="line-628">    <span class="k">class</span><span class="w"> </span><span class="nc">CronDataIntervalTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-629">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.interval.CronDataIntervalTimetable"</span>
+</span><span id="line-630">
+</span><span id="line-631">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cron</span><span class="p">,</span> <span class="n">timezone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-632">            <span class="bp">self</span><span class="o">.</span><span class="n">cron</span> <span class="o">=</span> <span class="n">cron</span>
+</span><span id="line-633">            <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
+</span><span id="line-634">
+</span><span id="line-635">    <span class="k">class</span><span class="w"> </span><span class="nc">DeltaDataIntervalTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-636">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.interval.DeltaDataIntervalTimetable"</span>
+</span><span id="line-637">
+</span><span id="line-638">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-639">            <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span> <span class="o">=</span> <span class="n">delta</span>
+</span><span id="line-640">
+</span><span id="line-641">    <span class="k">class</span><span class="w"> </span><span class="nc">CronTriggerTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-642">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.trigger.CronTriggerTimetable"</span>
+</span><span id="line-643">
+</span><span id="line-644">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cron</span><span class="p">,</span> <span class="n">timezone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-645">            <span class="bp">self</span><span class="o">.</span><span class="n">cron</span> <span class="o">=</span> <span class="n">cron</span>
+</span><span id="line-646">            <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
+</span><span id="line-647">
+</span><span id="line-648">    <span class="n">NEW_SESSION</span> <span class="o">=</span> <span class="n">Any</span>
+</span><span id="line-649">    <span class="n">provide_session</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span>
+</span><span id="line-650">
 </span><span id="line-651">
-</span><span id="line-652">    <span class="k">class</span><span class="w"> </span><span class="nc">HITLOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-653">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.hitl.HITLOperator"</span>
-</span><span id="line-654">
-</span><span id="line-655">    <span class="k">class</span><span class="w"> </span><span class="nc">HITLBranchOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-656">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.hitl.HITLBranchOperator"</span>
-</span><span id="line-657">
-</span><span id="line-658">    <span class="k">class</span><span class="w"> </span><span class="nc">DeltaTriggerTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-659">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.trigger.DeltaTriggerTimetable"</span>
-</span><span id="line-660">
-</span><span id="line-661">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">timedelta</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-662">            <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
-</span><span id="line-663">            <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+</span><span id="line-652"><span class="k">if</span> <span class="n">_airflow_3</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="line-653">
+</span><span id="line-654">    <span class="k">class</span><span class="w"> </span><span class="nc">ApprovalOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-655">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.hitl.ApprovalOperator"</span>
+</span><span id="line-656">
+</span><span id="line-657">    <span class="k">class</span><span class="w"> </span><span class="nc">HITLOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-658">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.hitl.HITLOperator"</span>
+</span><span id="line-659">
+</span><span id="line-660">    <span class="k">class</span><span class="w"> </span><span class="nc">HITLBranchOperator</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-661">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.providers.standard.operators.hitl.HITLBranchOperator"</span>
+</span><span id="line-662">
+</span><span id="line-663">    <span class="k">if</span> <span class="s2">"DeltaTriggerTimetable"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
 </span><span id="line-664">
-</span><span id="line-665">    <span class="k">class</span><span class="w"> </span><span class="nc">MultipleCronTriggerTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
-</span><span id="line-666">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.trigger.MultipleCronTriggerTimetable"</span>
+</span><span id="line-665">        <span class="k">class</span><span class="w"> </span><span class="nc">DeltaTriggerTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-666">            <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.trigger.DeltaTriggerTimetable"</span>
 </span><span id="line-667">
-</span><span id="line-668">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">crons</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(),</span> <span class="n">run_immediately</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-669">            <span class="bp">self</span><span class="o">.</span><span class="n">crons</span> <span class="o">=</span> <span class="n">crons</span>
-</span><span id="line-670">            <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
-</span><span id="line-671">            <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
-</span><span id="line-672">            <span class="bp">self</span><span class="o">.</span><span class="n">run_immediately</span> <span class="o">=</span> <span class="n">run_immediately</span>
+</span><span id="line-668">            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">timedelta</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-669">                <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+</span><span id="line-670">                <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+</span><span id="line-671">
+</span><span id="line-672">    <span class="k">class</span><span class="w"> </span><span class="nc">MultipleCronTriggerTimetable</span><span class="p">(</span><span class="n">_AirflowPydanticMarker</span><span class="p">):</span>
+</span><span id="line-673">        <span class="n">_original</span> <span class="o">=</span> <span class="s2">"airflow.timetables.trigger.MultipleCronTriggerTimetable"</span>
+</span><span id="line-674">
+</span><span id="line-675">        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">crons</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(),</span> <span class="n">run_immediately</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-676">            <span class="bp">self</span><span class="o">.</span><span class="n">crons</span> <span class="o">=</span> <span class="n">crons</span>
+</span><span id="line-677">            <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
+</span><span id="line-678">            <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+</span><span id="line-679">            <span class="bp">self</span><span class="o">.</span><span class="n">run_immediately</span> <span class="o">=</span> <span class="n">run_immediately</span>
 </span></code></pre></div>
     </div></div>
           </main>
