@@ -49,7 +49,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Python
-        uses: actions-ext/python/setup@ec67f82b3bd863948308a41ecb9e70547cbb19c7
+        uses: actions-ext/python/setup@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
         with:
           version: ${{ matrix.python-version }}
 
@@ -104,7 +104,7 @@ jobs:
         if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
       - name: Upload coverage
-        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4  # v7.1.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
         if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
@@ -114,12 +114,12 @@ jobs:
         if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
       - name: Test wheel
-        uses: actions-ext/python/test-wheel@ec67f82b3bd863948308a41ecb9e70547cbb19c7
+        uses: actions-ext/python/test-wheel@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
         with:
           module: airflow_pydantic
 
       - name: Test source distribution
-        uses: actions-ext/python/test-sdist@ec67f82b3bd863948308a41ecb9e70547cbb19c7
+        uses: actions-ext/python/test-sdist@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
         with:
           module: airflow_pydantic
 
