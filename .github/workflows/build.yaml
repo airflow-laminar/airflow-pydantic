@@ -49,7 +49,11 @@ jobs:
           persist-credentials: false
 
       - name: Setup Python
+<<<<<<< before updating
         uses: actions-ext/python/setup@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
+=======
+        uses: actions-ext/python/setup@c8228d827a81b9f8c808825328af361c45461ba3
+>>>>>>> after updating
         with:
           version: ${{ matrix.python-version }}
 
@@ -114,12 +118,20 @@ jobs:
         if: ${{ matrix.airflow == '2' && matrix.laminar == 'laminar' }}
 
       - name: Test wheel
+<<<<<<< before updating
         uses: actions-ext/python/test-wheel@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
+=======
+        uses: actions-ext/python/test-wheel@c8228d827a81b9f8c808825328af361c45461ba3
+>>>>>>> after updating
         with:
           module: airflow_pydantic
 
       - name: Test source distribution
+<<<<<<< before updating
         uses: actions-ext/python/test-sdist@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
+=======
+        uses: actions-ext/python/test-sdist@c8228d827a81b9f8c808825328af361c45461ba3
+>>>>>>> after updating
         with:
           module: airflow_pydantic
 
