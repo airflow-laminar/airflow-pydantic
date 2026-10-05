@@ -22,7 +22,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Python
-        uses: actions-ext/python/setup@04d8ae7f2cf48623ba6cbf1b9b1f5ce5093ec75f
+        uses: actions-ext/python/setup@c8228d827a81b9f8c808825328af361c45461ba3
 
       - name: Download distributions
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8
