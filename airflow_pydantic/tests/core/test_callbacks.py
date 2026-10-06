@@ -4,6 +4,7 @@ import json
 import pytest
 
 from airflow_pydantic import BashTask, TaskArgs
+from airflow_pydantic.airflow import BashOperator as AirflowBashOperator, _AirflowPydanticMarker
 
 
 def alert(context):
@@ -15,14 +16,22 @@ CALLBACK_FIELDS = ["on_failure_callback", "on_execute_callback", "on_retry_callb
 
 @pytest.mark.parametrize("field", CALLBACK_FIELDS)
 @pytest.mark.parametrize("as_list", [False, True])
-def test_callback_paths_roundtrip_and_instantiate(field, as_list):
+def test_callback_paths_roundtrip(field, as_list):
     callback = [alert] if as_list else alert
     task = BashTask(task_id="callback-task", bash_command="true", **{field: callback})
     dumped = json.loads(task.model_dump_json(exclude_unset=True))
     assert dumped[field] == [f"{__name__}.alert"] if as_list else dumped[field] == f"{__name__}.alert"
     restored = BashTask.model_validate(dumped)
     assert getattr(restored, field) == callback
-    assert getattr(restored.instantiate(), field) in (callback, [callback])
+
+
+@pytest.mark.skipif(issubclass(AirflowBashOperator, _AirflowPydanticMarker), reason="Airflow is not installed")
+@pytest.mark.parametrize("field", CALLBACK_FIELDS)
+@pytest.mark.parametrize("as_list", [False, True])
+def test_callback_instantiates_callable(field, as_list):
+    callback = [alert] if as_list else alert
+    task = BashTask(task_id="callback-task", bash_command="true", **{field: callback})
+    assert getattr(task.instantiate(), field) in (callback, [callback])
 
 
 @pytest.mark.parametrize("field", CALLBACK_FIELDS)
