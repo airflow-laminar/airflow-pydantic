@@ -220,7 +220,23 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
         raise NotImplementedError(
             f"Got lambda for {key}:Lambda functions are not supported in the configuration. Please use a regular function instead."
         )
-    if key in ("ssh_hook", "python_callable", "output_processor"):
+    if key in (
+        "ssh_hook",
+        "python_callable",
+        "output_processor",
+        "on_failure_callback",
+        "on_execute_callback",
+        "on_retry_callback",
+        "on_success_callback",
+        "on_skipped_callback",
+    ):
+        if isinstance(value, list):
+            nodes = []
+            for callback in value:
+                callback_imports, callback_node = _get_parts_from_value(key, callback, model_ref, airflow_major_version=airflow_major_version)
+                imports.extend(callback_imports)
+                nodes.append(callback_node)
+            return imports, ast.List(elts=nodes, ctx=ast.Load())
         try:
             from airflow_pydantic.airflow import SSHHook as BaseSSHHook
 

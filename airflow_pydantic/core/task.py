@@ -3,7 +3,7 @@ from typing import Union
 
 from pydantic import Field, field_validator, model_validator
 
-from ..utils import DatetimeArg, ImportPath, Pool, TriggerRule
+from ..utils import CallablePath, DatetimeArg, ImportPath, Pool, TriggerRule
 from .base import BaseModel
 from .instantiate import TaskInstantiateMixin
 from .render import TaskRenderMixin
@@ -79,11 +79,11 @@ class TaskArgs(BaseModel, validate_assignment=True):
         default=None,
         description="max time allowed for the execution of this task instance, if it goes beyond it will raise and fail.",
     )
-    # on_failure_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – a function or list of functions to be called when a task instance of this task fails. a context dictionary is passed as a single parameter to this function. Context contains references to related objects to the task instance and is documented under the macros section of the API.
-    # on_execute_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed right before the task is executed.
-    # on_retry_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed when retries occur.
-    # on_success_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed when the task succeeds.
-    # on_skipped_callback (None | airflow.models.abstractoperator.TaskStateChangeCallback | list[airflow.models.abstractoperator.TaskStateChangeCallback]) – much like the on_failure_callback except that it is executed when skipped occur; this callback will be called only if AirflowSkipException get raised. Explicitly it is NOT called if a task is not started to be executed because of a preceding branching decision in the DAG or a trigger rule which causes execution to skip so that the task execution is never scheduled.
+    on_failure_callback: list[CallablePath] | CallablePath | None = Field(default=None, union_mode="left_to_right")
+    on_execute_callback: list[CallablePath] | CallablePath | None = Field(default=None, union_mode="left_to_right")
+    on_retry_callback: list[CallablePath] | CallablePath | None = Field(default=None, union_mode="left_to_right")
+    on_success_callback: list[CallablePath] | CallablePath | None = Field(default=None, union_mode="left_to_right")
+    on_skipped_callback: list[CallablePath] | CallablePath | None = Field(default=None, union_mode="left_to_right")
     # pre_execute (TaskPreExecuteHook | None) – a function to be called immediately before task execution, receiving a context dictionary; raising an exception will prevent the task from being executed.
     # post_execute (TaskPostExecuteHook | None) – a function to be called immediately after task execution, receiving a context dictionary and task result; raising an exception will prevent the task from succeeding.
     trigger_rule: TriggerRule | None = Field(
