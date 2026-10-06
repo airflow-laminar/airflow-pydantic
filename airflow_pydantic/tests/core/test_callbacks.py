@@ -55,3 +55,18 @@ def test_callback_default_args_render():
     imports, _, rendered = render_base_task_args(TaskArgs(on_failure_callback=[alert]))
     assert f"from {__name__} import alert" in imports
     assert "'on_failure_callback': [alert]" in rendered
+
+
+def alert_again(context):
+    return context
+
+
+def test_multiple_callbacks_roundtrip_and_render_in_order():
+    callbacks = [alert, alert_again]
+    task = BashTask(task_id="callback-task", bash_command="true", on_failure_callback=callbacks)
+    restored = BashTask.model_validate_json(task.model_dump_json(exclude_unset=True))
+    assert restored.on_failure_callback == callbacks
+    imports, _, rendered = restored.render()
+    assert f"from {__name__} import alert" in imports
+    assert f"from {__name__} import alert_again" in imports
+    assert "on_failure_callback=[alert, alert_again]" in rendered
