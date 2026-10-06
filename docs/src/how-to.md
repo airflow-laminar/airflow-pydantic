@@ -249,3 +249,40 @@ Use task models from the runtime integration that owns the job:
 - [airflow-supervisor](https://github.com/airflow-laminar/airflow-supervisor) for supervisord processes modeled by [supervisor-pydantic](https://github.com/airflow-laminar/supervisor-pydantic).
 - [airflow-systemd](https://github.com/airflow-laminar/airflow-systemd) for services modeled by [systemd-pydantic](https://github.com/airflow-laminar/systemd-pydantic).
 - [airflow-cron](https://github.com/airflow-laminar/airflow-cron) for schedules modeled by [cron-pydantic](https://github.com/airflow-laminar/cron-pydantic).
+
+## How to attach task callbacks
+
+Set callbacks on task models or in `TaskArgs` used for DAG `default_args`:
+
+```python
+from airflow_pydantic import BashTask
+
+
+def alert(context):
+    context["task"].log.error("Task failed: %s", context["exception"])
+
+
+task = BashTask(
+    task_id="report",
+    bash_command="/opt/jobs/report",
+    on_failure_callback=alert,
+)
+```
+
+Use an importable function in your DAG directory for rendered DAGs and YAML
+configurations. Supply its dotted path, or a list of paths when several
+callbacks should run:
+
+```yaml
+task_id: report
+operator: airflow_pydantic.BashTask
+bash_command: /opt/jobs/report
+on_failure_callback:
+  - alerts.report_failed
+on_retry_callback: alerts.report_retrying
+```
+
+Callbacks receive Airflow's task context. Airflow invokes failure callbacks
+after task execution fails, subject to retries; changing a task's state through
+the UI does not invoke them. Check callback errors in the scheduler or task
+runner logs for your Airflow version.
