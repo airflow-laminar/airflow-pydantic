@@ -334,6 +334,39 @@ for loading and materialization.</p>
 <li><p><a class="reference external" href="https://github.com/airflow-laminar/airflow-cron">airflow-cron</a> for schedules modeled by <a class="reference external" href="https://github.com/airflow-laminar/cron-pydantic">cron-pydantic</a>.</p></li>
 </ul>
 </section>
+<section id="how-to-attach-task-callbacks">
+<h2>How to attach task callbacks<a class="headerlink" href="#how-to-attach-task-callbacks" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-attach-task-callbacks'">¶</a></h2>
+<p>Set callbacks on task models or in <code class="docutils literal notranslate"><span class="pre">TaskArgs</span></code> used for DAG <code class="docutils literal notranslate"><span class="pre">default_args</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">airflow_pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BashTask</span>
+</span><span id="line-2">
+</span><span id="line-3">
+</span><span id="line-4"><span class="k">def</span><span class="w"> </span><span class="nf">alert</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+</span><span id="line-5">    <span class="n">context</span><span class="p">[</span><span class="s2">"task"</span><span class="p">]</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Task failed: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">context</span><span class="p">[</span><span class="s2">"exception"</span><span class="p">])</span>
+</span><span id="line-6">
+</span><span id="line-7">
+</span><span id="line-8"><span class="n">task</span> <span class="o">=</span> <span class="n">BashTask</span><span class="p">(</span>
+</span><span id="line-9">    <span class="n">task_id</span><span class="o">=</span><span class="s2">"report"</span><span class="p">,</span>
+</span><span id="line-10">    <span class="n">bash_command</span><span class="o">=</span><span class="s2">"/opt/jobs/report"</span><span class="p">,</span>
+</span><span id="line-11">    <span class="n">on_failure_callback</span><span class="o">=</span><span class="n">alert</span><span class="p">,</span>
+</span><span id="line-12"><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>Use an importable function in your DAG directory for rendered DAGs and YAML
+configurations. Supply its dotted path, or a list of paths when several
+callbacks should run:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nt">task_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">report</span>
+</span><span id="line-2"><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">airflow_pydantic.BashTask</span>
+</span><span id="line-3"><span class="nt">bash_command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/jobs/report</span>
+</span><span id="line-4"><span class="nt">on_failure_callback</span><span class="p">:</span>
+</span><span id="line-5"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alerts.report_failed</span>
+</span><span id="line-6"><span class="nt">on_retry_callback</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alerts.report_retrying</span>
+</span></code></pre></div>
+</div>
+<p>Callbacks receive Airflow’s task context. Airflow invokes failure callbacks
+after task execution fails, subject to retries; changing a task’s state through
+the UI does not invoke them. Check callback errors in the scheduler or task
+runner logs for your Airflow version.</p>
+</section>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
@@ -351,6 +384,7 @@ for loading and materialization.</p>
 <li><a :data-current="activeSection === '#how-to-serialize-and-validate-models'" class="reference internal" href="#how-to-serialize-and-validate-models">How to serialize and validate models</a></li>
 <li><a :data-current="activeSection === '#how-to-use-models-with-airflow-config'" class="reference internal" href="#how-to-use-models-with-airflow-config">How to use models with airflow-config</a></li>
 <li><a :data-current="activeSection === '#how-to-integrate-long-running-and-imported-schedules'" class="reference internal" href="#how-to-integrate-long-running-and-imported-schedules">How to integrate long-running and imported schedules</a></li>
+<li><a :data-current="activeSection === '#how-to-attach-task-callbacks'" class="reference internal" href="#how-to-attach-task-callbacks">How to attach task callbacks</a></li>
 </ul>
 </div>
 </aside>
