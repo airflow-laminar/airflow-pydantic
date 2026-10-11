@@ -170,7 +170,7 @@ a unique, meaningful id for the task
 
 airflow operator path
 
-#### *field* dependencies *: list[str | [Task](#airflow_pydantic.core.task.Task)] | list[str | tuple[str, str] | tuple[[Task](#airflow_pydantic.core.task.Task), str]] | None* *= None*
+#### *field* dependencies *: list[str | [Task](#airflow_pydantic.core.task.Task) | tuple[str, str] | tuple[[Task](#airflow_pydantic.core.task.Task), str]] | None* *= None*
 
 dependencies
 
@@ -322,7 +322,7 @@ airflow operator path
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
-#### *field* bash_command *: str | list[str] | [BashCommands](#airflow_pydantic.utils.bash.BashCommands)* *= None*
+#### *field* bash_command *: str | list[str] | [BashCommands](#airflow_pydantic.utils.bash.BashCommands) | None* *= None*
 
 bash command string, list of strings, or model
 
@@ -932,7 +932,7 @@ ssh connection id from airflow Connections. ssh_conn_id will be ignored if ssh_h
 
 remote host to connect (templated) Nullable. If provided, it will replace the remote_host which was defined in ssh_hook or predefined in the connection of ssh_conn_id.
 
-#### *field* command *: str | list[str] | [BashCommands](#airflow_pydantic.utils.bash.BashCommands)* *= None*
+#### *field* command *: str | list[str] | [BashCommands](#airflow_pydantic.utils.bash.BashCommands) | None* *= None*
 
 command to execute on remote host. (templated)
 
@@ -1108,7 +1108,7 @@ airflow sensor path
 
 Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
-#### *field* bash_command *: str | list[str] | [BashCommands](#airflow_pydantic.utils.bash.BashCommands)* *= None*
+#### *field* bash_command *: str | list[str] | [BashCommands](#airflow_pydantic.utils.bash.BashCommands) | None* *= None*
 
 bash command string, list of strings, or model
 
@@ -1538,7 +1538,7 @@ Bases: `BaseModel`
 
 #### *field* commands *: list[str]* *[Required]*
 
-#### *field* quote *: str | None* *= "'"*
+#### *field* quote *: str | Literal[False] | None* *= "'"*
 
 #### *field* escape *: bool | None* *= False*
 
@@ -1548,7 +1548,7 @@ Bases: `BaseModel`
 
 #### *field* env *: dict[str, str] | None* *= None*
 
-### airflow_pydantic.utils.bash.in_bash(command: str, quote: str | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#in_bash)
+### airflow_pydantic.utils.bash.in_bash(command: str, quote: str | Literal[False] | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#in_bash)
 
 Run command inside bash.
 
@@ -1605,7 +1605,7 @@ Validate a trigger rule.
 
 <a id="module-airflow_pydantic.utils.env"></a>
 
-### airflow_pydantic.utils.env.in_bash(command: str, quote: str | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#in_bash)
+### airflow_pydantic.utils.env.in_bash(command: str, quote: str | Literal[False] | None = "'", escape: bool | None = False, login: bool | None = True, cwd: str | None = None, env: dict[str, str] | None = None) → str[[source]](../../_modules/airflow_pydantic/utils/bash.html.md#in_bash)
 
 Run command inside bash.
 
@@ -1685,7 +1685,7 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 
 #### *field* host_name *: str* *= ''*
 
-#### *field* port *: int* *= None*
+#### *field* port *: int | None* *= None*
 
 Port number
 
@@ -1735,7 +1735,7 @@ Kind of query to perform, either ‘filter’ to return a list of matching hosts
 
 #### *field* custom *: Callable | Annotated[object, BeforeValidator(func=get_import_path, json_schema_input_type=PydanticUndefined), PlainSerializer(func=serialize_path_as_string, return_type=str, when_used=json)] | None* *= None*
 
-#### execute() → list[[Host](#airflow_pydantic.extras.balancer.host.Host)] | [Host](#airflow_pydantic.extras.balancer.host.Host)[[source]](../../_modules/airflow_pydantic/extras/balancer/query.html.md#BalancerPortQueryConfiguration.execute)
+#### execute() → list[[Port](#airflow_pydantic.extras.balancer.port.Port)] | [Port](#airflow_pydantic.extras.balancer.port.Port)[[source]](../../_modules/airflow_pydantic/extras/balancer/query.html.md#BalancerPortQueryConfiguration.execute)
 
 Execute the query against the provided hosts and ports.
 
@@ -1788,7 +1788,7 @@ alias of [`DagCleanTaskArgs`](#airflow_pydantic.extras.common.clean.DagCleanTask
 
 Bases: [`Task`](#airflow_pydantic.core.task.Task), [`DagCleanTaskArgs`](#airflow_pydantic.extras.common.clean.DagCleanTaskArgs)
 
-#### *field* operator *: Annotated[object, BeforeValidator(func=get_import_path, json_schema_input_type=PydanticUndefined), PlainSerializer(func=serialize_path_as_string, return_type=str, when_used=json)]* *= 'airflow_pydantic.extras.common.clean.DagClean'*
+#### *field* operator *: Annotated[type, BeforeValidator(func=get_import_path, json_schema_input_type=PydanticUndefined), PlainSerializer(func=serialize_path_as_string, return_type=str, when_used=json)]* *= 'airflow_pydantic.extras.common.clean.DagClean'*
 
 ### *pydantic model* airflow_pydantic.extras.common.clean.DagCleanTaskArgs[[source]](../../_modules/airflow_pydantic/extras/common/clean.html.md#DagCleanTaskArgs)
 

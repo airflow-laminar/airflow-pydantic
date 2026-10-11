@@ -239,7 +239,7 @@
 </span><span id="line-77">        <span class="k">return</span> <span class="n">ret</span>
 </span><span id="line-78">
 </span><span id="line-79">    <span class="nd">@classmethod</span>
-</span><span id="line-80">    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typ_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-80">    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typ_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-81">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ_</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 </span><span id="line-82">            <span class="k">return</span> <span class="s2">"array"</span>
 </span><span id="line-83">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ_</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>

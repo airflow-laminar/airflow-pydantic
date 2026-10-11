@@ -289,66 +289,68 @@
 </span><span id="line-127">                    <span class="c1"># TODO double check this</span>
 </span><span id="line-128">                    <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="line-129">                <span class="n">param_type</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"null"</span><span class="p">,</span> <span class="n">check_param_type</span><span class="p">]</span>
-</span><span id="line-130">                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"value"</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
-</span><span id="line-131">                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_type</span>
-</span><span id="line-132">                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
-</span><span id="line-133">                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">"description"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">description</span>
-</span><span id="line-134">
-</span><span id="line-135">            <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new_v</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
-</span><span id="line-136">            <span class="c1"># TODO: exclude none, but extract the type into airflow params</span>
-</span><span id="line-137">        <span class="k">return</span> <span class="n">v</span>
-</span><span id="line-138">
-</span><span id="line-139">    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"default_view"</span><span class="p">)</span>
-</span><span id="line-140">    <span class="nd">@classmethod</span>
-</span><span id="line-141">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_default_view</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-</span><span id="line-142">        <span class="k">if</span> <span class="n">_airflow_3</span><span class="p">():</span>
-</span><span id="line-143">            <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"default_view is deprecated in Airflow 3"</span><span class="p">)</span>
-</span><span id="line-144">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-145">        <span class="k">return</span> <span class="n">v</span>
-</span><span id="line-146">
-</span><span id="line-147">    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"orientation"</span><span class="p">)</span>
-</span><span id="line-148">    <span class="nd">@classmethod</span>
-</span><span id="line-149">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_orientation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-</span><span id="line-150">        <span class="k">if</span> <span class="n">_airflow_3</span><span class="p">():</span>
-</span><span id="line-151">            <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"orientation is deprecated in Airflow 3"</span><span class="p">)</span>
-</span><span id="line-152">            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-153">        <span class="k">return</span> <span class="n">v</span></div>
+</span><span id="line-130">                <span class="n">new_v</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-131">                    <span class="s2">"value"</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+</span><span id="line-132">                    <span class="s2">"type"</span><span class="p">:</span> <span class="n">param_type</span><span class="p">,</span>
+</span><span id="line-133">                    <span class="s2">"title"</span><span class="p">:</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
+</span><span id="line-134">                    <span class="s2">"description"</span><span class="p">:</span> <span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+</span><span id="line-135">                <span class="p">}</span>
+</span><span id="line-136">
+</span><span id="line-137">            <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new_v</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+</span><span id="line-138">            <span class="c1"># TODO: exclude none, but extract the type into airflow params</span>
+</span><span id="line-139">        <span class="k">return</span> <span class="n">v</span>
+</span><span id="line-140">
+</span><span id="line-141">    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"default_view"</span><span class="p">)</span>
+</span><span id="line-142">    <span class="nd">@classmethod</span>
+</span><span id="line-143">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_default_view</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+</span><span id="line-144">        <span class="k">if</span> <span class="n">_airflow_3</span><span class="p">():</span>
+</span><span id="line-145">            <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"default_view is deprecated in Airflow 3"</span><span class="p">)</span>
+</span><span id="line-146">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-147">        <span class="k">return</span> <span class="n">v</span>
+</span><span id="line-148">
+</span><span id="line-149">    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"orientation"</span><span class="p">)</span>
+</span><span id="line-150">    <span class="nd">@classmethod</span>
+</span><span id="line-151">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_orientation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+</span><span id="line-152">        <span class="k">if</span> <span class="n">_airflow_3</span><span class="p">():</span>
+</span><span id="line-153">            <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"orientation is deprecated in Airflow 3"</span><span class="p">)</span>
+</span><span id="line-154">            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-155">        <span class="k">return</span> <span class="n">v</span></div>
 
-</span><span id="line-154">
-</span><span id="line-155">
+</span><span id="line-156">
+</span><span id="line-157">
 <div class="viewcode-block" id="Dag">
 <a class="viewcode-back" href="../../../docs/src/api.html#airflow_pydantic.core.dag.Dag">[docs]</a>
-</span><span id="line-156"><span class="k">class</span><span class="w"> </span><span class="nc">Dag</span><span class="p">(</span><span class="n">DagArgs</span><span class="p">,</span> <span class="n">DagRenderMixin</span><span class="p">,</span> <span class="n">DagInstantiateMixin</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="line-157">    <span class="n">dag_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-158">        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)"</span>
-</span><span id="line-159">    <span class="p">)</span>
-</span><span id="line-160">    <span class="n">tasks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SerializeAsAny</span><span class="p">[</span><span class="n">Task</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"List of tasks in the DAG"</span><span class="p">)</span>
-</span><span id="line-161">
-</span><span id="line-162">    <span class="c1"># TODO: Validate all task dependencies exist</span>
+</span><span id="line-158"><span class="k">class</span><span class="w"> </span><span class="nc">Dag</span><span class="p">(</span><span class="n">DagArgs</span><span class="p">,</span> <span class="n">DagRenderMixin</span><span class="p">,</span> <span class="n">DagInstantiateMixin</span><span class="p">,</span> <span class="n">validate_assignment</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span><span id="line-159">    <span class="n">dag_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-160">        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"The id of the DAG; must consist exclusively of alphanumeric characters, dashes, dots and underscores (all ASCII)"</span>
+</span><span id="line-161">    <span class="p">)</span>
+</span><span id="line-162">    <span class="n">tasks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SerializeAsAny</span><span class="p">[</span><span class="n">Task</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"List of tasks in the DAG"</span><span class="p">)</span>
 </span><span id="line-163">
-</span><span id="line-164">    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
-</span><span id="line-165">    <span class="nd">@classmethod</span>
-</span><span id="line-166">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="line-167">        <span class="k">if</span> <span class="s2">"template"</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
-</span><span id="line-168">            <span class="n">template</span><span class="p">:</span> <span class="n">DagArgs</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"template"</span><span class="p">)</span>
-</span><span id="line-169">            <span class="c1"># Do field-by-field for larger types</span>
-</span><span id="line-170">            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-171">                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
-</span><span id="line-172">                    <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-</span><span id="line-173">                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="line-174">                    <span class="c1"># If the field is a BaseModel, we need to update it</span>
-</span><span id="line-175">                    <span class="c1"># with the new values from the template</span>
-</span><span id="line-176">                    <span class="k">for</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="line-177">                        <span class="k">if</span> <span class="n">subkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-</span><span id="line-178">                            <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">subvalue</span>
-</span><span id="line-179">        <span class="k">return</span> <span class="n">values</span></div>
+</span><span id="line-164">    <span class="c1"># TODO: Validate all task dependencies exist</span>
+</span><span id="line-165">
+</span><span id="line-166">    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
+</span><span id="line-167">    <span class="nd">@classmethod</span>
+</span><span id="line-168">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+</span><span id="line-169">        <span class="k">if</span> <span class="s2">"template"</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+</span><span id="line-170">            <span class="n">template</span><span class="p">:</span> <span class="n">DagArgs</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"template"</span><span class="p">)</span>
+</span><span id="line-171">            <span class="c1"># Do field-by-field for larger types</span>
+</span><span id="line-172">            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-173">                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+</span><span id="line-174">                    <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="line-175">                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="line-176">                    <span class="c1"># If the field is a BaseModel, we need to update it</span>
+</span><span id="line-177">                    <span class="c1"># with the new values from the template</span>
+</span><span id="line-178">                    <span class="k">for</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-179">                        <span class="k">if</span> <span class="n">subkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+</span><span id="line-180">                            <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">subvalue</span>
+</span><span id="line-181">        <span class="k">return</span> <span class="n">values</span></div>
 
-</span><span id="line-180">
-</span><span id="line-181">
-</span><span id="line-182"><span class="n">__all_dag_fields__</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Dag</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">Dag</span><span class="p">,</span> <span class="s2">"__pydantic_fields__"</span><span class="p">)</span> <span class="k">else</span> <span class="n">Dag</span><span class="o">.</span><span class="n">__fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span><span id="line-182">
 </span><span id="line-183">
-</span><span id="line-184"><span class="c1"># Alias</span>
-</span><span id="line-185"><span class="n">DagModel</span> <span class="o">=</span> <span class="n">Dag</span>
+</span><span id="line-184"><span class="n">__all_dag_fields__</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Dag</span><span class="o">.</span><span class="n">__pydantic_fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">Dag</span><span class="p">,</span> <span class="s2">"__pydantic_fields__"</span><span class="p">)</span> <span class="k">else</span> <span class="n">Dag</span><span class="o">.</span><span class="n">__fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span><span id="line-185">
+</span><span id="line-186"><span class="c1"># Alias</span>
+</span><span id="line-187"><span class="n">DagModel</span> <span class="o">=</span> <span class="n">Dag</span>
 </span></code></pre></div>
     </div></div>
           </main>
