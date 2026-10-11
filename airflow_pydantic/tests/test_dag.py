@@ -110,6 +110,7 @@ class TestDag:
             params=bash_sensor_args,
         )
 
+        assert d.params is not None
         assert "bash_command" in d.params
         assert "env" in d.params
         assert "output_encoding" in d.params

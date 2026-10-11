@@ -2,7 +2,7 @@ from collections.abc import Callable
 from logging import getLogger
 from pathlib import Path
 from random import choice
-from typing import Self
+from typing import cast
 
 from pydantic import Field, model_validator
 
@@ -66,7 +66,7 @@ class BalancerConfiguration(BaseModel):
         return self.pool_manager.generated_files(self, airflow_major_version=airflow_major_version)
 
     @model_validator(mode="after")
-    def _validate(self) -> Self:
+    def _validate(self) -> "BalancerConfiguration":
         # Validate no duplicate hosts
         seen_hostnames = set()
         for host in self.hosts:
@@ -110,7 +110,7 @@ class BalancerConfiguration(BaseModel):
         # sort hosts by name, sort ports by host name then port number
         # NOTE: since we're in a validator and we have validate_on_assignment, bypass here
         self.__dict__["hosts"] = sorted(self.hosts, key=lambda host: host.name)
-        self.__dict__["ports"] = sorted(self.ports, key=lambda port: (port.host.name, port.port))
+        self.__dict__["ports"] = sorted(self.ports, key=lambda port: (cast(Host, port.host).name, port.port))
         return self
 
     def filter_hosts(
@@ -132,7 +132,9 @@ class BalancerConfiguration(BaseModel):
             custom=custom,
             balancer=self,
         )
-        return query.execute()
+        result = query.execute()
+        assert isinstance(result, list)
+        return result
 
     def select_host(
         self,
@@ -141,7 +143,7 @@ class BalancerConfiguration(BaseModel):
         os: str | list[str] = "",
         tag: str | list[str] = "",
         custom: Callable | None = None,
-    ) -> list[Host]:
+    ) -> Host:
         from .query import BalancerHostQueryConfiguration
 
         query = BalancerHostQueryConfiguration(
@@ -153,14 +155,16 @@ class BalancerConfiguration(BaseModel):
             custom=custom,
             balancer=self,
         )
-        return query.execute()
+        result = query.execute()
+        assert isinstance(result, Host)
+        return result
 
     def filter_ports(
         self,
         name: str | list[str] | None = None,
         tag: str | list[str] | None = None,
         custom: Callable | None = None,
-    ) -> list[Host]:
+    ) -> list[Port]:
         from .query import BalancerPortQueryConfiguration
 
         query = BalancerPortQueryConfiguration(
@@ -170,14 +174,16 @@ class BalancerConfiguration(BaseModel):
             custom=custom,
             balancer=self,
         )
-        return query.execute()
+        result = query.execute()
+        assert isinstance(result, list)
+        return result
 
     def select_port(
         self,
         name: str | list[str] | None = None,
         tag: str | list[str] = "",
         custom: Callable | None = None,
-    ) -> list[Host]:
+    ) -> Port:
         from .query import BalancerPortQueryConfiguration
 
         query = BalancerPortQueryConfiguration(
@@ -187,7 +193,9 @@ class BalancerConfiguration(BaseModel):
             custom=custom,
             balancer=self,
         )
-        return query.execute()
+        result = query.execute()
+        assert isinstance(result, Port)
+        return result
 
     def free_port(
         self,
@@ -203,7 +211,7 @@ class BalancerConfiguration(BaseModel):
         return port
 
     @staticmethod
-    def load_path(yaml_file: str | Path, _config_dir: str | Path | None = None) -> Self:
+    def load_path(yaml_file: str | Path, _config_dir: str | Path | None = None) -> "BalancerConfiguration":
         """Load configuration from yaml file"""
         from hydra import compose, initialize_config_dir
         from hydra.utils import instantiate

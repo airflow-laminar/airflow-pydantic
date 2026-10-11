@@ -28,4 +28,4 @@ class Variable(BaseModel):
         return v
 
     def get(self):
-        return BaseVariable.get(self.key, deserialize_json=self.deserialize_json)
+        return BaseVariable.get(self.key, deserialize_json=bool(self.deserialize_json))

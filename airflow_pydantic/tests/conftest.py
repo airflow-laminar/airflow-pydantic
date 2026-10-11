@@ -230,10 +230,7 @@ def ssh_operator_balancer(ssh_operator_args, balancer):
 @fixture
 def ssh_operator_balancer_template(ssh_operator_balancer):
     with pools(), variables({"user": "test", "password": "password"}):
-        return SSHTask(
-            task_id="test-ssh-operator",
-            template=ssh_operator_balancer,
-        )
+        return SSHTask.model_validate({"task_id": "test-ssh-operator", "template": ssh_operator_balancer})
 
 
 @fixture
@@ -330,7 +327,7 @@ def supervisor_cfg():
             port="*:1234",
             endtime=time(23, 59),
             working_dir=path,
-            path=path,
+            config_path=path,
             program={
                 "test": ProgramConfiguration(
                     command="bash -c 'sleep 60; exit 1'",
@@ -351,7 +348,7 @@ def supervisor_ssh_cfg():
         p1.return_value = str(path)
         cfg = SupervisorSSHAirflowConfiguration(
             working_dir=path,
-            path=path,
+            config_path=path,
             program={
                 "test": ProgramConfiguration(
                     command="bash -c 'sleep 60; exit 1'",

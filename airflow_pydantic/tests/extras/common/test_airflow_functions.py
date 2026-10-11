@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from urllib.parse import unquote
 
 import pytest
-from pytz import UTC
 
 from airflow_pydantic import fail, pass_, skip
 from airflow_pydantic.airflow import AirflowFailException, AirflowSkipException
@@ -41,6 +40,7 @@ class FakeRequest:
             self.patches.append((path, body))
             return None
         self.gets.append((path, query))
+        assert query is not None
         limit = query["limit"]
         offset = query["offset"]
         if path.endswith("/dagRuns"):

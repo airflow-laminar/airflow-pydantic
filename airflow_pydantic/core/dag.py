@@ -127,10 +127,12 @@ class DagArgs(BaseModel, validate_assignment=True):
                     # TODO double check this
                     value = None
                 param_type = ["null", check_param_type]
-                new_v[key] = {"value": value}
-                new_v[key]["type"] = param_type
-                new_v[key]["title"] = key.replace("_", " ").title()
-                new_v[key]["description"] = fields[key].description
+                new_v[key] = {
+                    "value": value,
+                    "type": param_type,
+                    "title": key.replace("_", " ").title(),
+                    "description": fields[key].description,
+                }
 
             v = {k: v for k, v in new_v.items() if v is not None}
             # TODO: exclude none, but extract the type into airflow params

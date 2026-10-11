@@ -2,7 +2,7 @@ from collections.abc import Callable
 from fnmatch import fnmatch
 from logging import getLogger
 from random import choice
-from typing import Literal
+from typing import Literal, cast
 
 from pkn.pydantic import CallablePath
 from pydantic import Field
@@ -10,6 +10,7 @@ from pydantic import Field
 from ...core import BaseModel
 from .balancer import BalancerConfiguration
 from .host import Host
+from .port import Port
 
 __all__ = (
     "BalancerHostQueryConfiguration",
@@ -60,7 +61,7 @@ class BalancerHostQueryConfiguration(BaseModel):
             and (not queue or any(fnmatch(host_queue, queue_pat) for queue_pat in queue for host_queue in host.queues))
             and (not tag or any(fnmatch(host_tag, tag_pat) for tag_pat in tag for host_tag in host.tags))
             and (not os or any(fnmatch(host.os, o) for o in os))
-            and (not self.custom or self.custom(host))
+            and (self.custom is None or cast(Callable, self.custom)(host))
         ]
 
         if not candidates:
@@ -91,7 +92,7 @@ class BalancerPortQueryConfiguration(BaseModel):
 
     def execute(
         self,
-    ) -> list[Host] | Host:
+    ) -> list[Port] | Port:
         """
         Execute the query against the provided hosts and ports.
         """
@@ -108,7 +109,7 @@ class BalancerPortQueryConfiguration(BaseModel):
             for port in ports
             if (not name or any(fnmatch(port.name, n) for n in name))
             and (not tag or any(fnmatch(port_tag, tag_pat) for tag_pat in tag for port_tag in port.tags))
-            and (not self.custom or self.custom(port))
+            and (self.custom is None or cast(Callable, self.custom)(port))
         ]
 
         if not candidates:

@@ -1,4 +1,5 @@
 from shlex import quote as shell_quote
+from typing import Literal
 
 from pydantic import BaseModel, model_serializer
 
@@ -7,7 +8,7 @@ __all__ = ("BashCommands", "in_bash")
 
 def in_bash(
     command: str,
-    quote: str | None = "'",
+    quote: str | Literal[False] | None = "'",
     escape: bool | None = False,
     login: bool | None = True,
     cwd: str | None = None,
@@ -41,7 +42,7 @@ def in_bash(
 
 class BashCommands(BaseModel):
     commands: list[str]
-    quote: str | None = "'"
+    quote: str | Literal[False] | None = "'"
     escape: bool | None = False
     login: bool | None = True
     cwd: str | None = ""

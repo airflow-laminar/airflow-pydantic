@@ -19,7 +19,7 @@ _log = getLogger(__name__)
 class BashTaskArgs(TaskArgs):
     # bash operator args
     # https://airflow.apache.org/docs/apache-airflow-providers-standard/stable/_api/airflow/providers/standard/operators/bash/index.html
-    bash_command: str | list[str] | BashCommands = Field(default=None, description="bash command string, list of strings, or model")
+    bash_command: str | list[str] | BashCommands | None = Field(default=None, description="bash command string, list of strings, or model")
 
     env: dict[str, str] | None = Field(default=None)
     append_env: bool | None = Field(default=None, description="Append environment variables to the existing environment. Default is False")

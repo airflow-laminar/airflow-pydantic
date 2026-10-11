@@ -137,7 +137,7 @@ def test_airflow2_reconciliation_runs_from_the_task():
     airflow = ModuleType("airflow")
     models = ModuleType("airflow.models")
     pool_module = ModuleType("airflow.models.pool")
-    pool_module.Pool = pool
+    pool_module.__dict__["Pool"] = pool
 
     with patch.dict(sys.modules, {"airflow": airflow, "airflow.models": models, "airflow.models.pool": pool_module}):
         actions = _reconcile_airflow2([desired], {"override_pool_size": False})
@@ -160,7 +160,7 @@ def test_airflow3_backend_uses_task_sdk_connection():
     connection_api.get.return_value = connection
     airflow = ModuleType("airflow")
     sdk = ModuleType("airflow.sdk")
-    sdk.Connection = connection_api
+    sdk.__dict__["Connection"] = connection_api
 
     with (
         patch.dict(sys.modules, {"airflow": airflow, "airflow.sdk": sdk}),
@@ -179,13 +179,14 @@ def test_mwaa_backend_uses_iam_rest_api():
     boto_client = MagicMock()
     boto_client.invoke_rest_api.return_value = {"RestApiStatusCode": 200, "RestApiResponse": {"name": "pool"}}
     boto3 = ModuleType("boto3")
-    boto3.client = MagicMock(return_value=boto_client)
+    client = MagicMock(return_value=boto_client)
+    boto3.__dict__["client"] = client
 
     with patch.dict(sys.modules, {"boto3": boto3}):
         request = _mwaa_request({"mwaa_environment_name": "environment", "mwaa_region_name": "us-east-1"})
         assert request("GET", "/pools/pool") == {"name": "pool"}
 
-    boto3.client.assert_called_once_with("mwaa", region_name="us-east-1")
+    client.assert_called_once_with("mwaa", region_name="us-east-1")
     boto_client.invoke_rest_api.assert_called_once_with(Name="environment", Path="/pools/pool", Method="GET")
 
 
@@ -194,7 +195,8 @@ def test_mwaa_backend_passes_query_parameters_and_detects_environment(monkeypatc
     boto_client = MagicMock()
     boto_client.invoke_rest_api.return_value = {"RestApiStatusCode": 204}
     boto3 = ModuleType("boto3")
-    boto3.client = MagicMock(return_value=boto_client)
+    client = MagicMock(return_value=boto_client)
+    boto3.__dict__["client"] = client
 
     with patch.dict(sys.modules, {"boto3": boto3}):
         request = _mwaa_request({})

@@ -1,9 +1,7 @@
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from logging import getLogger
 from urllib.parse import quote
-
-from pytz import UTC
 
 from ...airflow import AirflowFailException, AirflowSkipException
 

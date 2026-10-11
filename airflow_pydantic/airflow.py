@@ -8,9 +8,12 @@ from getpass import getuser
 from importlib.metadata import version
 from importlib.util import find_spec
 from logging import getLogger
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 from .migration import _airflow_3
+
+if TYPE_CHECKING:
+    from airflow.models.pool import Pool as PoolType
 
 __all__ = [
     "DAG",
@@ -35,6 +38,7 @@ __all__ = [
     "EmptyOperator",
     "EventsTimetable",
     "ExternalPythonOperator",
+    "ExternalTaskMarker",
     "ExternalTaskSensor",
     "FileSensor",
     "MultipleCronTriggerTimetable",
@@ -61,7 +65,8 @@ __all__ = [
 _log = getLogger(__name__)
 
 
-class _AirflowPydanticMarker: ...
+class _AirflowPydanticMarker:
+    _original: str
 
 
 if _airflow_3():
@@ -82,6 +87,7 @@ if _airflow_3():
         from airflow.providers.standard.operators.hitl import (
             ApprovalOperator,
             HITLBranchOperator,
+            HITLEntryOperator,
             HITLOperator,
         )
 
@@ -90,6 +96,7 @@ if _airflow_3():
             [
                 "ApprovalOperator",
                 "HITLBranchOperator",
+                "HITLEntryOperator",
                 "HITLOperator",
             ]
         )
@@ -107,7 +114,7 @@ if _airflow_3():
     from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator
     from airflow.providers.standard.sensors.bash import BashSensor
     from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync
-    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor
+    from airflow.providers.standard.sensors.external_task import ExternalTaskMarker, ExternalTaskSensor
     from airflow.providers.standard.sensors.filesystem import FileSensor
     from airflow.providers.standard.sensors.python import PythonSensor
     from airflow.providers.standard.sensors.time import TimeSensor
@@ -161,7 +168,7 @@ if _airflow_3():
         except Exception:  # noqa: BLE001
             return False
 
-    def _get_pool_via_cli(pool_name: str) -> Pool | None:
+    def _get_pool_via_cli(pool_name: str) -> "PoolType | None":
         """Get pool information using the Airflow CLI."""
         try:
             result = subprocess.run(
@@ -175,11 +182,14 @@ if _airflow_3():
                 pools = json.loads(result.stdout)
                 if pools and len(pools) > 0:
                     p = pools[0]
-                    return Pool(
-                        pool=p.get("pool", pool_name),
-                        slots=p.get("slots", 0),
-                        description=p.get("description", ""),
-                        include_deferred=p.get("include_deferred", False),
+                    return cast(
+                        "PoolType",
+                        Pool(
+                            pool=p.get("pool", pool_name),
+                            slots=p.get("slots", 0),
+                            description=p.get("description", ""),
+                            include_deferred=p.get("include_deferred", False),
+                        ),
                     )
         except (subprocess.TimeoutExpired, subprocess.SubprocessError, json.JSONDecodeError) as e:
             _log.debug(f"CLI get_pool failed for {pool_name}: {e}")
@@ -212,7 +222,7 @@ if _airflow_3():
             _log.debug("Airflow CLI not found in PATH")
         return False
 
-    def _get_pool_via_airflowctl(pool_name: str) -> Pool | None:
+    def _get_pool_via_airflowctl(pool_name: str) -> "PoolType | None":
         """Get pool information using airflowctl."""
         try:
             result = subprocess.run(
@@ -226,11 +236,14 @@ if _airflow_3():
                 pools = json.loads(result.stdout)
                 if pools and len(pools) > 0:
                     p = pools[0]
-                    return Pool(
-                        pool=p.get("name", pool_name),
-                        slots=p.get("slots", 0),
-                        description=p.get("description", ""),
-                        include_deferred=p.get("include_deferred", False),
+                    return cast(
+                        "PoolType",
+                        Pool(
+                            pool=p.get("name", pool_name),
+                            slots=p.get("slots", 0),
+                            description=p.get("description", ""),
+                            include_deferred=p.get("include_deferred", False),
+                        ),
                     )
         except (subprocess.TimeoutExpired, subprocess.SubprocessError, json.JSONDecodeError) as e:
             _log.debug(f"airflowctl get_pool failed for {pool_name}: {e}")
@@ -276,7 +289,7 @@ if _airflow_3():
             _log.debug("airflowctl not found in PATH")
         return False
 
-    def get_pool(pool_name: str, *args, **kwargs) -> Pool:
+    def get_pool(pool_name: str, *args, **kwargs) -> "PoolType":
         """
         Get a pool by name.
 
@@ -290,11 +303,14 @@ if _airflow_3():
             try:
                 client = get_current_api_client()
                 ret = client.get_pool(name=pool_name)
-                return Pool(
-                    pool=ret[0],
-                    slots=ret[1],
-                    description=ret[2],
-                    include_deferred=ret[3],
+                return cast(
+                    "PoolType",
+                    Pool(
+                        pool=ret[0],
+                        slots=ret[1],
+                        description=ret[2],
+                        include_deferred=ret[3],
+                    ),
                 )
             except PoolNotFound:
                 raise
@@ -375,7 +391,7 @@ elif _airflow_3() is False:
     from airflow.providers.standard.operators.weekday import BranchDayOfWeekOperator
     from airflow.providers.standard.sensors.bash import BashSensor
     from airflow.providers.standard.sensors.date_time import DateTimeSensor, DateTimeSensorAsync
-    from airflow.providers.standard.sensors.external_task import ExternalTaskSensor
+    from airflow.providers.standard.sensors.external_task import ExternalTaskMarker, ExternalTaskSensor
     from airflow.providers.standard.sensors.filesystem import FileSensor
     from airflow.providers.standard.sensors.python import PythonSensor
     from airflow.providers.standard.sensors.time import TimeSensor
@@ -398,8 +414,8 @@ elif _airflow_3() is False:
     def create_or_update_pool(name: str, slots: int = 0, description: str = "", include_deferred: bool = False, *args, **kwargs):
         Pool.create_or_update_pool(name, slots, description, include_deferred, *args, **kwargs)
 
-    def get_pool(pool_name: str, *args, **kwargs) -> Pool:
-        return Pool.get_pool(pool_name, *args, **kwargs)
+    def get_pool(pool_name: str, *args, **kwargs) -> "PoolType":
+        return cast("PoolType", Pool.get_pool(pool_name, *args, **kwargs))
 
 else:
     # NOTE: Airflow 3 Only
@@ -508,7 +524,7 @@ else:
         # Simulate creating or updating a pool in Airflow
         pass
 
-    def get_pool(pool_name: str, *args, **kwargs) -> Pool:
+    def get_pool(pool_name: str, *args, **kwargs):
         # Simulate getting a pool from Airflow
         return Pool(pool=pool_name, slots=5, description="Test pool")
 
@@ -580,6 +596,9 @@ else:
 
     class DayOfWeekSensor(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.sensors.weekday.DayOfWeekSensor"
+
+    class ExternalTaskMarker(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.sensors.external_task.ExternalTaskMarker"
 
     class ExternalTaskSensor(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.sensors.external_task.ExternalTaskSensor"
@@ -656,6 +675,9 @@ if _airflow_3() in (False, None):
 
     class HITLOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.hitl.HITLOperator"
+
+    class HITLEntryOperator(_AirflowPydanticMarker):
+        _original = "airflow.providers.standard.operators.hitl.HITLEntryOperator"
 
     class HITLBranchOperator(_AirflowPydanticMarker):
         _original = "airflow.providers.standard.operators.hitl.HITLBranchOperator"

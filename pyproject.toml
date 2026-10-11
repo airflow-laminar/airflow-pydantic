@@ -54,6 +54,9 @@ develop = [
     "ty",
     "uv",
     "wheel",
+    "boto3",
+    "paramiko",
+    "sqlalchemy",
 ]
 airflow = [
     "apache-airflow>=2.8,<3",
@@ -107,11 +110,7 @@ replace = 'version = "{new_version}"'
 [tool.coverage.run]
 branch = true
 omit = [
-<<<<<<< before updating
     "airflow_pydantic/tests/*",
-=======
-    "airflow_pydantic/tests/integration/*",
->>>>>>> after updating
 ]
 
 [tool.coverage.report]
@@ -199,3 +198,14 @@ description = "Pydantic models for Apache Airflow DAGs, tasks, sensors, and util
 build-parallel = true
 suffix-mode = "auto"
 full-build = true
+
+[tool.ty.analysis]
+allowed-unresolved-imports = [
+    "airflow.**",
+    "airflow_config.**",
+    "airflow_balancer.**",
+    "airflow_common.**",
+    "airflow_ha.**",
+    "airflow_supervisor.**",
+    "supervisor_pydantic.**",
+]
