@@ -327,7 +327,6 @@ def supervisor_cfg():
             port="*:1234",
             endtime=time(23, 59),
             working_dir=path,
-            config_path=path,
             program={
                 "test": ProgramConfiguration(
                     command="bash -c 'sleep 60; exit 1'",
@@ -348,7 +347,6 @@ def supervisor_ssh_cfg():
         p1.return_value = str(path)
         cfg = SupervisorSSHAirflowConfiguration(
             working_dir=path,
-            config_path=path,
             program={
                 "test": ProgramConfiguration(
                     command="bash -c 'sleep 60; exit 1'",
