@@ -1,10 +1,9 @@
 from typing import Annotated, Any
 
 from dateutil.relativedelta import relativedelta, weekday as weekdaytype
-from pydantic import Field, GetCoreSchemaHandler, model_serializer, model_validator
+from pydantic import Field, GetCoreSchemaHandler
 from pydantic_core.core_schema import (
     CoreSchema,
-    ValidatorFunctionWrapHandler,
     int_schema,
     is_instance_schema,
     json_or_python_schema,
@@ -39,7 +38,7 @@ class WeekdayType:
         return json_or_python_schema(
             json_schema=schema,
             python_schema=schema,
-            serialization=plain_serializer_function_ser_schema(cls._serialize, is_field_serializer=True, when_used="json"),
+            serialization=plain_serializer_function_ser_schema(cls._serialize, when_used="json"),
         )
 
     @classmethod
@@ -47,32 +46,13 @@ class WeekdayType:
         return weekdaytype(**v)
 
     @classmethod
-    def _serialize(cls, info, value: weekdaytype) -> dict:
+    def _serialize(cls, value: weekdaytype) -> dict:
         ret = {}
         for key in WeekdayType.__annotations__:
             val = getattr(value, key, None)
             if val is not None:
                 ret[key] = val
         return ret
-
-    @model_validator(mode="wrap")
-    def _validate(value, handler: ValidatorFunctionWrapHandler) -> relativedelta:
-        # if already dateutil._common.weekday instance, return it
-        if isinstance(value, weekdaytype):
-            return value
-
-        # otherwise run model validation, which returns either a
-        # a dateutil._common.weekday or a WeekdayAnnotations
-        validated = handler(value)
-        if isinstance(validated, weekdaytype):
-            return validated
-
-        kwargs = {k: v for k, v in dict(validated).items() if v is not None}
-        return weekdaytype(**kwargs)
-
-    @model_serializer(mode="plain")
-    def _serialize(self: weekdaytype) -> dict[str, Any]:
-        return {"weekday": self.weekday, "n": self.n}
 
 
 Weekday = Annotated[weekdaytype, WeekdayType]
@@ -136,7 +116,7 @@ class RelativeDeltaType:
         return json_or_python_schema(
             json_schema=schema,
             python_schema=schema,
-            serialization=plain_serializer_function_ser_schema(cls._serialize, is_field_serializer=True, when_used="json"),
+            serialization=plain_serializer_function_ser_schema(cls._serialize, when_used="json"),
         )
 
     @classmethod
@@ -144,7 +124,7 @@ class RelativeDeltaType:
         return relativedelta(**v)
 
     @classmethod
-    def _serialize(cls, info, value: relativedelta) -> dict:
+    def _serialize(cls, value: relativedelta) -> dict:
         ret = {}
         for key in RelativeDeltaType.__annotations__:
             val = getattr(value, key, None)

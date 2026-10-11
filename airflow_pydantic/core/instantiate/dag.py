@@ -1,7 +1,11 @@
 from importlib.util import find_spec
 from logging import getLogger
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from ..dag import Dag
 
 __all__ = ("DagInstantiateMixin",)
 
@@ -11,7 +15,7 @@ _log = getLogger(__name__)
 
 
 class DagInstantiateMixin:
-    def instantiate(self: BaseModel, **kwargs):
+    def instantiate(self: "Dag", **kwargs):
         # NOTE: accept dag as an argument
         dag_instance = kwargs.pop("dag", None)
         config_instance = kwargs.pop("config", None)
@@ -70,11 +74,12 @@ class DagInstantiateMixin:
                 schedule = self.schedule
             dag_instance = AirflowDAG(
                 dag_id=self.dag_id,
-                schedule=schedule,
+                schedule=cast(Any, schedule),
                 **self.model_dump(exclude_unset=True, exclude=["type_", "schedule", "tasks", "dag_id", "enabled"]),
                 **kwargs,
             )
 
+        assert self.tasks is not None
         task_instances = {}
 
         with dag_instance:
@@ -100,13 +105,15 @@ class DagInstantiateMixin:
                         if isinstance(dep, tuple):
                             dep, attr = dep
                             _log.info("Setting dependency: %s.%s >> %s", dep, attr, task_id)
+                            assert isinstance(dep, str)
                             getattr(task_instances[dep], attr) >> task_instances[task_id]
                         else:
                             _log.info("Setting dependency: %s >> %s", dep, task_id)
+                            assert isinstance(dep, str)
                             task_instances[dep] >> task_instances[task_id]
             return dag_instance
 
-    def __enter__(self):
+    def __enter__(self: "Dag"):
         """
         Allows the DagInstantiateMixin to be used as a context manager.
         """

@@ -32,7 +32,7 @@ class TestBaseModel:
         model.name = "updated"
         assert model.name == "updated"
 
-    @pytest.mark.skipif(os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW"), reason="CCFlow integration enabled")
+    @pytest.mark.skipif(bool(os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW")), reason="CCFlow integration enabled")
     def test_model_dump_excludes_type_(self):
         """Test that model_dump excludes type_ field."""
 
@@ -45,7 +45,7 @@ class TestBaseModel:
         assert "type_" not in dumped
         assert "name" in dumped
 
-    @pytest.mark.skipif(os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW"), reason="CCFlow integration enabled")
+    @pytest.mark.skipif(bool(os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW")), reason="CCFlow integration enabled")
     def test_model_dump_json_excludes_type_(self):
         """Test that model_dump_json excludes type_ field."""
 
@@ -81,7 +81,7 @@ class TestBaseModel:
             extra: str = "default"
 
         template = TestModel(name="template", value=20, extra="template_extra")
-        model = TestModel(name="new", template=template)
+        model = TestModel.model_validate({"name": "new", "template": template})
 
         # name is provided, so it should use the provided value
         assert model.name == "new"
@@ -99,7 +99,7 @@ class TestBaseModel:
             extra: str = "default"
 
         template = TestModel(name="template", value=20, extra="template_extra")
-        model = TestModel(name="new", value=30, template=template)
+        model = TestModel.model_validate({"name": "new", "value": 30, "template": template})
 
         assert model.name == "new"
         assert model.value == 30
@@ -114,7 +114,7 @@ class TestBaseModel:
             config: dict = {}  # noqa: RUF012
 
         template = TestModel(name="template", config={"a": 1, "b": 2})
-        model = TestModel(name="new", config={"c": 3}, template=template)
+        model = TestModel.model_validate({"name": "new", "config": {"c": 3}, "template": template})
 
         # config should merge - template values that aren't in new config should be added
         assert model.config["c"] == 3
@@ -129,7 +129,7 @@ class TestBaseModel:
 
         # Non-dict input should pass through validation
         with pytest.raises(Exception):  # noqa: B017
-            TestModel("not a dict")
+            TestModel.model_validate("not a dict")
 
     def test_model_roundtrip(self):
         """Test model serialization roundtrip."""

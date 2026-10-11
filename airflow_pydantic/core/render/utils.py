@@ -29,6 +29,7 @@ Globals = list[str]
 TaskCode = str
 
 RenderedCode = tuple[Imports, Globals, TaskCode]
+RawRenderedCode = tuple[list[ast.ImportFrom], list[ast.stmt], ast.expr]
 
 _LAMBDA_TYPE = type(lambda: 0)
 
@@ -40,7 +41,7 @@ def _islambda(v):
     return isinstance(v, _LAMBDA_TYPE) and v.__name__ == "<lambda>"
 
 
-def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.AST]:
+def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.expr]:
     if isinstance(pool, Pool):
         # Swap
         pool = pool.model_dump(exclude_unset=True)
@@ -66,7 +67,7 @@ def _build_pool_callable(pool, airflow_major_version: int = 2) -> tuple[list[ast
 
 
 def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.Call]:
-    imports = []
+    imports: list[ast.ImportFrom] = []
     # If the value is a Param, we can use a dict with the properties
     imports.append(ast.ImportFrom(module="airflow.models.param", names=[ast.alias(name="Param")], level=0))
 
@@ -109,9 +110,11 @@ def _build_param_callable(param, key, airflow_major_version: int = 2) -> tuple[l
 
 
 def _build_ssh_hook_callable(foo) -> tuple[list[ast.ImportFrom], ast.Call]:
-    imports = []
+    imports: list[ast.ImportFrom] = []
     # If we have a callable, we want to import it
-    foo_import, foo_name = serialize_path_as_string(foo).rsplit(".", 1)
+    path = serialize_path_as_string(foo)
+    assert path is not None
+    foo_import, foo_name = path.rsplit(".", 1)
     imports.append(
         ast.ImportFrom(
             module=foo_import,
@@ -125,7 +128,7 @@ def _build_ssh_hook_callable(foo) -> tuple[list[ast.ImportFrom], ast.Call]:
 
 
 def _build_ssh_hook_with_variable(host, call: ast.Call) -> tuple[list[ast.ImportFrom], ast.Call]:
-    imports = []
+    imports: list[ast.ImportFrom] = []
     if isinstance(host.password, Variable):
         has_any_variable = False
 
@@ -188,10 +191,10 @@ def _is_implicit_ssh_config_key_file(ssh_hook, key_file: str) -> bool:
     return any(str(Path(identity_file).expanduser()) == str(Path(key_file).expanduser()) for identity_file in identity_files)
 
 
-def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.AST]:
+def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflow_major_version: int = 2) -> tuple[list[ast.ImportFrom], ast.expr]:
     from airflow_pydantic import Host, Port
 
-    imports = []
+    imports: list[ast.ImportFrom] = []
 
     # For certain types, we want to reset the recursive model_dump back
     # to allow type-specific processing
@@ -242,7 +245,9 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
 
             if isinstance(value, BaseSSHHook):
                 # Add SSHHook to imports
-                import_module, name = serialize_path_as_string(value).rsplit(".", 1)
+                path = serialize_path_as_string(value)
+                assert path is not None
+                import_module, name = path.rsplit(".", 1)
                 imports.append(ast.ImportFrom(module="airflow.providers.ssh.hooks.ssh", names=[ast.alias(name="SSHHook")], level=0))
 
                 # Add SSHHook builder to args
@@ -274,7 +279,9 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
 
         if isinstance(value, (MethodType, FunctionType)):
             # If the field is an ImportPath or CallablePath, we need to serialize it as a string and add it to the imports
-            import_module, name = serialize_path_as_string(value).rsplit(".", 1)
+            path = serialize_path_as_string(value)
+            assert path is not None
+            import_module, name = path.rsplit(".", 1)
             imports.append(ast.ImportFrom(module=import_module, names=[ast.alias(name=name)], level=0))
 
             # Now swap the value in the args with the name
@@ -320,7 +327,7 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
 
     if isinstance(value, Pool):
         new_import, new_value = _build_pool_callable(value)
-        imports.append(new_import)
+        imports.extend(new_import)
         return imports, new_value
 
     if isinstance(value, Variable):
@@ -411,7 +418,7 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
                 # - SueprvisorAirflowConfiguration
                 # - SupervisorSSHAirflowConfiguration
                 pass
-        new_keys = []
+        new_keys: list[ast.expr | None] = []
         new_values = []
         for k, v in value.items():
             new_imports, new_value = _get_parts_from_value(k, v, None, airflow_major_version=airflow_major_version)
@@ -524,7 +531,7 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
 
     if isinstance(value, AirflowPool):
         new_import, new_value = _build_pool_callable(value, airflow_major_version=airflow_major_version)
-        imports.append(new_import)
+        imports.extend(new_import)
         return imports, new_value
 
     raise RenderError(f"Unsupported type for key: {key}, value: {type(value)}")

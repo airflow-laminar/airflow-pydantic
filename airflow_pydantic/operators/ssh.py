@@ -1,7 +1,7 @@
 import ast
 from logging import getLogger
 from types import FunctionType, MethodType
-from typing import Any
+from typing import Any, cast
 
 from pydantic import Field, TypeAdapter, field_validator, model_validator
 
@@ -45,7 +45,7 @@ class SSHTaskArgs(TaskArgs):
         default=None,
         description="remote host to connect (templated) Nullable. If provided, it will replace the remote_host which was defined in ssh_hook or predefined in the connection of ssh_conn_id.",
     )
-    command: str | list[str] | BashCommands = Field(default=None, description="command to execute on remote host. (templated)")
+    command: str | list[str] | BashCommands | None = Field(default=None, description="command to execute on remote host. (templated)")
     conn_timeout: int | None = Field(
         default=None,
         description="timeout (in seconds) for maintaining the connection. The default is 10 seconds. Nullable. If provided, it will replace the conn_timeout which was predefined in the connection of ssh_conn_id.",
@@ -243,7 +243,7 @@ class SSHTask(Task, SSHTaskArgs):
         # `remote_host` is supplied per mapped task instance, not in the partial.
         args.pop("remote_host", None)
         remote_hosts = [self._remote_host_name(host) for host in self.ssh_hook_hosts]
-        return self.operator.partial(**args).expand(remote_host=remote_hosts)
+        return cast(Any, self.operator).partial(**args).expand(remote_host=remote_hosts)
 
     def render(self, raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs):
         # Default (single-host) rendering is unchanged.
@@ -254,6 +254,7 @@ class SSHTask(Task, SSHTaskArgs):
         # `Operator.partial(**args).expand(remote_host=[...])`.
         imports, globals_, call = super().render(raw=True, dag_from_context=dag_from_context, airflow_major_version=airflow_major_version, **kwargs)
 
+        assert isinstance(call, ast.Call)
         call.keywords = [keyword for keyword in call.keywords if keyword.arg != "remote_host"]
         partial_call = ast.Call(
             func=ast.Attribute(value=call.func, attr="partial", ctx=ast.Load()),

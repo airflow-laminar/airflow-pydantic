@@ -12,7 +12,7 @@ class Port(BaseModel):
     name: str = ""
     host: Host | None = None
     host_name: str = ""
-    port: int = Field(default=None, ge=1, le=65535, description="Port number")
+    port: int | None = Field(default=None, ge=1, le=65535, description="Port number")
     tags: list[str] = Field(default_factory=list)
 
     @property

@@ -1,8 +1,11 @@
 import os
+from typing import TYPE_CHECKING
 
 from pydantic import model_validator
 
-if os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW", "") != "":
+if TYPE_CHECKING:
+    from pydantic import BaseModel as PydanticBaseModel
+elif os.environ.get("AIRFLOW_PYDANTIC_ENABLE_CCFLOW", "") != "":
     from ccflow import BaseModel as PydanticBaseModel
 else:
     from pydantic import BaseModel as PydanticBaseModel

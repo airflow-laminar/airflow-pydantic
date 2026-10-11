@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Union
+from typing import Any, Union
 
 from pydantic import Field, field_validator, model_validator
 
@@ -138,7 +138,7 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
     task_id: str | None = Field(default=None, description="a unique, meaningful id for the task")
 
     operator: ImportPath = Field(description="airflow operator path")
-    dependencies: list[TaskReference] | list[TaskAttribute] | None = Field(default=None, description="dependencies")
+    dependencies: list[TaskReference | TaskAttribute] | None = Field(default=None, description="dependencies")
 
     @model_validator(mode="before")
     @classmethod
@@ -146,7 +146,7 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
         return values
 
     @field_validator("dependencies", mode="before")
-    def _validate_dependencies(cls, v):
+    def _validate_dependencies(cls, v: Any):
         """Normalize to List[Union[str, Tuple[str, str]]]"""
         if isinstance(v, str):
             v = [v]
@@ -156,7 +156,8 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
             # NOTE: keep as task for now in case period in task_id
             v = [v]
 
-        for i, element in enumerate(v):
+        normalized: list[Any] = list(v)
+        for i, element in enumerate(normalized):
             if isinstance(element, tuple):
                 assert len(element) == 2, "Tuple dependencies must be of length 2 (task_id, attribute)"
                 if isinstance(element[0], Task):
@@ -171,13 +172,14 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
             if isinstance(element, Task):
                 # If the element is a Task, convert to its task_id
                 element = element.task_id
-            v[i] = element
-        return v
+            normalized[i] = element
+        return normalized
 
     def __lshift__(self, other: Union["Task", list["Task"]]) -> "Task":
         """e.g. a << Task() << b"""
         if isinstance(other, Task):
             self.dependencies = self.dependencies or []
+            assert other.task_id is not None
             self.dependencies.append(other.task_id)
         elif isinstance(other, list):
             for task in other:
@@ -188,6 +190,7 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
         """e.g. a >> Task() >> b"""
         if isinstance(other, Task):
             other.dependencies = other.dependencies or []
+            assert self.task_id is not None
             other.dependencies.append(self.task_id)
         elif isinstance(other, list):
             for task in other:
@@ -197,6 +200,7 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
     def set_upstream(self, other: Union["Task", list["Task"]]):
         if isinstance(other, Task):
             self.dependencies = self.dependencies or []
+            assert other.task_id is not None
             self.dependencies.append(other.task_id)
         elif isinstance(other, list):
             for task in other:
@@ -206,6 +210,7 @@ class Task(TaskArgs, TaskRenderMixin, TaskInstantiateMixin, validate_assignment=
     def set_downstream(self, other: Union["Task", list["Task"]]):
         if isinstance(other, Task):
             other.dependencies = other.dependencies or []
+            assert self.task_id is not None
             other.dependencies.append(self.task_id)
         elif isinstance(other, list):
             for task in other:

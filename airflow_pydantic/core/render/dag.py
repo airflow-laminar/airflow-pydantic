@@ -5,10 +5,14 @@ from pathlib import Path
 from shutil import which
 from subprocess import call
 from tempfile import NamedTemporaryFile
+from typing import TYPE_CHECKING
 
 from ...utils import _task_id_to_python_name
 from .task import render_base_task_args
 from .utils import _get_parts_from_value
+
+if TYPE_CHECKING:
+    from ..dag import Dag
 
 __all__ = ("DagRenderMixin",)
 
@@ -16,18 +20,18 @@ _log = getLogger(__name__)
 
 
 class DagRenderMixin:
-    def render(self, format: bool = True, debug_filename: str = "", airflow_major_version: int = 2) -> str:
+    def render(self: "Dag", format: bool = True, debug_filename: str = "", airflow_major_version: int = 2) -> str:
         """
         Render the DAG to a string representation, suitable for use in a .py file.
         """
         if not self.dag_id:
             raise ValueError("DAG must have a dag_id")
-        imports: list[str] = []
-        globals_: list[str] = []
-        task_id_to_task_code: dict[str, str] = {}
+        imports: list[ast.ImportFrom] = []
+        globals_: list[ast.stmt] = []
+        task_id_to_task_code: dict[str, ast.expr] = {}
         task_key_to_task_id: dict[str, str] = {}
         task_id_to_task_python_name: dict[str, str] = {}
-        task_id_to_task_dependencies: dict[str, list[str]] = {}
+        task_id_to_task_dependencies: dict[str, list[tuple[str, str | None]]] = {}
 
         new_dag = ast.Module(body=[], type_ignores=[])
         # First, Prepare DAG kwargs
@@ -56,8 +60,9 @@ class DagRenderMixin:
             dag_args["default_args"] = dag_default_args_values
 
         # reformat to keywords instance
-        dag_args = [ast.keyword(arg=k, value=v) for k, v in dag_args.items()]
+        dag_keywords = [ast.keyword(arg=k, value=v) for k, v in dag_args.items()]
 
+        assert self.tasks is not None
         for task_key, task in self.tasks.items():
             task_imports, task_globals, task_code = task.render(
                 raw=True,
@@ -67,6 +72,7 @@ class DagRenderMixin:
             imports.extend(task_imports)
             globals_.extend(task_globals)
 
+            assert task.task_id is not None
             # Ensure task_id is a valid Python identifier
             task_python_name = _task_id_to_python_name(task_key)
 
@@ -77,11 +83,13 @@ class DagRenderMixin:
 
             # Grab dependencies and add them
             if task.dependencies:
-                to_set = []
+                to_set: list[tuple[str, str | None]] = []
                 for dependency in task.dependencies:
                     if isinstance(dependency, tuple):
+                        assert isinstance(dependency[0], str)
                         dependency = (dependency[0], dependency[1])
                     else:
+                        assert isinstance(dependency, str)
                         dependency = (dependency, None)
                     to_set.append(dependency)
                 task_id_to_task_dependencies[task.task_id] = to_set
@@ -112,7 +120,7 @@ class DagRenderMixin:
         dag_block = ast.With(
             items=[
                 ast.withitem(
-                    context_expr=ast.Call(func=ast.Name(id="DAG", ctx=ast.Load()), args=[], keywords=dag_args),
+                    context_expr=ast.Call(func=ast.Name(id="DAG", ctx=ast.Load()), args=[], keywords=dag_keywords),
                     optional_vars=ast.Name(id="dag", ctx=ast.Store(), col_offset=0),
                 )
             ],
@@ -159,7 +167,7 @@ class DagRenderMixin:
 
                 if accessor:
                     # Access attribute `accessor` of the dependency task
-                    dependency_ast = ast.Attribute(
+                    dependency_ast: ast.expr = ast.Attribute(
                         value=ast.Name(id=dependency_python_name, ctx=ast.Load()),
                         attr=accessor,
                         ctx=ast.Load(),

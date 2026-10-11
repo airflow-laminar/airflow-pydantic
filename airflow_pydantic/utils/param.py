@@ -77,7 +77,7 @@ class ParamType:
         return ret
 
     @classmethod
-    def _resolve_type(cls, typ_) -> str:
+    def _resolve_type(cls, typ_) -> str | None:
         if isinstance(typ_, list):
             return "array"
         if isinstance(typ_, dict):

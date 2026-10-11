@@ -18,7 +18,7 @@ CALLBACK_FIELDS = ["on_failure_callback", "on_execute_callback", "on_retry_callb
 @pytest.mark.parametrize("as_list", [False, True])
 def test_callback_paths_roundtrip(field, as_list):
     callback = [alert] if as_list else alert
-    task = BashTask(task_id="callback-task", bash_command="true", **{field: callback})
+    task = BashTask.model_validate({"task_id": "callback-task", "bash_command": "true", field: callback})
     dumped = json.loads(task.model_dump_json(exclude_unset=True))
     assert dumped[field] == [f"{__name__}.alert"] if as_list else dumped[field] == f"{__name__}.alert"
     restored = BashTask.model_validate(dumped)
@@ -30,17 +30,20 @@ def test_callback_paths_roundtrip(field, as_list):
 @pytest.mark.parametrize("as_list", [False, True])
 def test_callback_instantiates_callable(field, as_list):
     callback = [alert] if as_list else alert
-    task = BashTask(task_id="callback-task", bash_command="true", **{field: callback})
+    task = BashTask.model_validate({"task_id": "callback-task", "bash_command": "true", field: callback})
     assert getattr(task.instantiate(), field) in (callback, [callback])
 
 
 @pytest.mark.parametrize("field", CALLBACK_FIELDS)
 @pytest.mark.parametrize("as_list", [False, True])
 def test_callback_render_imports_callable(field, as_list):
-    task = BashTask(task_id="callback-task", bash_command="true", **{field: [alert] if as_list else alert})
+    task = BashTask.model_validate({"task_id": "callback-task", "bash_command": "true", field: [alert] if as_list else alert})
     imports, _, rendered = task.render()
     assert f"from {__name__} import alert" in imports
-    expression = ast.parse(rendered).body[0].value
+    statement = ast.parse(rendered).body[0]
+    assert isinstance(statement, ast.Expr)
+    expression = statement.value
+    assert isinstance(expression, ast.Call)
     callback = next(keyword.value for keyword in expression.keywords if keyword.arg == field)
     if as_list:
         assert isinstance(callback, ast.List)

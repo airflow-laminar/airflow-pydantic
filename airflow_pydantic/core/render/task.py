@@ -1,9 +1,13 @@
 import ast
+from typing import TYPE_CHECKING, Literal, overload
 
 from pkn.pydantic import serialize_path_as_string
 
 from ...airflow import _AirflowPydanticMarker
-from .utils import RenderedCode, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
+from .utils import RawRenderedCode, RenderedCode, _build_ssh_hook_callable, _build_ssh_hook_with_variable, _get_parts_from_value
+
+if TYPE_CHECKING:
+    from ..task import Task
 
 __all__ = (
     "TaskRenderMixin",
@@ -11,10 +15,18 @@ __all__ = (
 )
 
 
-def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 2, **kwargs: dict[str, str]) -> RenderedCode:
+@overload
+def render_base_task_args(self, raw: Literal[False] = False, airflow_major_version: int = 2, **kwargs) -> RenderedCode: ...
+
+
+@overload
+def render_base_task_args(self, raw: Literal[True], airflow_major_version: int = 2, **kwargs) -> RawRenderedCode: ...
+
+
+def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 2, **kwargs) -> RenderedCode | RawRenderedCode:
     # Extract the importable from the operator path
-    imports = []
-    globals_ = []
+    imports: list[ast.ImportFrom] = []
+    globals_: list[ast.stmt] = []
 
     args = {**self.model_dump(exclude_unset=True, exclude=["type_"]), **kwargs}
     for k, v in args.items():
@@ -35,9 +47,7 @@ def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 
     )
     if not raw:
         # If not raw, we need to convert the imports and inside_dag to a string representation
-        imports = [ast.unparse(i) for i in imports]
-        globals_ = [ast.unparse(i) for i in globals_]
-        value = ast.unparse(value)
+        return [ast.unparse(i) for i in imports], [ast.unparse(i) for i in globals_], ast.unparse(value)
     return (
         imports,
         globals_,
@@ -46,7 +56,17 @@ def render_base_task_args(self, raw: bool = False, airflow_major_version: int = 
 
 
 class TaskRenderMixin:
-    def render(self, raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs: dict[str, str]) -> RenderedCode:
+    @overload
+    def render(
+        self: "Task", raw: Literal[False] = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs
+    ) -> RenderedCode: ...
+
+    @overload
+    def render(self: "Task", raw: Literal[True], dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs) -> RawRenderedCode: ...
+
+    def render(
+        self: "Task", raw: bool = False, dag_from_context: bool = False, airflow_major_version: int = 2, **kwargs
+    ) -> RenderedCode | RawRenderedCode:
         if not self.task_id:
             raise ValueError("task_id must be set to render a task")
 
@@ -55,9 +75,11 @@ class TaskRenderMixin:
             # Airflow is not present locally! Use the original
             operator_import, operator_name = self.operator._original.rsplit(".", 1)
         else:
-            operator_import, operator_name = serialize_path_as_string(self.operator).rsplit(".", 1)
+            path = serialize_path_as_string(self.operator)
+            assert path is not None
+            operator_import, operator_name = path.rsplit(".", 1)
         imports = [ast.ImportFrom(module=operator_import, names=[ast.alias(name=operator_name)], level=0)]
-        globals_ = []
+        globals_: list[ast.stmt] = []
 
         args = {**self.model_dump(exclude_unset=True, exclude=["type_", "operator", "dependencies"]), **kwargs}
         for k, v in args.items():
@@ -90,7 +112,9 @@ class TaskRenderMixin:
             if k == "ssh_hook" and hasattr(self, "ssh_hook_host") and self.ssh_hook_host:
                 # If we have a host, and the host looks in a variable, lets
                 # use that instead of printing the password.
-                import_, call = _build_ssh_hook_with_variable(self.ssh_hook_host, args[k])
+                hook_call = args[k]
+                assert isinstance(hook_call, ast.Call)
+                import_, call = _build_ssh_hook_with_variable(self.ssh_hook_host, hook_call)
                 imports.extend(import_)
                 args[k] = call
 
@@ -103,9 +127,7 @@ class TaskRenderMixin:
 
         if not raw:
             # If not raw, we need to convert the imports and inside_dag to a string representation
-            imports = [ast.unparse(i) for i in imports]
-            globals_ = [ast.unparse(i) for i in globals_]
-            inside_dag = ast.unparse(inside_dag)
+            return [ast.unparse(i) for i in imports], [ast.unparse(i) for i in globals_], ast.unparse(inside_dag)
         return (
             imports,
             globals_,

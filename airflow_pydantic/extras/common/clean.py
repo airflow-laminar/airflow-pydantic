@@ -1,11 +1,14 @@
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import Field, field_validator
 
-from ...airflow import PythonOperator
+if TYPE_CHECKING:
+    from airflow.providers.standard.operators.python import PythonOperator
+else:
+    from ...airflow import PythonOperator
 from ...core import Task, TaskArgs
 from ...migration import _airflow_3
-from ...utils import CallablePath
+from ...utils import ImportPath
 from .airflow_functions import clean_dag_runs, clean_dag_runs_api, clean_dags, clean_dags_api
 
 __all__ = (
@@ -149,7 +152,7 @@ DagCleanOperatorArgs = DagCleanTaskArgs
 
 
 class DagCleanTask(Task, DagCleanTaskArgs):
-    operator: CallablePath = Field(default="airflow_pydantic.extras.common.clean.DagClean", validate_default=True)
+    operator: ImportPath = Field(default="airflow_pydantic.extras.common.clean.DagClean", validate_default=True)
 
     @field_validator("operator")
     @classmethod
