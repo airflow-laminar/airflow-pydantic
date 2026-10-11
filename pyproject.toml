@@ -45,6 +45,7 @@ develop = [
     "codespell",
     "hatchling",
     "mdformat",
+    "mdformat-frontmatter",
     "mdformat-tables>=1",
     "pytest",
     "pytest-cov",
@@ -106,7 +107,11 @@ replace = 'version = "{new_version}"'
 [tool.coverage.run]
 branch = true
 omit = [
+<<<<<<< before updating
     "airflow_pydantic/tests/*",
+=======
+    "airflow_pydantic/tests/integration/*",
+>>>>>>> after updating
 ]
 
 [tool.coverage.report]
