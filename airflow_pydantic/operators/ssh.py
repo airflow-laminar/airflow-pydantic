@@ -89,11 +89,11 @@ class SSHTaskArgs(TaskArgs):
             password_key = password.key if isinstance(password, Variable) else password
             return (host.username, password_key, host.key_file)
 
-        if len({_creds(host) for host in hosts}) > 1:
+        if len({_creds(host) for host in hosts}) > 1 or any(host.ssh_hook_args != hosts[0].ssh_hook_args for host in hosts[1:]):
             names = ", ".join(sorted(host.name for host in hosts))
             raise ValueError(
-                f"Host filter for SSH expansion matched hosts with differing credentials ({names}); "
-                "all matching hosts must share username/password/key_file."
+                f"Host filter for SSH expansion matched hosts with differing credentials or SSHHook arguments ({names}); "
+                "all matching hosts must share username/password/key_file and ssh_hook_args."
             )
 
     @model_validator(mode="before")

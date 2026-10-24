@@ -272,6 +272,16 @@ def _get_parts_from_value(key, value, model_ref: BaseModel | None = None, airflo
                         call.keywords.append(ast.keyword(arg=arg_name, value=ast.Constant(value=arg_value)))
                     else:
                         raise TypeError(f"Unsupported type for SSHHook argument '{arg_name}': {type(arg_value)}")
+                host = getattr(model_ref, "ssh_hook_host", None)
+                if isinstance(host, Host):
+                    for arg_name, arg_value in host.ssh_hook_args.items():
+                        if any(keyword.arg == arg_name for keyword in call.keywords):
+                            continue
+                        extra_imports, expression = _get_parts_from_value(
+                            "", getattr(value, arg_name, arg_value), airflow_major_version=airflow_major_version
+                        )
+                        imports.extend(extra_imports)
+                        call.keywords.append(ast.keyword(arg=arg_name, value=expression))
                 return imports, call
         except ImportError:
             # If SSHHook is not available, we can skip it
