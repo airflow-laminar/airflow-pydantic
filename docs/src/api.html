@@ -2198,9 +2198,19 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 </dl>
 </dd></dl>
 </section>
-<section id="module-airflow_pydantic.utils.host">
-<span id="host-and-balancer-models"></span><span id="module-airflow_pydantic.utils.relativedelta"></span><h2>Host and balancer models<a class="headerlink" href="#module-airflow_pydantic.utils.host" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#module-airflow_pydantic.utils.host'">¶</a></h2>
-<dl class="py function">
+<section id="host-and-balancer-models">
+<span id="module-airflow_pydantic.utils.relativedelta"></span><h2>Host and balancer models<a class="headerlink" href="#host-and-balancer-models" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#host-and-balancer-models'">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Host.ssh_hook_args</span></code> stores keyword arguments for <code class="docutils literal notranslate"><span class="pre">SSHHook</span></code>, such as <code class="docutils literal notranslate"><span class="pre">port</span></code>,
+<code class="docutils literal notranslate"><span class="pre">conn_timeout</span></code>, and <code class="docutils literal notranslate"><span class="pre">keepalive_interval</span></code>. It defaults to an empty dictionary.
+Values must be JSON-serializable scalars, lists, or dictionaries. Nested Hydra
+containers are normalized to Python lists and dictionaries.
+Arguments derived from the host’s name and credentials override stored arguments;
+arguments supplied to <code class="docutils literal notranslate"><span class="pre">Host.hook()</span></code> override both. <code class="docutils literal notranslate"><span class="pre">Host.override()</span></code> and model
+serialization preserve stored arguments. Provider-specific arguments are validated
+by <code class="docutils literal notranslate"><span class="pre">SSHHook</span></code> when the hook is constructed.</p>
+<p>Hosts selected for a single mapped SSH task must share credentials and
+<code class="docutils literal notranslate"><span class="pre">ssh_hook_args</span></code>; only the remote host varies across mapped instances.</p>
+<dl class="py function" id="module-airflow_pydantic.utils.host">
 <dt class="sig sig-object py" id="airflow_pydantic.utils.host.ping">
 <span class="sig-prename descclassname"><span class="pre">airflow_pydantic.utils.host.</span></span><span class="sig-name descname"><span class="pre">ping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="../../_modules/airflow_pydantic/utils/host.html#ping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#airflow_pydantic.utils.host.ping" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.utils.host.ping'">¶</a></dt>
 <dd></dd></dl>
@@ -2224,6 +2234,11 @@ a [<cite>PydanticSerializationError</cite>][pydantic_core.PydanticSerializationE
 <dt class="sig sig-object py" id="airflow_pydantic.extras.balancer.host.Host.key_file">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.extras.balancer.host.Host.key_file" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.extras.balancer.host.Host.key_file'">¶</a></dt>
 <dd></dd></dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="airflow_pydantic.extras.balancer.host.Host.ssh_hook_args">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ssh_hook_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">JsonValue</span><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#airflow_pydantic.extras.balancer.host.Host.ssh_hook_args" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.extras.balancer.host.Host.ssh_hook_args'">¶</a></dt>
+<dd><p>Default SSHHook arguments; call-time arguments take precedence</p>
+</dd></dl>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="airflow_pydantic.extras.balancer.host.Host.os">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">os</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#airflow_pydantic.extras.balancer.host.Host.os" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#airflow_pydantic.extras.balancer.host.Host.os'">¶</a></dt>
@@ -3060,13 +3075,14 @@ dag processor has marked stale (their file or bundle no longer exists).</p>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.path.link'" class="reference internal" href="#airflow_pydantic.utils.path.link"><code class="docutils literal notranslate"><span class="pre">link()</span></code></a></li>
 </ul>
 </li>
-<li><a :data-current="activeSection === '#module-airflow_pydantic.utils.host'" class="reference internal" href="#module-airflow_pydantic.utils.host">Host and balancer models</a><ul>
+<li><a :data-current="activeSection === '#host-and-balancer-models'" class="reference internal" href="#host-and-balancer-models">Host and balancer models</a><ul>
 <li><a :data-current="activeSection === '#airflow_pydantic.utils.host.ping'" class="reference internal" href="#airflow_pydantic.utils.host.ping"><code class="docutils literal notranslate"><span class="pre">ping()</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host"><code class="docutils literal notranslate"><span class="pre">Host</span></code></a><ul>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.name'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.name"><code class="docutils literal notranslate"><span class="pre">Host.name</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.username'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.username"><code class="docutils literal notranslate"><span class="pre">Host.username</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.password'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.password"><code class="docutils literal notranslate"><span class="pre">Host.password</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.key_file'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.key_file"><code class="docutils literal notranslate"><span class="pre">Host.key_file</span></code></a></li>
+<li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.ssh_hook_args'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.ssh_hook_args"><code class="docutils literal notranslate"><span class="pre">Host.ssh_hook_args</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.os'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.os"><code class="docutils literal notranslate"><span class="pre">Host.os</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.pool'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.pool"><code class="docutils literal notranslate"><span class="pre">Host.pool</span></code></a></li>
 <li><a :data-current="activeSection === '#airflow_pydantic.extras.balancer.host.Host.size'" class="reference internal" href="#airflow_pydantic.extras.balancer.host.Host.size"><code class="docutils literal notranslate"><span class="pre">Host.size</span></code></a></li>

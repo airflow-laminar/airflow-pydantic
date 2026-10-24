@@ -1643,6 +1643,20 @@ Link a file or directory to another location.
 
 ## Host and balancer models
 
+`Host.ssh_hook_args` stores keyword arguments for `SSHHook`, such as `port`,
+`conn_timeout`, and `keepalive_interval`. It defaults to an empty dictionary.
+Values must be JSON-serializable scalars, lists, or dictionaries. Nested Hydra
+containers are normalized to Python lists and dictionaries.
+Arguments derived from the host’s name and credentials override stored arguments;
+arguments supplied to `Host.hook()` override both. `Host.override()` and model
+serialization preserve stored arguments. Provider-specific arguments are validated
+by `SSHHook` when the hook is constructed.
+
+Hosts selected for a single mapped SSH task must share credentials and
+`ssh_hook_args`; only the remote host varies across mapped instances.
+
+<a id="module-airflow_pydantic.utils.host"></a>
+
 ### airflow_pydantic.utils.host.ping(host, , local=True) → Callable[[source]](../../_modules/airflow_pydantic/utils/host.html.md#ping)
 
 <a id="module-airflow_pydantic.extras.balancer.host"></a>
@@ -1658,6 +1672,10 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 #### *field* password *: str | [Variable](#airflow_pydantic.utils.variable.Variable) | None* *= None*
 
 #### *field* key_file *: str | None* *= None*
+
+#### *field* ssh_hook_args *: dict[str, JsonValue]* *[Optional]*
+
+Default SSHHook arguments; call-time arguments take precedence
 
 #### *field* os *: str | None* *= None*
 

@@ -207,6 +207,39 @@ with DAG(dag_id="daily-etl", schedule=None) as airflow_dag:
 For declarative configurations, `Configuration.generate_in_mem()` registers
 every configured DAG in the calling module.
 
+## How to save SSH connection options on a host
+
+Store shared SSHHook options on the host, then pass the host to an SSH task:
+
+```python
+from airflow_pydantic import Host, SSHTask
+
+host = Host(
+    name="worker.example.com",
+    username="airflow",
+    ssh_hook_args={"port": 2222, "conn_timeout": 20, "keepalive_interval": 15},
+)
+task = SSHTask(task_id="check", command="hostname", ssh_hook=host)
+```
+
+Use the same field in a Hydra host definition:
+
+```yaml
+_target_: airflow_pydantic.Host
+name: worker.example.com
+username: airflow
+ssh_hook_args:
+  port: 2222
+  conn_timeout: 20
+  keepalive_interval: 15
+```
+
+For a one-off hook, override individual options at the call site:
+
+```python
+hook = host.hook(conn_timeout=60)
+```
+
 ## How to use sensors and branching
 
 Mix sensors and operators in one task mapping:
@@ -2180,6 +2213,20 @@ Link a file or directory to another location.
 
 ## Host and balancer models
 
+`Host.ssh_hook_args` stores keyword arguments for `SSHHook`, such as `port`,
+`conn_timeout`, and `keepalive_interval`. It defaults to an empty dictionary.
+Values must be JSON-serializable scalars, lists, or dictionaries. Nested Hydra
+containers are normalized to Python lists and dictionaries.
+Arguments derived from the host’s name and credentials override stored arguments;
+arguments supplied to `Host.hook()` override both. `Host.override()` and model
+serialization preserve stored arguments. Provider-specific arguments are validated
+by `SSHHook` when the hook is constructed.
+
+Hosts selected for a single mapped SSH task must share credentials and
+`ssh_hook_args`; only the remote host varies across mapped instances.
+
+<a id="module-airflow_pydantic.utils.host"></a>
+
 ### airflow_pydantic.utils.host.ping(host, , local=True) → Callable[[source]](../../_modules/airflow_pydantic/utils/host.html.md#ping)
 
 <a id="module-airflow_pydantic.extras.balancer.host"></a>
@@ -2195,6 +2242,10 @@ Bases: [`BaseModel`](#airflow_pydantic.core.base.BaseModel)
 #### *field* password *: str | [Variable](#airflow_pydantic.utils.variable.Variable) | None* *= None*
 
 #### *field* key_file *: str | None* *= None*
+
+#### *field* ssh_hook_args *: dict[str, JsonValue]* *[Optional]*
+
+Default SSHHook arguments; call-time arguments take precedence
 
 #### *field* os *: str | None* *= None*
 

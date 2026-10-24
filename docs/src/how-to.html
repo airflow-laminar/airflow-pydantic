@@ -160,6 +160,34 @@ instantiated. <code class="docutils literal notranslate"><span class="pre">depen
 <p>For declarative configurations, <code class="docutils literal notranslate"><span class="pre">Configuration.generate_in_mem()</span></code> registers
 every configured DAG in the calling module.</p>
 </section>
+<section id="how-to-save-ssh-connection-options-on-a-host">
+<h2>How to save SSH connection options on a host<a class="headerlink" href="#how-to-save-ssh-connection-options-on-a-host" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-save-ssh-connection-options-on-a-host'">¶</a></h2>
+<p>Store shared SSHHook options on the host, then pass the host to an SSH task:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">airflow_pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Host</span><span class="p">,</span> <span class="n">SSHTask</span>
+</span><span id="line-2">
+</span><span id="line-3"><span class="n">host</span> <span class="o">=</span> <span class="n">Host</span><span class="p">(</span>
+</span><span id="line-4">    <span class="n">name</span><span class="o">=</span><span class="s2">"worker.example.com"</span><span class="p">,</span>
+</span><span id="line-5">    <span class="n">username</span><span class="o">=</span><span class="s2">"airflow"</span><span class="p">,</span>
+</span><span id="line-6">    <span class="n">ssh_hook_args</span><span class="o">=</span><span class="p">{</span><span class="s2">"port"</span><span class="p">:</span> <span class="mi">2222</span><span class="p">,</span> <span class="s2">"conn_timeout"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"keepalive_interval"</span><span class="p">:</span> <span class="mi">15</span><span class="p">},</span>
+</span><span id="line-7"><span class="p">)</span>
+</span><span id="line-8"><span class="n">task</span> <span class="o">=</span> <span class="n">SSHTask</span><span class="p">(</span><span class="n">task_id</span><span class="o">=</span><span class="s2">"check"</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="s2">"hostname"</span><span class="p">,</span> <span class="n">ssh_hook</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>Use the same field in a Hydra host definition:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">airflow_pydantic.Host</span>
+</span><span id="line-2"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">worker.example.com</span>
+</span><span id="line-3"><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">airflow</span>
+</span><span id="line-4"><span class="nt">ssh_hook_args</span><span class="p">:</span>
+</span><span id="line-5"><span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2222</span>
+</span><span id="line-6"><span class="w">  </span><span class="nt">conn_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+</span><span id="line-7"><span class="w">  </span><span class="nt">keepalive_interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span>
+</span></code></pre></div>
+</div>
+<p>For a one-off hook, override individual options at the call site:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">hook</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">hook</span><span class="p">(</span><span class="n">conn_timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+</section>
 <section id="how-to-use-sensors-and-branching">
 <h2>How to use sensors and branching<a class="headerlink" href="#how-to-use-sensors-and-branching" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-use-sensors-and-branching'">¶</a></h2>
 <p>Mix sensors and operators in one task mapping:</p>
@@ -399,6 +427,7 @@ runner logs for your Airflow version.</p>
 <li><a :data-current="activeSection === '#how-to-build-a-dag-in-python'" class="reference internal" href="#how-to-build-a-dag-in-python">How to build a DAG in Python</a></li>
 <li><a :data-current="activeSection === '#how-to-render-deployable-python'" class="reference internal" href="#how-to-render-deployable-python">How to render deployable Python</a></li>
 <li><a :data-current="activeSection === '#how-to-instantiate-models-in-memory'" class="reference internal" href="#how-to-instantiate-models-in-memory">How to instantiate models in memory</a></li>
+<li><a :data-current="activeSection === '#how-to-save-ssh-connection-options-on-a-host'" class="reference internal" href="#how-to-save-ssh-connection-options-on-a-host">How to save SSH connection options on a host</a></li>
 <li><a :data-current="activeSection === '#how-to-use-sensors-and-branching'" class="reference internal" href="#how-to-use-sensors-and-branching">How to use sensors and branching</a></li>
 <li><a :data-current="activeSection === '#how-to-use-custom-timetables'" class="reference internal" href="#how-to-use-custom-timetables">How to use custom timetables</a></li>
 <li><a :data-current="activeSection === '#how-to-configure-pools-and-variables'" class="reference internal" href="#how-to-configure-pools-and-variables">How to configure pools and variables</a></li>
