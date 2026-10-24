@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from logging import getLogger
 from types import UnionType
 from typing import Literal
@@ -75,7 +76,7 @@ class DagArgs(BaseModel, validate_assignment=True):
     )
     # jinja_environment_kwargs (dict | None) – additional configuration options to be passed to Jinja Environment for template rendering
     # render_template_as_native_obj (bool) – If True, uses a Jinja NativeEnvironment to render templates as native Python types. If False, a Jinja Environment is used to render templates as string values.
-    tags: list[str] | None = Field(default=None, description="List of tags to help filtering DAGs in the UI.")
+    tags: list[str] | None = Field(default=None, description="List of tags to help filtering DAGs in the UI. Nested tag lists are flattened.")
     # owner_links (dict[str, str] | None) – Dict of owners and their links, that will be clickable on the DAGs view UI. Can be used as an HTTP link (for example the link to your Slack channel), or a mailto link. e.g: {“dag_owner”: “https://airflow.apache.org/”}
     # auto_register (bool) – Automatically register this DAG when it is used in a with block
     # fail_stop (bool) – Fails currently running tasks when task in DAG fails. Warning: A fail stop dag can only have tasks with the default trigger rule (“all_success”). An exception will be thrown if any task in a fail stop dag has a non default trigger rule.
@@ -83,6 +84,19 @@ class DagArgs(BaseModel, validate_assignment=True):
 
     # Extras
     enabled: bool | None = Field(default=None, description="Whether the DAG is enabled")
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def _validate_tags(cls, v):
+        if not isinstance(v, Sequence) or isinstance(v, (str, bytes, bytearray)):
+            return v
+        tags = []
+        for tag in v:
+            if isinstance(tag, Sequence) and not isinstance(tag, (str, bytes, bytearray)):
+                tags.extend(cls._validate_tags(tag))
+            else:
+                tags.append(tag)
+        return tags
 
     @field_validator("params", mode="before")
     @classmethod
