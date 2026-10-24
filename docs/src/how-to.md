@@ -224,6 +224,35 @@ restored_from_json = Dag.model_validate_json(json_payload)
 Serialization retains the import paths needed to reconstruct operator,
 callable, timetable, and connection types.
 
+## How to combine shared and DAG-specific tags
+
+With Hydra and OmegaConf installed, save shared tags and a DAG configuration
+in `tags.yaml`:
+
+```yaml
+common_tags: [analytics, daily]
+dag:
+  _target_: airflow_pydantic.Dag
+  dag_id: report
+  tags:
+    - ${common_tags}
+    - ${dag.dag_id}
+```
+
+Instantiate the DAG model:
+
+```python
+from hydra.utils import instantiate
+from omegaconf import OmegaConf
+
+config = OmegaConf.load("tags.yaml")
+dag = instantiate(config.dag)
+assert dag.tags == ["analytics", "daily", "report"]
+```
+
+Nested tag lists are flattened in order, with duplicates preserved. The model
+validates the resulting tags as strings.
+
 ## How to use models with airflow-config
 
 Select exported model classes with Hydra `_target_` entries:
