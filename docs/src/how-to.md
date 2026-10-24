@@ -59,6 +59,39 @@ with DAG(dag_id="daily-etl", schedule=None) as airflow_dag:
 For declarative configurations, `Configuration.generate_in_mem()` registers
 every configured DAG in the calling module.
 
+## How to save SSH connection options on a host
+
+Store shared SSHHook options on the host, then pass the host to an SSH task:
+
+```python
+from airflow_pydantic import Host, SSHTask
+
+host = Host(
+    name="worker.example.com",
+    username="airflow",
+    ssh_hook_args={"port": 2222, "conn_timeout": 20, "keepalive_interval": 15},
+)
+task = SSHTask(task_id="check", command="hostname", ssh_hook=host)
+```
+
+Use the same field in a Hydra host definition:
+
+```yaml
+_target_: airflow_pydantic.Host
+name: worker.example.com
+username: airflow
+ssh_hook_args:
+  port: 2222
+  conn_timeout: 20
+  keepalive_interval: 15
+```
+
+For a one-off hook, override individual options at the call site:
+
+```python
+hook = host.hook(conn_timeout=60)
+```
+
 ## How to use sensors and branching
 
 Mix sensors and operators in one task mapping:
