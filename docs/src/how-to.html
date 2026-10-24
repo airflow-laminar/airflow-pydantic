@@ -25,16 +25,16 @@
 <meta content="How-to guides | airflow-pydantic v1.7.1" property="og:title"/>
 <meta content="How-to guides | airflow-pydantic v1.7.1" name="twitter:title"/>
 <link href="../../_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css"/>
-<link href="../../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" rel="stylesheet" type="text/css"/>
 <link href="../../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../../_static/graphviz.css?v=4ae1632d" rel="stylesheet" type="text/css"/>
 <link href="../../_static/autodoc_pydantic.css" rel="stylesheet" type="text/css"/>
 <link href="../../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <link href="../../_static/searchlite.css?v=4235115c" rel="stylesheet" type="text/css"/>
-<link href="../../_static/styles/custom.css?v=cf0da3a9" rel="stylesheet" type="text/css"/>
-<link href="../../_static/awesome-sphinx-design.css?v=a81faafa" rel="stylesheet" type="text/css"/>
-<link href="../../_static/awesome-myst-nb.css?v=7c7ea10c" rel="stylesheet" type="text/css"/>
+<link href="../../_static/styles/custom.css?v=113af4ad" rel="stylesheet" type="text/css"/>
+<link href="../../_static/awesome-sphinx-design.css?v=b41b1d54" rel="stylesheet" type="text/css"/>
+<link href="../../_static/awesome-myst-nb.css?v=45fd483e" rel="stylesheet" type="text/css"/>
 <link href="../../search.html" rel="search" title="Search"/>
 <link href="../../genindex.html" rel="index" title="Index"/>
 <link href="explanation.html" rel="next" title="Why model Airflow configuration"/>
@@ -309,6 +309,31 @@ single-purpose command transformations.</p>
 <p>Serialization retains the import paths needed to reconstruct operator,
 callable, timetable, and connection types.</p>
 </section>
+<section id="how-to-combine-shared-and-dag-specific-tags">
+<h2>How to combine shared and DAG-specific tags<a class="headerlink" href="#how-to-combine-shared-and-dag-specific-tags" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-combine-shared-and-dag-specific-tags'">¶</a></h2>
+<p>With Hydra and OmegaConf installed, save shared tags and a DAG configuration
+in <code class="docutils literal notranslate"><span class="pre">tags.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nt">common_tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">analytics</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">daily</span><span class="p p-Indicator">]</span>
+</span><span id="line-2"><span class="nt">dag</span><span class="p">:</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">airflow_pydantic.Dag</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">dag_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">report</span>
+</span><span id="line-5"><span class="w">  </span><span class="nt">tags</span><span class="p">:</span>
+</span><span id="line-6"><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${common_tags}</span>
+</span><span id="line-7"><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${dag.dag_id}</span>
+</span></code></pre></div>
+</div>
+<p>Instantiate the DAG model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">hydra.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">instantiate</span>
+</span><span id="line-2"><span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">OmegaConf</span>
+</span><span id="line-3">
+</span><span id="line-4"><span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"tags.yaml"</span><span class="p">)</span>
+</span><span id="line-5"><span class="n">dag</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">dag</span><span class="p">)</span>
+</span><span id="line-6"><span class="k">assert</span> <span class="n">dag</span><span class="o">.</span><span class="n">tags</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"analytics"</span><span class="p">,</span> <span class="s2">"daily"</span><span class="p">,</span> <span class="s2">"report"</span><span class="p">]</span>
+</span></code></pre></div>
+</div>
+<p>Nested tag lists are flattened in order, with duplicates preserved. The model
+validates the resulting tags as strings.</p>
+</section>
 <section id="how-to-use-models-with-airflow-config">
 <h2>How to use models with airflow-config<a class="headerlink" href="#how-to-use-models-with-airflow-config" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-use-models-with-airflow-config'">¶</a></h2>
 <p>Select exported model classes with Hydra <code class="docutils literal notranslate"><span class="pre">_target_</span></code> entries:</p>
@@ -382,6 +407,7 @@ runner logs for your Airflow version.</p>
 <li><a :data-current="activeSection === '#how-to-reuse-task-settings-in-python'" class="reference internal" href="#how-to-reuse-task-settings-in-python">How to reuse task settings in Python</a></li>
 <li><a :data-current="activeSection === '#how-to-compose-shell-environments'" class="reference internal" href="#how-to-compose-shell-environments">How to compose shell environments</a></li>
 <li><a :data-current="activeSection === '#how-to-serialize-and-validate-models'" class="reference internal" href="#how-to-serialize-and-validate-models">How to serialize and validate models</a></li>
+<li><a :data-current="activeSection === '#how-to-combine-shared-and-dag-specific-tags'" class="reference internal" href="#how-to-combine-shared-and-dag-specific-tags">How to combine shared and DAG-specific tags</a></li>
 <li><a :data-current="activeSection === '#how-to-use-models-with-airflow-config'" class="reference internal" href="#how-to-use-models-with-airflow-config">How to use models with airflow-config</a></li>
 <li><a :data-current="activeSection === '#how-to-integrate-long-running-and-imported-schedules'" class="reference internal" href="#how-to-integrate-long-running-and-imported-schedules">How to integrate long-running and imported schedules</a></li>
 <li><a :data-current="activeSection === '#how-to-attach-task-callbacks'" class="reference internal" href="#how-to-attach-task-callbacks">How to attach task callbacks</a></li>
@@ -403,7 +429,7 @@ runner logs for your Airflow version.</p>
 <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../../_static/copybutton.js?v=f281be69"></script>
-<script defer="defer" src="../../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../../_static/theme.js?v=49cc6205"></script>
 <script src="../../_static/design-tabs.js?v=f930bc37"></script>
 <script data-searchlite-index="searchlite-index.json" defer="defer" src="../../_static/searchlite.js?v=a5320898"></script>
 <script data-searchlite-adopt="true" defer="defer" src="../../_static/searchlite-ui.js?v=4e4bdd69"></script>

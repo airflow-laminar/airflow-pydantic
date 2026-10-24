@@ -142,7 +142,7 @@ Specifies if the dag is paused when created for the first time. If the dag exist
 
 #### *field* tags *: list[str] | None* *= None*
 
-List of tags to help filtering DAGs in the UI.
+List of tags to help filtering DAGs in the UI. Nested tag lists are flattened.
 
 #### *field* dag_display_name *: str | None* *= None*
 
