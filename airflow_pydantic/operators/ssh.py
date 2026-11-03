@@ -1,4 +1,5 @@
 import ast
+from importlib.metadata import version
 from logging import getLogger
 from types import FunctionType, MethodType
 from typing import Any, cast
@@ -8,6 +9,7 @@ from pydantic import Field, TypeAdapter, field_validator, model_validator
 from ..airflow import SSHHook as BaseSSHHook
 from ..core import Task, TaskArgs
 from ..extras import BalancerHostQueryConfiguration, Host
+from ..migration import _airflow_3
 from ..utils import BashCommands, CallablePath, ImportPath, SSHHook, Variable, get_import_path
 
 __all__ = (
@@ -122,6 +124,10 @@ class SSHTaskArgs(TaskArgs):
                         if data.get("remote_host"):
                             raise ValueError("Cannot set 'remote_host' together with a host filter; remote_host is mapped per-host during expansion.")
                         data["ssh_hook_hosts"] = hosts
+                        if _airflow_3() is not False or tuple(map(int, version("apache-airflow").split(".")[:2])) >= (2, 9):
+                            template = data.get("template")
+                            if template is None or "map_index_template" not in template.model_fields_set:
+                                data.setdefault("map_index_template", "{{ task.remote_host }}")
                         # Base hook carries the shared credentials; remote_host is overridden per mapped instance.
                         data["ssh_hook"] = hosts[0]
                         data["ssh_hook_host"] = hosts[0]
