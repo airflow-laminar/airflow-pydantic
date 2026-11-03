@@ -126,6 +126,7 @@ class TaskArgs(BaseModel, validate_assignment=True):
         description="Add documentation in YAML format or notes to your Task objects that is visible in Task Instance details View in the Webserver.",
     )
     task_display_name: str | None = Field(default=None, description="The display name of the task which appears on the UI.")
+    map_index_template: str | None = Field(default=None, description="Jinja template for mapped task instance labels (Airflow 2.9+).")
     # logger_name (str | None) – Name of the logger used by the Operator to emit logs. If set to None (default), the logger name will fall back to airflow.task.operators.{class.__module__}.{class.__name__} (e.g. SimpleHttpOperator will have airflow.task.operators.airflow.providers.http.operators.http.SimpleHttpOperator as logger).
     # allow_nested_operators (bool) – if True, when an operator is executed within another one a warning message will be logged. If False, then an exception will be raised if the operator is badly used (e.g. nested within another one). In future releases of Airflow this parameter will be removed and an exception will always be thrown when operators are nested within each other (default is True).
 
