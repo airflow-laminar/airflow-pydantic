@@ -38,8 +38,13 @@ def test_each_expanded_instance_renders_its_own_hostname(ssh_operator_balancer_f
 
 
 @pytest.mark.parametrize("label", ["{{ task.remote_host | upper }}", None, ""])
-def test_explicit_template_overrides_survive_task_templates(ssh_operator_balancer_filter, label):
-    template = SSHTaskArgs.model_validate({"template": ssh_operator_balancer_filter, "map_index_template": label})
+def test_explicit_template_overrides_survive_task_templates(balancer_multi, label):
+    with pools(), variables({"password": "password"}):
+        template = SSHTaskArgs(
+            command="hostname",
+            map_index_template=label,
+            ssh_hook=BalancerHostQueryConfiguration(kind="filter", balancer=balancer_multi, tag="worker"),
+        )
     task = SSHTask.model_validate({"task_id": "custom-label", "template": template})
     assert task.map_index_template == label
     assert task.model_dump(exclude_unset=True)["map_index_template"] == label
