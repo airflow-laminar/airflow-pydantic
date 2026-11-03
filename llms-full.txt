@@ -240,6 +240,50 @@ For a one-off hook, override individual options at the call site:
 hook = host.hook(conn_timeout=60)
 ```
 
+## How to label mapped SSH tasks by hostname
+
+Use a host filter to create one mapped SSH task instance per matching host:
+
+```python
+from airflow_pydantic import BalancerConfiguration, BalancerHostQueryConfiguration, Host, SSHTask
+
+balancer = BalancerConfiguration(
+    hosts=[
+        Host(name="worker-a.example.com", username="airflow", tags=["worker"]),
+        Host(name="worker-b.example.com", username="airflow", tags=["worker"]),
+    ],
+)
+task = SSHTask(
+    task_id="check-workers",
+    command="hostname",
+    ssh_hook=BalancerHostQueryConfiguration(kind="filter", balancer=balancer, tag="worker"),
+)
+```
+
+On Airflow 2.9+ and Airflow 3, the task automatically sets
+`map_index_template="{{ task.remote_host }}"`. Instantiated DAGs and generated
+Python use the same default. The labels above become `worker-a.example.com` and
+`worker-b.example.com`. Airflow renders named indexes after each mapped task
+executes, so numeric indexes can appear before execution. See
+[Airflow’s named mapping documentation](https://airflow.apache.org/docs/apache-airflow/2.9.0/authoring-and-scheduling/dynamic-task-mapping.html#named-mapping).
+
+An existing `ssh-template-all-hosts` template using a host filter gets this
+default automatically. Override it on the template or on an individual task:
+
+```yaml
+_target_: airflow_pydantic.SSHTask
+task_id: check-workers
+template: ${templates.task.ssh-template-all-hosts}
+command: hostname
+map_index_template: "{{ task.remote_host | upper }}"
+```
+
+Set `map_index_template: null` to keep numeric indexes. Single-host tasks retain
+their existing default. When constructing models under Airflow 2.8, automatic
+hostname labels are omitted because that version does not support named mapping.
+Source generated without an installed Airflow package uses the named-mapping
+default and requires Airflow 2.9+ when loaded.
+
 ## How to use sensors and branching
 
 Mix sensors and operators in one task mapping:
@@ -865,6 +909,10 @@ Add documentation in YAML format or notes to your Task objects that is visible i
 #### *field* task_display_name *: str | None* *= None*
 
 The display name of the task which appears on the UI.
+
+#### *field* map_index_template *: str | None* *= None*
+
+Jinja template for mapped task instance labels (Airflow 2.9+).
 
 ### airflow_pydantic.core.task.TaskModel
 

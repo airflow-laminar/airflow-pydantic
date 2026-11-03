@@ -296,6 +296,10 @@ Add documentation in YAML format or notes to your Task objects that is visible i
 
 The display name of the task which appears on the UI.
 
+#### *field* map_index_template *: str | None* *= None*
+
+Jinja template for mapped task instance labels (Airflow 2.9+).
+
 ### airflow_pydantic.core.task.TaskModel
 
 alias of [`Task`](#airflow_pydantic.core.task.Task)

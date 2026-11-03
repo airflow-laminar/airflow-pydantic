@@ -188,6 +188,45 @@ every configured DAG in the calling module.</p>
 </span></code></pre></div>
 </div>
 </section>
+<section id="how-to-label-mapped-ssh-tasks-by-hostname">
+<h2>How to label mapped SSH tasks by hostname<a class="headerlink" href="#how-to-label-mapped-ssh-tasks-by-hostname" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-label-mapped-ssh-tasks-by-hostname'">¶</a></h2>
+<p>Use a host filter to create one mapped SSH task instance per matching host:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">airflow_pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BalancerConfiguration</span><span class="p">,</span> <span class="n">BalancerHostQueryConfiguration</span><span class="p">,</span> <span class="n">Host</span><span class="p">,</span> <span class="n">SSHTask</span>
+</span><span id="line-2">
+</span><span id="line-3"><span class="n">balancer</span> <span class="o">=</span> <span class="n">BalancerConfiguration</span><span class="p">(</span>
+</span><span id="line-4">    <span class="n">hosts</span><span class="o">=</span><span class="p">[</span>
+</span><span id="line-5">        <span class="n">Host</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"worker-a.example.com"</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">"airflow"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"worker"</span><span class="p">]),</span>
+</span><span id="line-6">        <span class="n">Host</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"worker-b.example.com"</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">"airflow"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"worker"</span><span class="p">]),</span>
+</span><span id="line-7">    <span class="p">],</span>
+</span><span id="line-8"><span class="p">)</span>
+</span><span id="line-9"><span class="n">task</span> <span class="o">=</span> <span class="n">SSHTask</span><span class="p">(</span>
+</span><span id="line-10">    <span class="n">task_id</span><span class="o">=</span><span class="s2">"check-workers"</span><span class="p">,</span>
+</span><span id="line-11">    <span class="n">command</span><span class="o">=</span><span class="s2">"hostname"</span><span class="p">,</span>
+</span><span id="line-12">    <span class="n">ssh_hook</span><span class="o">=</span><span class="n">BalancerHostQueryConfiguration</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"filter"</span><span class="p">,</span> <span class="n">balancer</span><span class="o">=</span><span class="n">balancer</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">"worker"</span><span class="p">),</span>
+</span><span id="line-13"><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>On Airflow 2.9+ and Airflow 3, the task automatically sets
+<code class="docutils literal notranslate"><span class="pre">map_index_template="{{</span> <span class="pre">task.remote_host</span> <span class="pre">}}"</span></code>. Instantiated DAGs and generated
+Python use the same default. The labels above become <code class="docutils literal notranslate"><span class="pre">worker-a.example.com</span></code> and
+<code class="docutils literal notranslate"><span class="pre">worker-b.example.com</span></code>. Airflow renders named indexes after each mapped task
+executes, so numeric indexes can appear before execution. See
+<a class="reference external" href="https://airflow.apache.org/docs/apache-airflow/2.9.0/authoring-and-scheduling/dynamic-task-mapping.html#named-mapping">Airflow’s named mapping documentation</a>.</p>
+<p>An existing <code class="docutils literal notranslate"><span class="pre">ssh-template-all-hosts</span></code> template using a host filter gets this
+default automatically. Override it on the template or on an individual task:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">airflow_pydantic.SSHTask</span>
+</span><span id="line-2"><span class="nt">task_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">check-workers</span>
+</span><span id="line-3"><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${templates.task.ssh-template-all-hosts}</span>
+</span><span id="line-4"><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hostname</span>
+</span><span id="line-5"><span class="nt">map_index_template</span><span class="p">:</span><span class="w"> </span><span class="s">"{{</span><span class="nv"> </span><span class="s">task.remote_host</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">upper</span><span class="nv"> </span><span class="s">}}"</span>
+</span></code></pre></div>
+</div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">map_index_template:</span> <span class="pre">null</span></code> to keep numeric indexes. Single-host tasks retain
+their existing default. When constructing models under Airflow 2.8, automatic
+hostname labels are omitted because that version does not support named mapping.
+Source generated without an installed Airflow package uses the named-mapping
+default and requires Airflow 2.9+ when loaded.</p>
+</section>
 <section id="how-to-use-sensors-and-branching">
 <h2>How to use sensors and branching<a class="headerlink" href="#how-to-use-sensors-and-branching" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-to-use-sensors-and-branching'">¶</a></h2>
 <p>Mix sensors and operators in one task mapping:</p>
@@ -428,6 +467,7 @@ runner logs for your Airflow version.</p>
 <li><a :data-current="activeSection === '#how-to-render-deployable-python'" class="reference internal" href="#how-to-render-deployable-python">How to render deployable Python</a></li>
 <li><a :data-current="activeSection === '#how-to-instantiate-models-in-memory'" class="reference internal" href="#how-to-instantiate-models-in-memory">How to instantiate models in memory</a></li>
 <li><a :data-current="activeSection === '#how-to-save-ssh-connection-options-on-a-host'" class="reference internal" href="#how-to-save-ssh-connection-options-on-a-host">How to save SSH connection options on a host</a></li>
+<li><a :data-current="activeSection === '#how-to-label-mapped-ssh-tasks-by-hostname'" class="reference internal" href="#how-to-label-mapped-ssh-tasks-by-hostname">How to label mapped SSH tasks by hostname</a></li>
 <li><a :data-current="activeSection === '#how-to-use-sensors-and-branching'" class="reference internal" href="#how-to-use-sensors-and-branching">How to use sensors and branching</a></li>
 <li><a :data-current="activeSection === '#how-to-use-custom-timetables'" class="reference internal" href="#how-to-use-custom-timetables">How to use custom timetables</a></li>
 <li><a :data-current="activeSection === '#how-to-configure-pools-and-variables'" class="reference internal" href="#how-to-configure-pools-and-variables">How to configure pools and variables</a></li>
