@@ -23,16 +23,16 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#030711" />
   
-  <title>airflow_pydantic.extras.common.airflow_functions | airflow-pydantic v1.7.3</title>
-  <meta property="og:title" content="airflow_pydantic.extras.common.airflow_functions | airflow-pydantic v1.7.3" />
-  <meta name="twitter:title" content="airflow_pydantic.extras.common.airflow_functions | airflow-pydantic v1.7.3" />
+  <title>airflow_pydantic.extras.common.airflow_functions | airflow-pydantic v1.7.4</title>
+  <meta property="og:title" content="airflow_pydantic.extras.common.airflow_functions | airflow-pydantic v1.7.4" />
+  <meta name="twitter:title" content="airflow_pydantic.extras.common.airflow_functions | airflow-pydantic v1.7.4" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/theme.css?v=009055c6" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
-  <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=6a604523" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/searchlite.css?v=4235115c" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/styles/custom.css?v=113af4ad" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/awesome-sphinx-design.css?v=b41b1d54" />
@@ -50,7 +50,7 @@
       Skip to content
     </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
-      <a href="../../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.7.3</code></span>
+      <a href="../../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.7.4</code></span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -106,7 +106,7 @@
   class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="../../../../index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.7.3</code></span>
+    <a href="../../../../index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.7.4</code></span>
     </a>
 
     <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
@@ -136,7 +136,7 @@
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="../../../../index.html">
-    <span class="hidden md:inline">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.7.3</code></span>
+    <span class="hidden md:inline">airflow-pydantic <code style='font-size: var(--font-size--small--4);color: var(--sd-color-primary);'>v1.7.4</code></span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -411,72 +411,69 @@
 </span><span id="line-234">
 </span><span id="line-235">        <span class="n">runs_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/dags/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">dag_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">/dagRuns"</span>
 </span><span id="line-236">        <span class="n">runs</span> <span class="o">=</span> <span class="n">_api_get_paginated</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">runs_path</span><span class="p">,</span> <span class="s2">"dag_runs"</span><span class="p">)</span>
-</span><span id="line-237">
-</span><span id="line-238">        <span class="k">if</span> <span class="n">delete_successful</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span><span id="line-239">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not deleting successful DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-240">            <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">runs</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"success"</span><span class="p">]</span>
-</span><span id="line-241">        <span class="k">if</span> <span class="n">delete_failed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span><span id="line-242">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not deleting failed DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-243">            <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">runs</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"failed"</span><span class="p">]</span>
-</span><span id="line-244">
-</span><span id="line-245">        <span class="n">runs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">_dag_run_date</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="n">utc_now</span><span class="p">)</span>
-</span><span id="line-246">        <span class="n">total_runs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span>
-</span><span id="line-247">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="n">total_runs</span><span class="si">}</span><span class="s2"> DAG runs to clean up for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-248">
-</span><span id="line-249">        <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
-</span><span id="line-250">            <span class="n">run_id</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s2">"dag_run_id"</span><span class="p">]</span>
-</span><span id="line-251">            <span class="n">run_date</span> <span class="o">=</span> <span class="n">_dag_run_date</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
-</span><span id="line-252">            <span class="k">if</span> <span class="p">(</span><span class="n">run_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">run_date</span> <span class="o">&lt;</span> <span class="n">cutoff_date</span><span class="p">)</span> <span class="ow">or</span> <span class="n">total_runs</span> <span class="o">&gt;</span> <span class="n">max_dagruns</span><span class="p">:</span>
-</span><span id="line-253">                <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"queued"</span><span class="p">,</span> <span class="s2">"success"</span><span class="p">,</span> <span class="s2">"failed"</span><span class="p">):</span>
-</span><span id="line-254">                    <span class="c1"># The API only allows deleting runs in queued/success/failed states</span>
-</span><span id="line-255">                    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping DAG run in </span><span class="si">{</span><span class="n">run</span><span class="p">[</span><span class="s1">'state'</span><span class="p">]</span><span class="si">}</span><span class="s2"> state: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-256">                    <span class="k">continue</span>
-</span><span id="line-257">                <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting DAG run: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-258">                <span class="k">try</span><span class="p">:</span>
-</span><span id="line-259">                    <span class="n">request</span><span class="p">(</span><span class="s2">"DELETE"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">runs_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-260">                <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-261">                    <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to delete DAG run </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-262">                    <span class="k">continue</span>
-</span><span id="line-263">                <span class="n">deleted</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="line-264">                <span class="n">total_runs</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span id="line-265">            <span class="k">elif</span> <span class="n">mark_failed_as_successful</span><span class="p">:</span>
-</span><span id="line-266">                <span class="c1"># Need to iterate through all remaining</span>
-</span><span id="line-267">                <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"failed"</span><span class="p">:</span>
-</span><span id="line-268">                    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Marking failed DAG run as successful: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-269">                    <span class="n">request</span><span class="p">(</span><span class="s2">"PATCH"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">runs_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">"state"</span><span class="p">:</span> <span class="s2">"success"</span><span class="p">})</span>
-</span><span id="line-270">            <span class="k">else</span><span class="p">:</span>
-</span><span id="line-271">                <span class="k">break</span>  <span class="c1"># Since they are ordered, no more to delete</span>
-</span><span id="line-272">
-</span><span id="line-273">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total DAG runs deleted: </span><span class="si">{</span><span class="n">deleted</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+</span><span id="line-237">        <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">runs</span> <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"success"</span><span class="p">,</span> <span class="s2">"failed"</span><span class="p">)]</span>
+</span><span id="line-238">
+</span><span id="line-239">        <span class="k">if</span> <span class="n">delete_successful</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+</span><span id="line-240">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not deleting successful DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-241">            <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">runs</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"success"</span><span class="p">]</span>
+</span><span id="line-242">        <span class="k">if</span> <span class="n">delete_failed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+</span><span id="line-243">            <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Not deleting failed DAG runs for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-244">            <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">runs</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"failed"</span><span class="p">]</span>
+</span><span id="line-245">
+</span><span id="line-246">        <span class="n">runs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">_dag_run_date</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="n">utc_now</span><span class="p">)</span>
+</span><span id="line-247">        <span class="n">total_runs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span>
+</span><span id="line-248">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="n">total_runs</span><span class="si">}</span><span class="s2"> DAG runs to clean up for DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-249">
+</span><span id="line-250">        <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
+</span><span id="line-251">            <span class="n">run_id</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s2">"dag_run_id"</span><span class="p">]</span>
+</span><span id="line-252">            <span class="n">run_date</span> <span class="o">=</span> <span class="n">_dag_run_date</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
+</span><span id="line-253">            <span class="k">if</span> <span class="p">(</span><span class="n">run_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">run_date</span> <span class="o">&lt;</span> <span class="n">cutoff_date</span><span class="p">)</span> <span class="ow">or</span> <span class="n">total_runs</span> <span class="o">&gt;</span> <span class="n">max_dagruns</span><span class="p">:</span>
+</span><span id="line-254">                <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting DAG run: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-255">                <span class="k">try</span><span class="p">:</span>
+</span><span id="line-256">                    <span class="n">request</span><span class="p">(</span><span class="s2">"DELETE"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">runs_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-257">                <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-258">                    <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to delete DAG run </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-259">                    <span class="k">continue</span>
+</span><span id="line-260">                <span class="n">deleted</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="line-261">                <span class="n">total_runs</span> <span class="o">-=</span> <span class="mi">1</span>
+</span><span id="line-262">            <span class="k">elif</span> <span class="n">mark_failed_as_successful</span><span class="p">:</span>
+</span><span id="line-263">                <span class="c1"># Need to iterate through all remaining</span>
+</span><span id="line-264">                <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"failed"</span><span class="p">:</span>
+</span><span id="line-265">                    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Marking failed DAG run as successful: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-266">                    <span class="n">request</span><span class="p">(</span><span class="s2">"PATCH"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">runs_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">"state"</span><span class="p">:</span> <span class="s2">"success"</span><span class="p">})</span>
+</span><span id="line-267">            <span class="k">else</span><span class="p">:</span>
+</span><span id="line-268">                <span class="k">break</span>  <span class="c1"># Since they are ordered, no more to delete</span>
+</span><span id="line-269">
+</span><span id="line-270">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total DAG runs deleted: </span><span class="si">{</span><span class="n">deleted</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
-</span><span id="line-274">
-</span><span id="line-275">
+</span><span id="line-271">
+</span><span id="line-272">
 <div class="viewcode-block" id="clean_dags_api">
 <a class="viewcode-back" href="../../../../docs/src/api.html#airflow_pydantic.extras.common.airflow_functions.clean_dags_api">[docs]</a>
-</span><span id="line-276"><span class="k">def</span><span class="w"> </span><span class="nf">clean_dags_api</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="line-277"><span class="w">    </span><span class="sd">"""REST API implementation of clean_dags, for Airflow 3 where tasks have no database access.</span>
-</span><span id="line-278">
-</span><span id="line-279"><span class="sd">    Instead of checking file existence locally (meaningless on a worker), deletes DAGs the</span>
-</span><span id="line-280"><span class="sd">    dag processor has marked stale (their file or bundle no longer exists).</span>
-</span><span id="line-281"><span class="sd">    """</span>
-</span><span id="line-282">    <span class="n">request</span> <span class="o">=</span> <span class="n">_create_api_request</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
-</span><span id="line-283">
-</span><span id="line-284">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Starting to run Clear Process"</span><span class="p">)</span>
+</span><span id="line-273"><span class="k">def</span><span class="w"> </span><span class="nf">clean_dags_api</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="line-274"><span class="w">    </span><span class="sd">"""REST API implementation of clean_dags, for Airflow 3 where tasks have no database access.</span>
+</span><span id="line-275">
+</span><span id="line-276"><span class="sd">    Instead of checking file existence locally (meaningless on a worker), deletes DAGs the</span>
+</span><span id="line-277"><span class="sd">    dag processor has marked stale (their file or bundle no longer exists).</span>
+</span><span id="line-278"><span class="sd">    """</span>
+</span><span id="line-279">    <span class="n">request</span> <span class="o">=</span> <span class="n">_create_api_request</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
+</span><span id="line-280">
+</span><span id="line-281">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Starting to run Clear Process"</span><span class="p">)</span>
+</span><span id="line-282">
+</span><span id="line-283">    <span class="n">dags</span> <span class="o">=</span> <span class="n">_api_get_paginated</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"/dags"</span><span class="p">,</span> <span class="s2">"dags"</span><span class="p">,</span> <span class="n">exclude_stale</span><span class="o">=</span><span class="s2">"false"</span><span class="p">)</span>
+</span><span id="line-284">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found DAGs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dags</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-285">
-</span><span id="line-286">    <span class="n">dags</span> <span class="o">=</span> <span class="n">_api_get_paginated</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">"/dags"</span><span class="p">,</span> <span class="s2">"dags"</span><span class="p">,</span> <span class="n">exclude_stale</span><span class="o">=</span><span class="s2">"false"</span><span class="p">)</span>
-</span><span id="line-287">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found DAGs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dags</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-286">    <span class="n">stale_dag_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">"dag_id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dags</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_stale"</span><span class="p">)]</span>
+</span><span id="line-287">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting dags:</span><span class="se">\n</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stale_dag_ids</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="line-288">
-</span><span id="line-289">    <span class="n">stale_dag_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">"dag_id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dags</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_stale"</span><span class="p">)]</span>
-</span><span id="line-290">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting dags:</span><span class="se">\n</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stale_dag_ids</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-291">
-</span><span id="line-292">    <span class="k">for</span> <span class="n">dag_id</span> <span class="ow">in</span> <span class="n">stale_dag_ids</span><span class="p">:</span>
-</span><span id="line-293">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting stale DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-294">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-295">            <span class="n">request</span><span class="p">(</span><span class="s2">"DELETE"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"/dags/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">dag_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-296">        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="line-297">            <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to delete DAG </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-298">
-</span><span id="line-299">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total DAGs deleted: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stale_dag_ids</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+</span><span id="line-289">    <span class="k">for</span> <span class="n">dag_id</span> <span class="ow">in</span> <span class="n">stale_dag_ids</span><span class="p">:</span>
+</span><span id="line-290">        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deleting stale DAG: </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-291">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-292">            <span class="n">request</span><span class="p">(</span><span class="s2">"DELETE"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"/dags/</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">dag_id</span><span class="p">,</span><span class="w"> </span><span class="n">safe</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-293">        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-294">            <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to delete DAG </span><span class="si">{</span><span class="n">dag_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-295">
+</span><span id="line-296">    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total DAGs deleted: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stale_dag_ids</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -493,13 +490,13 @@
 </footer>
     </div>
     
-    <script src="../../../../_static/documentation_options.js?v=34f54c9c"></script>
+    <script src="../../../../_static/documentation_options.js?v=ff7cdc51"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script defer="defer" src="../../../../_static/theme.js?v=49cc6205"></script>
-    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../../_static/design-tabs.js?v=fcb327ea"></script>
     <script data-searchlite-index="searchlite-index.json" defer="defer" src="../../../../_static/searchlite.js?v=a5320898"></script>
     <script data-searchlite-adopt="true" defer="defer" src="../../../../_static/searchlite-ui.js?v=4e4bdd69"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>

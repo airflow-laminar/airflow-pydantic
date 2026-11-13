@@ -2434,6 +2434,8 @@ Bases: [`TaskArgs`](#airflow_pydantic.core.task.TaskArgs)
 
 #### *field* delete_failed *: bool | None* *= True*
 
+#### *field* delete_stale_dags *: bool* *= True*
+
 #### *field* mark_failed_as_successful *: bool | None* *= False*
 
 #### *field* max_dagruns *: int | None* *= 10*
