@@ -234,6 +234,7 @@ def clean_dag_runs_api(delete_successful, delete_failed, mark_failed_as_successf
 
         runs_path = f"/dags/{quote(dag_id, safe='')}/dagRuns"
         runs = _api_get_paginated(request, runs_path, "dag_runs")
+        runs = [run for run in runs if run["state"] in ("success", "failed")]
 
         if delete_successful is False:
             _log.info(f"Not deleting successful DAG runs for DAG: {dag_id}")
@@ -250,10 +251,6 @@ def clean_dag_runs_api(delete_successful, delete_failed, mark_failed_as_successf
             run_id = run["dag_run_id"]
             run_date = _dag_run_date(run)
             if (run_date is not None and run_date < cutoff_date) or total_runs > max_dagruns:
-                if run["state"] not in ("queued", "success", "failed"):
-                    # The API only allows deleting runs in queued/success/failed states
-                    _log.info(f"Skipping DAG run in {run['state']} state: {run_id}")
-                    continue
                 _log.info(f"Deleting DAG run: {run_id}")
                 try:
                     request("DELETE", f"{runs_path}/{quote(run_id, safe='')}")

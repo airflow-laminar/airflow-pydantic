@@ -83,7 +83,8 @@ def create_clean_dags_and_dag_runs():
 
         def _clean_dags_and_dag_runs(**context):
             create_clean_dag_runs()(**context)
-            create_clean_dags()(**context)
+            if context["params"].get("delete_stale_dags", True):
+                create_clean_dags()(**context)
 
         return _clean_dags_and_dag_runs
 
@@ -95,7 +96,8 @@ def create_clean_dags_and_dag_runs():
         clean_dag_runs = create_clean_dag_runs()
         clean_dags = create_clean_dags()
         clean_dag_runs(session=session, **context)
-        clean_dags(session=session, **context)
+        if context["params"].get("delete_stale_dags", True):
+            clean_dags(session=session, **context)
 
     return _clean_dags_and_dag_runs
 
@@ -105,6 +107,7 @@ def _move_clean_kwargs_to_params(kwargs):
     for key in (
         "delete_successful",
         "delete_failed",
+        "delete_stale_dags",
         "mark_failed_as_successful",
         "max_dagruns",
         "days_to_keep",
@@ -138,6 +141,7 @@ class DagClean(PythonOperator):
 class DagCleanTaskArgs(TaskArgs):
     delete_successful: bool | None = Field(default=True)
     delete_failed: bool | None = Field(default=True)
+    delete_stale_dags: bool = Field(default=True)
     mark_failed_as_successful: bool | None = Field(default=False)
     max_dagruns: int | None = Field(default=10)
     days_to_keep: int | None = Field(default=10)
