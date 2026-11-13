@@ -108,6 +108,7 @@ class TestCleanAPI:
         clean_dag_runs_api(delete_successful=False, delete_failed=True, mark_failed_as_successful=False, max_dagruns=1, days_to_keep=10)
         assert api.deletes == []
 
+    @pytest.mark.skipif(clean._airflow_3() is None, reason="Airflow is not installed")
     @pytest.mark.parametrize("delete_stale_dags", [None, True, False])
     def test_operator_stale_dag_cleanup_is_optional(self, monkeypatch, delete_stale_dags):
         api = FakeRequest(
