@@ -6,7 +6,7 @@ import pytest
 from airflow_pydantic import fail, pass_, skip
 from airflow_pydantic.airflow import AirflowFailException, AirflowSkipException
 from airflow_pydantic.extras.balancer import _pool_runtime
-from airflow_pydantic.extras.common import airflow_functions
+from airflow_pydantic.extras.common import airflow_functions, clean
 from airflow_pydantic.extras.common.airflow_functions import clean_dag_runs_api, clean_dags_api
 
 
@@ -85,6 +85,45 @@ class TestCleanAPI:
         _patch_api(monkeypatch, api)
         clean_dag_runs_api(delete_successful=False, delete_failed=True, mark_failed_as_successful=False, max_dagruns=10, days_to_keep=10)
         assert api.deletes == ["/dags/d1/dagRuns/old_failed"]
+
+    def test_failed_only_preserves_successful_and_active_runs(self, monkeypatch):
+        api = FakeRequest(
+            dags=[{"dag_id": "d1"}],
+            dag_runs={
+                "d1": [_run("failed", "failed", 20), _run("success", "success", 20), _run("queued", "queued", 20), _run("running", "running", 20)]
+            },
+        )
+        _patch_api(monkeypatch, api)
+        clean_dag_runs_api(delete_successful=False, delete_failed=True, mark_failed_as_successful=False, max_dagruns=100, days_to_keep=10)
+        assert api.deletes == ["/dags/d1/dagRuns/failed"]
+        assert api.patches == []
+
+    @pytest.mark.parametrize("state", ["queued", "running"])
+    def test_active_runs_do_not_count_toward_retention(self, monkeypatch, state):
+        api = FakeRequest(
+            dags=[{"dag_id": "d1"}],
+            dag_runs={"d1": [_run("active", state, 20), _run("recent_failed", "failed", 1)]},
+        )
+        _patch_api(monkeypatch, api)
+        clean_dag_runs_api(delete_successful=False, delete_failed=True, mark_failed_as_successful=False, max_dagruns=1, days_to_keep=10)
+        assert api.deletes == []
+
+    @pytest.mark.parametrize("delete_stale_dags", [None, True, False])
+    def test_operator_stale_dag_cleanup_is_optional(self, monkeypatch, delete_stale_dags):
+        api = FakeRequest(
+            dags=[{"dag_id": "live", "is_stale": False}, {"dag_id": "stale", "is_stale": True}],
+            dag_runs={"live": [_run("failed", "failed", 20)]},
+        )
+        _patch_api(monkeypatch, api)
+        monkeypatch.setattr(clean, "_airflow_3", lambda: True)
+        params = {"delete_successful": False, "delete_failed": True, "mark_failed_as_successful": False, "max_dagruns": 100, "days_to_keep": 10}
+        kwargs = {} if delete_stale_dags is None else {"delete_stale_dags": delete_stale_dags}
+        operator = clean.DagClean(task_id="cleanup", params=params, **kwargs)
+        operator.python_callable(params=operator.params)
+        expected = ["/dags/live/dagRuns/failed"]
+        if delete_stale_dags is not False:
+            expected.append("/dags/stale")
+        assert api.deletes == expected
 
     def test_skips_non_deletable_states(self, monkeypatch):
         api = FakeRequest(

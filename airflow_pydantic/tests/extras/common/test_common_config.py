@@ -33,6 +33,7 @@ with DAG(
     params={
         "delete_successful": Param(True, title="Delete Successful", description=None, type="boolean"),
         "delete_failed": Param(True, title="Delete Failed", description=None, type="boolean"),
+        "delete_stale_dags": Param(True, title="Delete Stale Dags", description=None, type="boolean"),
         "mark_failed_as_successful": Param(False, title="Mark Failed As Successful", description=None, type="boolean"),
         "max_dagruns": Param(10, title="Max Dagruns", description=None, type="integer"),
         "days_to_keep": Param(10, title="Days To Keep", description=None, type="integer"),
@@ -88,6 +89,7 @@ with DAG(
     params={
         "delete_successful": Param(True, title="Delete Successful", description=None, type="boolean"),
         "delete_failed": Param(True, title="Delete Failed", description=None, type="boolean"),
+        "delete_stale_dags": Param(True, title="Delete Stale Dags", description=None, type="boolean"),
         "mark_failed_as_successful": Param(False, title="Mark Failed As Successful", description=None, type="boolean"),
         "max_dagruns": Param(100, title="Max Dagruns", description=None, type="integer"),
         "days_to_keep": Param(60, title="Days To Keep", description=None, type="integer"),
@@ -132,6 +134,7 @@ with DAG(
     params={
         "delete_successful": Param(True, title="Delete Successful", description=None, type="boolean"),
         "delete_failed": Param(True, title="Delete Failed", description=None, type="boolean"),
+        "delete_stale_dags": Param(True, title="Delete Stale Dags", description=None, type="boolean"),
         "mark_failed_as_successful": Param(False, title="Mark Failed As Successful", description=None, type="boolean"),
         "max_dagruns": Param(50, title="Max Dagruns", description=None, type="integer"),
         "days_to_keep": Param(30, title="Days To Keep", description=None, type="integer"),
