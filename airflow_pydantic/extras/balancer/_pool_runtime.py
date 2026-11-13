@@ -216,6 +216,8 @@ def _mwaa_request(backend: dict[str, Any]):
         if not 200 <= status < 300:
             raise RuntimeError(f"MWAA REST API request failed with HTTP {status}: {response['RestApiResponse']}")
         result = response.get("RestApiResponse")
-        return json.loads(result) if isinstance(result, str) else result
+        if isinstance(result, str):
+            return json.loads(result) if result else None
+        return result
 
     return request
