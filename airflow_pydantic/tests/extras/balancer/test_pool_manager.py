@@ -207,6 +207,21 @@ def test_mwaa_backend_passes_query_parameters_and_detects_environment(monkeypatc
     )
 
 
+@pytest.mark.parametrize(
+    ("status", "payload", "expected"),
+    [(204, "", None), (204, None, None), (200, '{"name": "pool"}', {"name": "pool"})],
+)
+def test_mwaa_backend_parses_successful_responses(status, payload, expected):
+    boto_client = MagicMock()
+    boto_client.invoke_rest_api.return_value = {"RestApiStatusCode": status, "RestApiResponse": payload}
+    boto3 = ModuleType("boto3")
+    boto3.__dict__["client"] = MagicMock(return_value=boto_client)
+
+    with patch.dict(sys.modules, {"boto3": boto3}):
+        request = _mwaa_request({"mwaa_environment_name": "environment"})
+        assert request("DELETE" if status == 204 else "GET", "/pools/pool") == expected
+
+
 def test_http_request_query_and_empty_response():
     from airflow_pydantic.extras.balancer._pool_runtime import _http_request
 
